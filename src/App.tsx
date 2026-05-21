@@ -75,6 +75,7 @@ import { Search } from './pages/Search';
 import { Notifications } from './pages/Notifications';
 import { Help } from './pages/support/Help';
 import { Contact } from './pages/support/Contact';
+import { AboutAavis } from './pages/support/AboutAavis';
 function ProtectedRoute({ children }: {children: React.ReactNode;}) {
   const { isAuthenticated } = useAppContext();
   
@@ -313,6 +314,14 @@ function AppContent() {
           element={
           <ProtectedRoute>
               <Contact />
+            </ProtectedRoute>
+          } />
+          
+        <Route
+          path="/about"
+          element={
+          <ProtectedRoute>
+              <AboutAavis />
             </ProtectedRoute>
           } />
         

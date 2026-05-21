@@ -83,7 +83,7 @@ export function Home() {
               {greeting} 👋
             </h2>
             <p className="text-content-secondary text-sm">
-              Your daily health dashboard overview.
+              Scan, analyze, and make healthier choices today.
             </p>
           </div>
         </header>

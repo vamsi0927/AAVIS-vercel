@@ -192,13 +192,13 @@ export function Settings() {
               <ChevronRight className="w-4 h-4 text-content-secondary" />
             </button>
             <button
-              onClick={handleFutureReady}
+              onClick={() => navigate('/about')}
               className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-3">
                 <Info className="w-4 h-4 text-content-secondary" />
                 <span className="font-bold text-sm text-white">About Aavis</span>
               </div>
-              <span className="text-xs text-content-secondary font-semibold">v2.5.0</span>
+              <ChevronRight className="w-4 h-4 text-content-secondary" />
             </button>
           </div>
         </section>
