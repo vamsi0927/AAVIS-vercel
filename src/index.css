@@ -1,0 +1,610 @@
+/* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
+
+:root {
+  --navy-900: 8 9 20;       /* #080914 */
+  --navy-800: 17 19 36;     /* #111324 */
+  --navy-700: 27 30 54;     /* #1b1e36 */
+  --navy-600: 38 42 74;     /* #262a4a */
+  --content-primary: 244 245 251;   /* #f4f5fb */
+  --content-secondary: 156 163 184; /* #9ca3b8 */
+  --brand-primary: 139 92 246;      /* #8b5cf6 - Neon Purple */
+  --brand-secondary: 6 182 212;     /* #06b6d4 - Neon Blue */
+  --brand-safe: 16 185 129;         /* #10b981 - Vibrant Emerald */
+  --brand-caution: 245 158 11;      /* #f59e0b */
+  --brand-hazardous: 239 68 68;     /* #ef4444 */
+}
+
+/* Light Theme Variables */
+.light-theme {
+  --navy-900: 245 246 250;       /* Crisp iOS-style grey-blue: #f5f6fa */
+  --navy-800: 255 255 255;       /* Pure white for high-contrast cards: #ffffff */
+  --navy-700: 170 180 200;       /* Much darker card border for high visibility */
+  --navy-600: 150 160 180;       /* Focus/active borders */
+  --content-primary: 20 24 35;   /* Deep charcoal black for crisp text: #141823 */
+  --content-secondary: 90 100 120; /* Slate grey for metadata and secondary elements: #5a6478 */
+}
+
+/* Add heavy shadow and solid border to all standard cards in light mode */
+.light-theme .bg-navy-800 {
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Stunning light theme glassmorphism cards and inputs */
+.light-theme .glass-card {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(20, 24, 35, 0.08) !important;
+  box-shadow: 0 10px 30px -10px rgba(20, 24, 35, 0.06), 0 1px 3px 0 rgba(20, 24, 35, 0.02) !important;
+}
+
+.light-theme .glass-input {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(20, 24, 35, 0.12) !important;
+  color: rgb(var(--content-primary)) !important;
+}
+
+.light-theme .glass-input::placeholder {
+  color: rgb(var(--content-secondary) / 0.7) !important;
+}
+
+/* Map hardcoded text-white colors to dark text under light theme */
+.light-theme .text-white {
+  color: rgb(var(--content-primary)) !important;
+}
+.light-theme .text-white\/90 {
+  color: rgb(var(--content-primary) / 0.9) !important;
+}
+.light-theme .text-white\/80 {
+  color: rgb(var(--content-primary) / 0.8) !important;
+}
+.light-theme .text-white\/70 {
+  color: rgb(var(--content-primary) / 0.7) !important;
+}
+.light-theme .text-white\/60 {
+  color: rgb(var(--content-primary) / 0.6) !important;
+}
+.light-theme .text-white\/50 {
+  color: rgb(var(--content-primary) / 0.5) !important;
+}
+.light-theme .text-white\/40 {
+  color: rgb(var(--content-primary) / 0.4) !important;
+}
+.light-theme .text-white\/30 {
+  color: rgb(var(--content-primary) / 0.3) !important;
+}
+.light-theme .text-white\/20 {
+  color: rgb(var(--content-primary) / 0.2) !important;
+}
+.light-theme .hover\:text-white:hover {
+  color: rgb(var(--content-primary)) !important;
+}
+
+/* Map hardcoded white background alphas to elegant soft dark alphas */
+.light-theme .bg-white\/3 {
+  background-color: rgba(20, 24, 35, 0.02) !important;
+}
+.light-theme .bg-white\/5 {
+  background-color: rgba(20, 24, 35, 0.04) !important;
+}
+.light-theme .bg-white\/10 {
+  background-color: rgba(20, 24, 35, 0.08) !important;
+}
+.light-theme .bg-white\/20 {
+  background-color: rgba(20, 24, 35, 0.14) !important;
+}
+.light-theme .bg-white\/30 {
+  background-color: rgba(20, 24, 35, 0.22) !important;
+}
+.light-theme .bg-white\/80 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+.light-theme .bg-white\/90 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+.light-theme .hover\:bg-white\/10:hover {
+  background-color: rgba(20, 24, 35, 0.08) !important;
+}
+.light-theme .hover\:bg-white\/5:hover {
+  background-color: rgba(20, 24, 35, 0.05) !important;
+}
+
+/* Map hardcoded white border alphas to elegant soft dark borders */
+.light-theme .border-white\/5 {
+  border-color: rgba(20, 24, 35, 0.06) !important;
+}
+.light-theme .border-white\/10 {
+  border-color: rgba(20, 24, 35, 0.10) !important;
+}
+.light-theme .border-white\/20 {
+  border-color: rgba(20, 24, 35, 0.18) !important;
+}
+
+/* Soften light theme ambient glows */
+.light-theme .bg-brand-primary\/10 {
+  background-color: rgba(139, 92, 246, 0.07) !important;
+}
+.light-theme .bg-brand-secondary\/5 {
+  background-color: rgba(6, 182, 212, 0.04) !important;
+}
+.light-theme .bg-brand-secondary\/10 {
+  background-color: rgba(6, 182, 212, 0.07) !important;
+}
+.light-theme .bg-brand-safe\/10 {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+}
+.light-theme .bg-brand-caution\/10 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+}
+.light-theme .bg-brand-hazardous\/10 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* Keep SVG circular progress track visible under light theme */
+.light-theme svg circle[stroke="rgba(255,255,255,0.07)"] {
+  stroke: rgba(20, 24, 35, 0.07) !important;
+}
+
+/* ── Light Theme: Risk-Level Chip & Badge Text Contrast ── */
+/* Override dark-mode pastel text to high-contrast light-mode equivalents */
+.light-theme .text-purple-300 {
+  color: #7c3aed !important; /* Deep vivid purple */
+}
+.light-theme .text-red-300 {
+  color: #dc2626 !important; /* Rich crimson */
+}
+.light-theme .text-orange-300 {
+  color: #c2410c !important; /* Deep burnt orange */
+}
+.light-theme .text-yellow-300 {
+  color: #a16207 !important; /* Dark amber */
+}
+.light-theme .text-emerald-300 {
+  color: #047857 !important; /* Forest green */
+}
+
+/* Risk chip backgrounds — visible but soft under light theme */
+.light-theme .bg-purple-500\/15 {
+  background-color: rgba(124, 58, 237, 0.10) !important;
+}
+.light-theme .bg-red-500\/15 {
+  background-color: rgba(220, 38, 38, 0.10) !important;
+}
+.light-theme .bg-orange-500\/15 {
+  background-color: rgba(194, 65, 12, 0.10) !important;
+}
+.light-theme .bg-yellow-500\/15 {
+  background-color: rgba(161, 98, 7, 0.10) !important;
+}
+.light-theme .bg-emerald-500\/10 {
+  background-color: rgba(4, 120, 87, 0.08) !important;
+}
+
+/* Risk chip borders — visible under light theme */
+.light-theme .border-purple-500\/40 {
+  border-color: rgba(124, 58, 237, 0.30) !important;
+}
+.light-theme .border-red-500\/40 {
+  border-color: rgba(220, 38, 38, 0.30) !important;
+}
+.light-theme .border-orange-500\/40 {
+  border-color: rgba(194, 65, 12, 0.30) !important;
+}
+.light-theme .border-yellow-500\/40 {
+  border-color: rgba(161, 98, 7, 0.30) !important;
+}
+.light-theme .border-emerald-500\/30 {
+  border-color: rgba(4, 120, 87, 0.25) !important;
+}
+
+/* Additive badge backgrounds — visible under light */
+.light-theme .bg-purple-500\/20 {
+  background-color: rgba(124, 58, 237, 0.12) !important;
+}
+.light-theme .bg-orange-500\/20 {
+  background-color: rgba(194, 65, 12, 0.12) !important;
+}
+.light-theme .bg-emerald-500\/20 {
+  background-color: rgba(4, 120, 87, 0.10) !important;
+}
+
+/* Risk dot colors — keep vivid in light theme */
+.light-theme .bg-purple-400 {
+  background-color: #7c3aed !important;
+}
+.light-theme .bg-red-400 {
+  background-color: #dc2626 !important;
+}
+.light-theme .bg-orange-400 {
+  background-color: #c2410c !important;
+}
+.light-theme .bg-yellow-400 {
+  background-color: #a16207 !important;
+}
+.light-theme .bg-emerald-400 {
+  background-color: #047857 !important;
+}
+
+/* Additive left border colors — keep vivid in light theme */
+.light-theme .border-l-purple-500 {
+  border-left-color: #7c3aed !important;
+}
+.light-theme .border-l-orange-400 {
+  border-left-color: #c2410c !important;
+}
+.light-theme .border-l-emerald-400 {
+  border-left-color: #047857 !important;
+}
+
+/* Score badge borders — soften hue under light theme */
+.light-theme .border-brand-hazardous\/25 {
+  border-color: rgba(220, 38, 38, 0.20) !important;
+}
+.light-theme .border-brand-caution\/25 {
+  border-color: rgba(245, 158, 11, 0.20) !important;
+}
+.light-theme .border-brand-safe\/25 {
+  border-color: rgba(16, 185, 129, 0.20) !important;
+}
+.light-theme .bg-brand-hazardous\/5 {
+  background-color: rgba(220, 38, 38, 0.05) !important;
+}
+.light-theme .bg-brand-caution\/5 {
+  background-color: rgba(245, 158, 11, 0.05) !important;
+}
+.light-theme .bg-brand-safe\/5 {
+  background-color: rgba(16, 185, 129, 0.05) !important;
+}
+.light-theme .bg-brand-primary\/5 {
+  background-color: rgba(139, 92, 246, 0.05) !important;
+}
+.light-theme .border-brand-primary\/20 {
+  border-color: rgba(139, 92, 246, 0.15) !important;
+}
+.light-theme .border-brand-hazardous\/30 {
+  border-color: rgba(220, 38, 38, 0.25) !important;
+}
+.light-theme .border-brand-caution\/30 {
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+.light-theme .border-brand-safe\/30 {
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Light theme glass-card shadows */
+.light-theme .glass-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15) !important;
+}
+
+/* Light theme glass-card-hover */
+.light-theme .glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(139, 92, 246, 0.25) !important;
+  box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.08) !important;
+}
+
+/* ── Light Theme: Hardcoded Dark Background Overrides ── */
+/* Pages like HealthDashboard, FoodMyths, Scan use hardcoded hex backgrounds */
+.light-theme .bg-\[\#0d0d14\] {
+  background-color: rgb(var(--navy-900)) !important;
+}
+.light-theme .bg-\[\#0d0d14\]\/80 {
+  background-color: rgb(var(--navy-900) / 0.8) !important;
+}
+.light-theme .bg-\[\#0d0d14\]\/90 {
+  background-color: rgb(var(--navy-900) / 0.9) !important;
+}
+.light-theme .bg-\[\#13131e\] {
+  background-color: rgb(var(--navy-800)) !important;
+}
+.light-theme .bg-\[\#1c1a07\] {
+  background-color: rgba(245, 158, 11, 0.06) !important;
+}
+.light-theme .bg-\[\#052e16\] {
+  background-color: rgba(16, 185, 129, 0.06) !important;
+}
+.light-theme .from-\[\#1a1a2e\] {
+  --tw-gradient-from: rgb(var(--navy-800)) !important;
+}
+.light-theme .to-\[\#16213e\] {
+  --tw-gradient-to: rgb(var(--navy-800)) !important;
+}
+.light-theme .bg-gradient-to-r.from-\[\#1a1a2e\].to-\[\#16213e\] {
+  background: rgb(var(--navy-800)) !important;
+}
+
+/* Hardcoded dark borders -> light equivalents */
+.light-theme .border-\[\#1e1e2e\] {
+  border-color: rgba(20, 24, 35, 0.10) !important;
+}
+.light-theme .border-\[\#2d2d4e\] {
+  border-color: rgba(20, 24, 35, 0.10) !important;
+}
+.light-theme .border-\[\#f59e0b\] {
+  border-color: rgba(245, 158, 11, 0.30) !important;
+}
+.light-theme .border-\[\#22c55e\] {
+  border-color: rgba(34, 197, 94, 0.30) !important;
+}
+
+/* Hardcoded text colors for light mode visibility */
+.light-theme .text-\[\#22c55e\] {
+  color: #047857 !important;
+}
+.light-theme .text-\[\#22c55e\]\/80 {
+  color: rgba(4, 120, 87, 0.8) !important;
+}
+
+/* Scanner viewfinder area - lighten the dark areas */
+.light-theme .scanner-overlay {
+  background: radial-gradient(circle at center, transparent 30%, rgba(245, 246, 250, 0.3) 100%) !important;
+}
+
+/* Light theme: bg-navy-800/40 used in FoodMyths card */
+.light-theme .bg-navy-800\/40 {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Ensure bg-black/* overlays are lighter in light mode */
+.light-theme .bg-black\/20 {
+  background-color: rgba(20, 24, 35, 0.08) !important;
+}
+.light-theme .bg-black\/30 {
+  background-color: rgba(20, 24, 35, 0.10) !important;
+}
+.light-theme .bg-black\/40 {
+  background-color: rgba(20, 24, 35, 0.12) !important;
+}
+.light-theme .bg-black\/60 {
+  background-color: rgba(20, 24, 35, 0.15) !important;
+}
+
+/* Green badge backgrounds in light mode */
+.light-theme .bg-\[\#22c55e\]\/10 {
+  background-color: rgba(4, 120, 87, 0.08) !important;
+}
+.light-theme .border-\[\#22c55e\]\/30 {
+  border-color: rgba(4, 120, 87, 0.20) !important;
+}
+
+body {
+  background-color: rgb(var(--navy-900));
+  color: rgb(var(--content-primary));
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* Hide scrollbar globally */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+/* Also hide for all elements */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
+body ::selection {
+  background-color: rgb(var(--brand-primary) / 0.3);
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+.font-sans { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+.font-display { font-family: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
+
+/* Backgrounds — solid */
+.bg-navy-900 { background-color: rgb(var(--navy-900)); }
+.bg-navy-800 { background-color: rgb(var(--navy-800)); }
+.bg-navy-700 { background-color: rgb(var(--navy-700)); }
+.bg-navy-600 { background-color: rgb(var(--navy-600)); }
+.bg-brand-primary { background-color: rgb(var(--brand-primary)); }
+.bg-brand-secondary { background-color: rgb(var(--brand-secondary)); }
+.bg-brand-safe { background-color: rgb(var(--brand-safe)); }
+.bg-brand-caution { background-color: rgb(var(--brand-caution)); }
+.bg-brand-hazardous { background-color: rgb(var(--brand-hazardous)); }
+
+/* Backgrounds — alpha variants */
+.bg-navy-900\/90 { background-color: rgb(var(--navy-900) / 0.9); }
+.bg-navy-800\/90 { background-color: rgb(var(--navy-800) / 0.9); }
+.bg-navy-800\/50 { background-color: rgb(var(--navy-800) / 0.5); }
+.bg-navy-700\/50 { background-color: rgb(var(--navy-700) / 0.5); }
+.hover\:bg-navy-700:hover { background-color: rgb(var(--navy-700)); }
+.hover\:bg-navy-600:hover { background-color: rgb(var(--navy-600)); }
+.bg-brand-primary\/10 { background-color: rgb(var(--brand-primary) / 0.1); }
+.bg-brand-primary\/20 { background-color: rgb(var(--brand-primary) / 0.2); }
+.bg-brand-primary\/30 { background-color: rgb(var(--brand-primary) / 0.3); }
+.hover\:bg-brand-primary\/90:hover { background-color: rgb(var(--brand-primary) / 0.9); }
+.bg-brand-secondary\/10 { background-color: rgb(var(--brand-secondary) / 0.1); }
+.bg-brand-secondary\/20 { background-color: rgb(var(--brand-secondary) / 0.2); }
+.bg-brand-safe\/10 { background-color: rgb(var(--brand-safe) / 0.1); }
+.bg-brand-safe\/20 { background-color: rgb(var(--brand-safe) / 0.2); }
+.bg-brand-caution\/10 { background-color: rgb(var(--brand-caution) / 0.1); }
+.bg-brand-caution\/20 { background-color: rgb(var(--brand-caution) / 0.2); }
+.bg-brand-hazardous\/10 { background-color: rgb(var(--brand-hazardous) / 0.1); }
+.bg-brand-hazardous\/20 { background-color: rgb(var(--brand-hazardous) / 0.2); }
+.hover\:bg-brand-hazardous\/10:hover { background-color: rgb(var(--brand-hazardous) / 0.1); }
+
+/* Text colors */
+.text-content-primary { color: rgb(var(--content-primary)); }
+.text-content-secondary { color: rgb(var(--content-secondary)); }
+.text-brand-primary { color: rgb(var(--brand-primary)); }
+.text-brand-secondary { color: rgb(var(--brand-secondary)); }
+.text-brand-safe { color: rgb(var(--brand-safe)); }
+.text-brand-caution { color: rgb(var(--brand-caution)); }
+.text-brand-hazardous { color: rgb(var(--brand-hazardous)); }
+.text-content-primary\/80 { color: rgb(var(--content-primary) / 0.8); }
+.text-content-primary\/90 { color: rgb(var(--content-primary) / 0.9); }
+.hover\:text-content-primary:hover { color: rgb(var(--content-primary)); }
+.placeholder\:text-content-secondary::placeholder { color: rgb(var(--content-secondary)); }
+
+/* Borders */
+.border-navy-600 { border-color: rgb(var(--navy-600)); }
+.border-navy-700 { border-color: rgb(var(--navy-700)); }
+.border-navy-700\/50 { border-color: rgb(var(--navy-700) / 0.5); }
+.border-navy-800 { border-color: rgb(var(--navy-800)); }
+.border-t-navy-600 { border-top-color: rgb(var(--navy-600)); }
+.focus\:border-brand-primary:focus { border-color: rgb(var(--brand-primary)); }
+.border-brand-primary { border-color: rgb(var(--brand-primary)); }
+.border-brand-secondary { border-color: rgb(var(--brand-secondary)); }
+.border-t-brand-primary { border-top-color: rgb(var(--brand-primary)); }
+.border-l-brand-primary { border-left-color: rgb(var(--brand-primary)); }
+.border-r-brand-primary { border-right-color: rgb(var(--brand-primary)); }
+.border-b-brand-primary { border-bottom-color: rgb(var(--brand-primary)); }
+.border-brand-safe\/20 { border-color: rgb(var(--brand-safe) / 0.2); }
+.border-brand-caution\/20 { border-color: rgb(var(--brand-caution) / 0.2); }
+.border-brand-hazardous\/20 { border-color: rgb(var(--brand-hazardous) / 0.2); }
+.border-brand-hazardous\/30 { border-color: rgb(var(--brand-hazardous) / 0.3); }
+
+/* Stroke mappings for SVGs */
+.stroke-brand-primary { stroke: rgb(var(--brand-primary)); }
+.stroke-brand-secondary { stroke: rgb(var(--brand-secondary)); }
+.stroke-brand-safe { stroke: rgb(var(--brand-safe)); }
+.stroke-brand-caution { stroke: rgb(var(--brand-caution)); }
+.stroke-brand-hazardous { stroke: rgb(var(--brand-hazardous)); }
+.stroke-navy-800 { stroke: rgb(var(--navy-800)); }
+.stroke-navy-700 { stroke: rgb(var(--navy-700)); }
+.stroke-navy-600 { stroke: rgb(var(--navy-600)); }
+
+/* Glassmorphism Styles */
+.glass-card {
+  background: rgba(17, 19, 36, 0.45);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.glass-card-hover:hover {
+  background: rgba(17, 19, 36, 0.65);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.glass-input {
+  background: rgba(8, 9, 20, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease-in-out;
+}
+.glass-input:focus {
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+  outline: none;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-brand {
+  background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+}
+
+.glow-purple {
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.25);
+}
+.glow-blue {
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--brand-primary));
+}
+
+/* ─── Futuristic Scanner UI ─── */
+@keyframes scan-move {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.scanner-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgb(var(--brand-primary)), transparent);
+  box-shadow: 0 0 15px rgb(var(--brand-primary));
+  animation: scan-move 2.5s ease-in-out infinite;
+  z-index: 10;
+}
+
+.scanner-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: rgb(var(--brand-primary));
+  border-style: solid;
+  z-index: 20;
+  filter: drop-shadow(0 0 5px rgb(var(--brand-primary)));
+}
+
+.scanner-corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 12px; }
+.scanner-corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 12px; }
+.scanner-corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 12px; }
+.scanner-corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 12px; }
+
+@keyframes pulse-soft {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+.scanner-overlay {
+  background: radial-gradient(circle at center, transparent 30%, rgba(11, 13, 23, 0.4) 100%);
+}
+
+/* Active glow for nutrition scan stage */
+.scanner-corner-active {
+  border-color: rgb(var(--brand-safe));
+  filter: drop-shadow(0 0 8px rgb(var(--brand-safe)));
+  animation: corner-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes corner-glow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgb(var(--brand-safe))); }
+  50% { filter: drop-shadow(0 0 12px rgb(var(--brand-safe))); }
+}
+
+.scanner-line-nutrition {
+  background: linear-gradient(90deg, transparent, rgb(var(--brand-safe)), transparent) !important;
+  box-shadow: 0 0 15px rgb(var(--brand-safe)) !important;
+}
+
+/* Shutter button pulse */
+.shutter-button {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  transition: transform 0.15s ease;
+}
+.shutter-button:active {
+  transform: scale(0.88);
+}
