@@ -4,12 +4,15 @@ import {
   Routes,
   Route,
   useLocation,
-  Navigate } from
-'react-router-dom';
+  useNavigate,
+  Navigate
+} from 'react-router-dom';
+import { App as CapacitorApp } from '@capacitor/app';
 import { Toaster } from 'sonner';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { MobileFrame } from './components/MobileFrame';
 import { BottomNav } from './components/BottomNav';
+import { Sidebar } from './components/Sidebar';
 import { RatingPrompt } from './components/RatingPrompt';
 import { OfflineBanner } from './components/OfflineBanner';
 // Existing pages
@@ -87,7 +90,23 @@ function ProtectedRoute({ children }: {children: React.ReactNode;}) {
 }
 function AppContent() {
   const location = useLocation();
-  const { theme } = useAppContext();
+  const navigate = useNavigate();
+  const { theme, isAuthenticated } = useAppContext();
+
+  React.useEffect(() => {
+    const handleBackButton = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      const path = window.location.pathname;
+      if (['/', '/home', '/login', '/onboarding'].includes(path)) {
+        CapacitorApp.exitApp();
+      } else {
+        navigate(-1);
+      }
+    });
+
+    return () => {
+      handleBackButton.then(listener => listener.remove());
+    };
+  }, [navigate]);
 
   React.useEffect(() => {
     if (theme === 'light') {
@@ -104,9 +123,14 @@ function AppContent() {
   '/dashboard',
   '/saved'].
   includes(location.pathname);
+  
+  const hideSidebar = ['/', '/login', '/register', '/onboarding', '/setup'].includes(location.pathname);
+  
   return (
-    <>
-      <Routes>
+    <div className="flex flex-row h-full w-full bg-navy-900 overflow-hidden">
+      {isAuthenticated && !hideSidebar && <Sidebar className="hidden md:flex" />}
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        <Routes>
         {/* Public */}
         <Route path="/" element={<Splash />} />
         <Route path="/onboarding" element={<Onboarding />} />
@@ -347,12 +371,12 @@ function AppContent() {
         <Route path="/dashboard/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
         <Route path="/dashboard/weekly-report" element={<ProtectedRoute><WeeklyReport /></ProtectedRoute>} />
         <Route path="/dashboard/chat" element={<ProtectedRoute><NutritionChat /></ProtectedRoute>} />
-      </Routes>
-
-      {showBottomNav && <BottomNav />}
-      <RatingPrompt />
-    </>);
-
+        </Routes>
+        {showBottomNav && <div className="md:hidden"><BottomNav /></div>}
+        <RatingPrompt />
+      </div>
+    </div>
+  );
 }
 export function App() {
   return (

@@ -4,10 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
-const DIET_OPTIONS = ['None', 'Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
+const DIET_OPTIONS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
 const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'IBS', 'Celiac'];
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
-const GOAL_OPTIONS = ['Weight Loss', 'Muscle Gain', 'Maintenance', 'Energy', 'Heart Health'];
 
 export function ProfileSetup() {
   const navigate = useNavigate();
@@ -38,7 +37,7 @@ export function ProfileSetup() {
     fitnessGoals: profile.fitnessGoals || [],
   });
 
-  const TOTAL_STEPS = 5;
+  const TOTAL_STEPS = 4;
 
   const handleNext = async () => {
     if (step < TOTAL_STEPS - 1) {
@@ -86,7 +85,7 @@ export function ProfileSetup() {
         <div className="w-10" />
       </div>
 
-      <div className="flex-1 relative flex flex-col px-6 overflow-hidden mt-6">
+      <div className="flex-1 relative flex flex-col px-6 overflow-y-auto no-scrollbar mt-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -196,33 +195,9 @@ export function ProfileSetup() {
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* STEP 4: Fitness Goals */}
-            {step === 4 && (
-              <div className="flex-1 flex flex-col h-full">
-                <h1 className="text-3xl font-display font-bold mb-2 text-white">What is your goal?</h1>
-                <p className="text-content-secondary mb-8">This helps refine diet advice.</p>
-                
-                <div className="flex flex-wrap gap-3 mb-10">
-                  {GOAL_OPTIONS.map(goal => (
-                    <button
-                      key={goal}
-                      onClick={() => toggleArrayItem('fitnessGoals', goal)}
-                      className={`px-5 py-3 rounded-2xl font-bold transition-all ${
-                        setupData.fitnessGoals.includes(goal) 
-                          ? 'bg-brand-primary text-white scale-105 border border-brand-primary/50 shadow-lg shadow-brand-primary/20' 
-                          : 'bg-navy-800 text-content-secondary border border-navy-700 hover:bg-navy-700'
-                      }`}
-                    >
-                      {goal}
-                    </button>
-                  ))}
-                </div>
                 
                 {/* Visual Finish Indicator */}
-                <div className="mt-auto flex justify-center items-center pb-10">
+                <div className="mt-10 flex justify-center items-center pb-10">
                   <div className="w-24 h-24 bg-brand-safe/10 rounded-full flex items-center justify-center border border-brand-safe/20 animate-pulse">
                     <CheckCircle2 className="w-10 h-10 text-brand-safe" />
                   </div>
@@ -236,7 +211,7 @@ export function ProfileSetup() {
           <button
             onClick={handleNext}
             disabled={!isStepValid()}
-            className="w-full bg-white text-navy-900 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 rounded-2xl py-4 font-bold text-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-lg shadow-white/10"
+            className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-95 rounded-2xl py-4 font-bold text-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-lg shadow-brand-primary/20"
           >
             {step === TOTAL_STEPS - 1 ? 'Complete Setup' : 'Continue'}
             {step < TOTAL_STEPS - 1 && <ArrowRight className="w-5 h-5" />}

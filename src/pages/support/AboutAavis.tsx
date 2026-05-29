@@ -31,7 +31,9 @@ export function AboutAavis() {
           <h2 className="text-3xl font-display font-black text-white tracking-tight">Aavis</h2>
           <p className="text-content-secondary text-sm mt-1">Version 2.5.0</p>
           <p className="text-center text-white/80 mt-4 leading-relaxed px-4">
-            Aavis is your intelligent companion for navigating the complex world of food labels. We believe that everyone deserves to know exactly what they are putting into their body.
+            Aavis is your intelligent companion for navigating the complex world of food labels. 
+            In India, reading and understanding ingredient labels isn't yet a common habit—but it needs to be. 
+            We created Aavis to change this by making label reading effortless, so everyone can know exactly what they are putting into their bodies.
           </p>
         </div>
 

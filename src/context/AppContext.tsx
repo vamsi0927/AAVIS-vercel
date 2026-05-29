@@ -104,17 +104,18 @@ const ensureCompleteState = (state: any): AppState => ({
 });
 
 export function AppProvider({ children }: {children: React.ReactNode;}) {
-  const [state, setState] = useState<AppState>(() =>
-    ensureCompleteState(loadState())
-  );
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(
     () => localStorage.getItem('aavis_supabase_user_id')
   );
+  const [state, setState] = useState<AppState>(() =>
+    ensureCompleteState(loadState(localStorage.getItem('aavis_supabase_user_id')))
+  );
 
-  // Persist state to localStorage
+  // Persist state to localStorage (scoped by user ID when available)
   useEffect(() => {
-    saveState(state);
-  }, [state]);
+    saveState(state, supabaseUserId);
+  }, [state, supabaseUserId]);
+
 
   // ── Supabase Auth Listener ──
   useEffect(() => {
@@ -136,7 +137,24 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           setSupabaseUserId(null);
           localStorage.removeItem('aavis_supabase_user_id');
           localStorage.removeItem('aavis_user_id');
-          setState(prev => ({ ...prev, isAuthenticated: false }));
+          // Clear all user-specific state on logout so a new login starts fresh
+          setState(prev => ({
+            ...prev,
+            isAuthenticated: false,
+            scans: [],
+            bookmarkedProductIds: [],
+            profile: {
+              name: '',
+              age: '',
+              gender: 'Prefer not to say',
+              height: '',
+              weight: '',
+              activityLevel: 'Moderately Active',
+              diet: 'None',
+              allergens: [],
+              conditions: []
+            }
+          }));
         }
       }
     );
@@ -149,15 +167,17 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     try {
       const email = authUser.email || '';
       const name = authUser.user_metadata?.name || email.split('@')[0] || 'User';
-      
-      // Get or create user in Supabase users table
-      const dbUser = await getOrCreateUser(email, name);
-      
-      if (dbUser) {
-        setSupabaseUserId(dbUser.id);
-        localStorage.setItem('aavis_supabase_user_id', dbUser.id);
-        localStorage.setItem('aavis_user_id', dbUser.id);
 
+      // authUser.id IS the auth.uid() — always use it as the canonical user ID
+      const authUid = authUser.id as string;
+      setSupabaseUserId(authUid);
+      localStorage.setItem('aavis_supabase_user_id', authUid);
+      localStorage.setItem('aavis_user_id', authUid);
+
+      // Fetch profile from Supabase users table (row created by trigger on signup)
+      const dbUser = await getOrCreateUser(email, name);
+
+      if (dbUser) {
         // Sync profile from cloud (cloud is source of truth if it has data)
         setState(prev => ({
           ...prev,
@@ -262,7 +282,22 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     }));
   };
 
-  const updateProfile = async (profile: UserProfile) => {
+  const updateProfile = async (newProfile: UserProfile) => {
+    // Normalize string arrays to Title Case and remove duplicates
+    const normalizeArray = (arr?: string[]) => {
+      if (!arr) return [];
+      return Array.from(new Set(arr.map(s => 
+        s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+      )));
+    };
+
+    const profile = {
+      ...newProfile,
+      allergens: normalizeArray(newProfile.allergens),
+      conditions: normalizeArray(newProfile.conditions),
+      fitnessGoals: normalizeArray(newProfile.fitnessGoals),
+    };
+
     setState((prev) => {
       // Recalculate historical scans based on the new profile
       const updatedScans = prev.scans.map(scan => {

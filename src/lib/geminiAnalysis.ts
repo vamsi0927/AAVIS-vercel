@@ -4,7 +4,8 @@
  */
 
 import { Product } from './types';
-import Tesseract from 'tesseract.js';
+import { optimizedOCR } from './imagePreprocess';
+import { extractNutrientsFromText } from './nutritionParser';
 
 const BACKEND_URL = 'https://aavis-backend.onrender.com';
 
@@ -74,7 +75,26 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
 }
 
 // ─── Helper: build Product from parsed JSON ───────────────────────
-function buildProduct(parsed: any, fallbackName: string, emoji: string): Product {
+function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?: string): Product {
+  // Use regex parser as a fallback for missing values
+  const regexNutrients = extractNutrientsFromText(rawText || '');
+
+  const getNutrient = (key: keyof typeof regexNutrients) => {
+    // 1. Try Gemini's parsed value
+    if (typeof parsed.nutrients?.[key] === 'number' && parsed.nutrients[key] !== 0) {
+      return parsed.nutrients[key];
+    }
+    // 2. Fallback to Regex extracted value
+    if (regexNutrients[key] !== null) {
+      return regexNutrients[key];
+    }
+    // 3. Fallback to 0 if Gemini explicitly said 0 (though Regex would have caught it if it existed)
+    if (parsed.nutrients?.[key] === 0) {
+      return 0;
+    }
+    return null;
+  };
+
   return {
     id: `ai_${Date.now()}`,
     name: parsed.productName || fallbackName,
@@ -86,14 +106,14 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string): Product
           ? parsed.ingredients.split(',').map((i: string) => i.trim()).filter(Boolean)
           : ['(AI could not extract ingredients)']),
     nutrients: {
-      calories: typeof parsed.nutrients?.calories === 'number' ? parsed.nutrients.calories : null,
-      sugar: typeof parsed.nutrients?.sugar === 'number' ? parsed.nutrients.sugar : null,
-      sodium: typeof parsed.nutrients?.sodium === 'number' ? parsed.nutrients.sodium : null,
-      fat: typeof parsed.nutrients?.fat === 'number' ? parsed.nutrients.fat : null,
-      satFat: typeof parsed.nutrients?.satFat === 'number' ? parsed.nutrients.satFat : null,
-      protein: typeof parsed.nutrients?.protein === 'number' ? parsed.nutrients.protein : null,
-      fiber: typeof parsed.nutrients?.fiber === 'number' ? parsed.nutrients.fiber : null,
-      carbs: typeof parsed.nutrients?.carbs === 'number' ? parsed.nutrients.carbs : null,
+      calories: getNutrient('calories'),
+      sugar: getNutrient('sugar'),
+      sodium: getNutrient('sodium'),
+      fat: getNutrient('fat'),
+      satFat: getNutrient('satFat'),
+      protein: getNutrient('protein'),
+      fiber: getNutrient('fiber'),
+      carbs: getNutrient('carbs'),
     },
     additives: Array.isArray(parsed.additives) ? parsed.additives : [],
     dynamicAdditives: parsed.additiveDetails || {},
@@ -104,18 +124,13 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string): Product
 // ─── Helper: Perform OCR ──────────────────────────────────────────
 export async function performOCR(
   file: File,
+  mode: 'ingredients' | 'nutrition' | 'general',
   onProgress?: (percent: number) => void
 ): Promise<string> {
-  console.log('[OCR] Starting extraction...');
-  const ocrResult = await Tesseract.recognize(file, 'eng', {
-    logger: m => {
-      if (m.status === 'recognizing text') {
-        onProgress?.(Math.round(m.progress * 100));
-      }
-    }
-  });
+  console.log(`[OCR] Starting extraction with optimized pipeline for ${mode}...`);
+  const text = await optimizedOCR(file, mode, onProgress);
   console.log('[OCR] Extraction complete.');
-  return ocrResult.data.text;
+  return text;
 }
 
 // ─── Image Scan (OCR → Backend) ───────────────────────────────────
@@ -125,9 +140,10 @@ export async function analyzeImageWithGemini(
   onProgress?: (message: string, percent: number) => void
 ): Promise<GeminiAnalysisResult> {
 
-  // Step 1: OCR
+  // Step 1: Preprocess + OCR
+  onProgress?.('Enhancing image quality...', 5);
   onProgress?.('Scanning image with OCR...', 10);
-  const extractedText = await performOCR(file, (p) => {
+  const extractedText = await performOCR(file, 'general', (p) => {
     onProgress?.(`OCR Progress: ${p}%`, 10 + Math.round(p * 0.15));
   });
 
@@ -142,7 +158,7 @@ export async function analyzeImageWithGemini(
   onProgress?.('Finalizing results...', 95);
 
   return {
-    product: buildProduct(parsed, 'AI Scanned Product', '🤖'),
+    product: buildProduct(parsed, 'AI Scanned Product', '🤖', extractedText),
     aiSummary: parsed.aiSummary || 'AI analysis complete.',
     dietAdvice: parsed.dietAdvice || 'Check details for more info.',
     mainConcerns: Array.isArray(parsed.mainConcerns) ? parsed.mainConcerns : [],
@@ -158,6 +174,7 @@ export async function analyzeMultiStepScan(
   onProgress?: (message: string, percent: number) => void
 ): Promise<GeminiAnalysisResult> {
 
+  onProgress?.('Enhancing image quality...', 5);
   onProgress?.('Processing with Groq Llama 3...', 30);
   
   const profileContext = `Age: ${profile.age}, Diet: ${profile.diet}, Allergies: ${profile.allergens.join(', ')}, Conditions: ${profile.conditions.join(', ')}`;
@@ -176,7 +193,7 @@ export async function analyzeMultiStepScan(
   onProgress?.('Generating Health Insights...', 95);
 
   return {
-    product: buildProduct(parsed, 'AI Scanned Product', '🤖'),
+    product: buildProduct(parsed, 'AI Scanned Product', '🤖', combinedText),
     aiSummary: parsed.aiSummary || 'AI analysis complete.',
     dietAdvice: parsed.dietAdvice || 'Check details for more info.',
     mainConcerns: Array.isArray(parsed.mainConcerns) ? parsed.mainConcerns : [],
@@ -201,7 +218,7 @@ export async function analyzeTextWithGemini(
 
   onProgress?.('Finalizing results...', 95);
 
-  const product = buildProduct(parsed, productName || 'AI Scanned Product', '📝');
+  const product = buildProduct(parsed, productName || 'AI Scanned Product', '📝', ingredientsText);
   if (product.ingredients[0] === '(AI could not extract ingredients)') {
     product.ingredients = [ingredientsText];
   }
@@ -217,15 +234,15 @@ export async function analyzeTextWithGemini(
 
 // ─── Food Search (Backend) ────────────────────────────────────────
 export async function askGeminiAboutFood(query: string): Promise<string> {
-  const prompt = `You are a helpful nutrition and food expert for an Indian health app called "Aavis".
+const prompt = `You are a helpful nutrition and food expert for an Indian health app called "Aavis".
 The user is searching for: "${query}"
 
-Please provide a highly concise response (strictly 2 to 3 sentences max, under 50 words).
+Provide a concise response by default (2 to 3 sentences max). However, if the user explicitly asks for a detailed explanation, a specific length, or more information in their query, follow their instruction.
 State:
 1. Verdict (safe, caution, or hazardous).
 2. The primary reason why.
 
-Keep the language simple, direct, and helpful. Do not use headers, markdown lists, or intro text.`;
+Keep the language simple, direct, and helpful. Do not use markdown lists or intro text unless specifically asked for a detailed breakdown.`;
 
   const parsed = await callBackend('/api/chat', { message: prompt });
   return parsed.reply || '';
@@ -236,8 +253,8 @@ export async function askGeminiChat(
   chatHistory: { role: 'user' | 'model'; parts: { text: string }[] }[],
   newMessage: string
 ): Promise<string> {
-  const systemContext = `Keep your response extremely brief, strictly 2-3 sentences max, under 50 words. Focus only on the direct answer.`;
-  const shortNewMessage = `${newMessage}\n\n(Instruction: ${systemContext})`;
+  const systemContext = `You are a helpful nutrition and food expert for "Aavis". Provide a concise answer by default (2-3 sentences). However, if the user explicitly asks for a detailed explanation, a specific length (e.g., "in 4 lines"), or more information, you MUST follow their request and adjust your length accordingly.`;
+  const shortNewMessage = `${newMessage}\n\n(System Instruction: ${systemContext})`;
 
   const history = chatHistory.map(m => ({
     role: m.role === 'model' ? 'assistant' : 'user',
@@ -249,10 +266,36 @@ export async function askGeminiChat(
 }
 
 // ─── Intelligent OCR Correction (Backend) ────────────────────────
-export async function aiOcrCorrection(rawText: string): Promise<string> {
+export async function aiOcrCorrection(rawText: string, mode: 'ingredients' | 'nutrition' = 'ingredients'): Promise<string> {
   if (!rawText || rawText.trim().length < 5) return rawText;
   
-  const prompt = `You are a highly intelligent OCR correction engine for food labels.
+  let prompt = '';
+  
+  if (mode === 'nutrition') {
+    prompt = `You are extracting nutrition label information from noisy OCR text.
+
+Your task has TWO PHASES:
+
+PHASE 1 — OCR RECONSTRUCTION
+* Fix OCR mistakes and broken words using nutrition-label context.
+* Reconstruct incomplete or split nutrient names when confidence is high.
+* Remove duplicate headers, random symbols, and OCR garbage text.
+* Ignore unrelated noise words.
+* Preserve all numeric values exactly as extracted.
+* Do not hallucinate missing numbers or values.
+
+PHASE 2 — STRUCTURED EXTRACTION
+* Reconstruct the nutrition table correctly.
+* ONLY extract standard recognized nutrition facts (e.g., Calories/Energy, Fat, Carbohydrates, Sugar, Sodium, Protein, Fiber, Potassium, Cholesterol, etc.).
+* COMPLETELY IGNORE all unrecognized words, acronyms, gibberish (e.g., "SHR", "Laas"), and OCR errors. Do not include them in your output.
+* COLUMN ALIGNMENT: If the OCR text presents a list of nutrient names followed by a separate list of numeric values (like two columns read top-to-bottom), carefully pair the names with the numbers sequentially in order.
+
+CRITICAL INSTRUCTION: Return a clean, human-readable text list with each recognized nutrient on a new line (e.g. "Energy: 28.8 kcal"). DO NOT output JSON. DO NOT include any conversational text, introductions, or markdown blocks. Output exactly and only the formatted text list of valid nutrients.
+
+OCR INPUT:
+${rawText}`;
+  } else {
+    prompt = `You are a highly intelligent OCR correction engine for food labels.
 Your task is to fix spelling errors, distorted words, and bad formatting in the following raw OCR text.
 CRITICAL RULES:
 1. ONLY fix obvious spelling mistakes, spacing issues, and formatting.
@@ -265,10 +308,21 @@ RAW OCR TEXT TO CORRECT:
 ---
 ${rawText}
 ---`;
+  }
 
   try {
     const parsed = await callBackend('/api/chat', { message: prompt });
-    return parsed.reply?.trim() || rawText;
+    let reply = parsed.reply?.trim() || rawText;
+    
+    if (mode === 'nutrition') {
+      if (reply.startsWith('```json')) {
+        reply = reply.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+      } else if (reply.startsWith('```')) {
+        reply = reply.replace(/^```\n?/, '').replace(/\n?```$/, '');
+      }
+    }
+    
+    return reply.trim();
   } catch (error) {
     console.warn('[AI OCR Correction Failed] Falling back to raw text', error);
     return rawText; // Fallback to raw text if AI fails

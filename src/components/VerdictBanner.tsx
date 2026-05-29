@@ -12,10 +12,28 @@ export function VerdictBanner({ verdict }: VerdictBannerProps) {
       label: 'Safe to Consume',
       emoji: '✅'
     },
+    mild: {
+      color: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20',
+      icon: CheckCircle,
+      label: 'Mild Concern',
+      emoji: '🟡'
+    },
+    moderate: {
+      color: 'bg-brand-caution/10 text-brand-caution border-brand-caution/20',
+      icon: AlertTriangle,
+      label: 'Moderate Concern',
+      emoji: '⚡'
+    },
     caution: {
       color: 'bg-brand-caution/10 text-brand-caution border-brand-caution/20',
       icon: AlertTriangle,
       label: 'Consume with Caution',
+      emoji: '⚠️'
+    },
+    harmful: {
+      color: 'bg-brand-caution/10 text-brand-caution border-brand-caution/20',
+      icon: AlertTriangle,
+      label: 'Harmful - Avoid',
       emoji: '⚠️'
     },
     hazardous: {

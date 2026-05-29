@@ -15,9 +15,14 @@ export function ScoreRing({ score, verdict, size = 160 }: ScoreRingProps) {
   const getColor = (v: HazardLevel) => {
     switch (v) {
       case 'safe':
-        return '#22c55e';
-      case 'caution':
+        return '#10b981';
+      case 'mild':
+        return '#eab308';
+      case 'moderate':
         return '#f59e0b';
+      case 'caution':
+      case 'harmful':
+        return '#fb7185';
       case 'hazardous':
         return '#ef4444';
       default:

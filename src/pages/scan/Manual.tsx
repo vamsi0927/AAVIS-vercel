@@ -111,7 +111,7 @@ export function ScanManual() {
         <button
           onClick={handleAnalyze}
           disabled={!ingredients.trim() || isAnalyzing}
-          className="w-full bg-gradient-brand text-white hover:opacity-95 disabled:opacity-50 rounded-2xl py-4 font-bold text-base flex items-center justify-center gap-2 transition-transform active:scale-[0.98] shadow-lg shadow-brand-primary/20"
+          className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white hover:opacity-95 disabled:opacity-50 rounded-2xl py-4 font-bold text-base flex items-center justify-center gap-2 transition-transform active:scale-[0.98] shadow-lg shadow-brand-primary/20"
         >
           {isAnalyzing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
           {isAnalyzing ? 'AI is Analyzing...' : 'Analyze Ingredients'}

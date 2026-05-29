@@ -77,7 +77,8 @@ function applyFuzzyDictionary(text: string): string {
 
 // 3. Main Intelligent Pipeline
 export async function intelligentOcrCorrection(
-  rawText: string, 
+  rawText: string,
+  mode: 'ingredients' | 'nutrition' = 'ingredients',
   onProgress?: (msg: string) => void
 ): Promise<string> {
   if (!rawText || rawText.trim().length < 3) return rawText;
@@ -92,7 +93,7 @@ export async function intelligentOcrCorrection(
   
   // Step 3: AI Contextual Normalization (Deep pass)
   onProgress?.('Running AI contextual correction...');
-  processedText = await aiOcrCorrection(processedText);
+  processedText = await aiOcrCorrection(processedText, mode);
   
   return processedText;
 }

@@ -5,7 +5,7 @@
 
 -- ─── 1. Users (profiles linked to Supabase Auth) ──────────────
 create table if not exists users (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
   name text,
   age integer,
@@ -127,15 +127,65 @@ alter table memes enable row level security;
 alter table search_history enable row level security;
 alter table reports enable row level security;
 
--- Allow all access with anon key (required since we use anon key, not auth JWT for now)
--- When you want tighter security, replace these with auth.uid()-based policies
-create policy "Allow all for users" on users for all using (true) with check (true);
-create policy "Allow all for scans" on scans for all using (true) with check (true);
-create policy "Allow all for products" on products for all using (true) with check (true);
-create policy "Allow all for bookmarks" on bookmarks for all using (true) with check (true);
-create policy "Allow read for memes" on memes for select using (true);
-create policy "Allow all for search_history" on search_history for all using (true) with check (true);
-create policy "Allow all for reports" on reports for all using (true) with check (true);
+-- Drop old permissive policies first
+drop policy if exists "Allow all for users" on users;
+drop policy if exists "Allow all for scans" on scans;
+drop policy if exists "Allow all for products" on products;
+drop policy if exists "Allow all for bookmarks" on bookmarks;
+drop policy if exists "Allow read for memes" on memes;
+drop policy if exists "Allow all for search_history" on search_history;
+drop policy if exists "Allow all for reports" on reports;
+
+-- USERS: each user can only see/edit their own row
+create policy "users_select_own" on users for select using (id = auth.uid());
+create policy "users_update_own" on users for update using (id = auth.uid());
+create policy "users_insert_own" on users for insert with check (id = auth.uid());
+
+-- SCANS: user can only access their own scans
+create policy "scans_select_own" on scans for select using (user_id = auth.uid());
+create policy "scans_insert_own" on scans for insert with check (user_id = auth.uid());
+create policy "scans_delete_own" on scans for delete using (user_id = auth.uid());
+
+-- PRODUCTS: public read, no write from client
+create policy "products_read_all" on products for select using (true);
+
+-- BOOKMARKS: user's own only
+create policy "bookmarks_select_own" on bookmarks for select using (user_id = auth.uid());
+create policy "bookmarks_insert_own" on bookmarks for insert with check (user_id = auth.uid());
+create policy "bookmarks_delete_own" on bookmarks for delete using (user_id = auth.uid());
+
+-- MEMES: public read
+create policy "memes_read_all" on memes for select using (true);
+
+-- SEARCH HISTORY: user's own only
+create policy "search_history_select_own" on search_history for select using (user_id = auth.uid());
+create policy "search_history_insert_own" on search_history for insert with check (user_id = auth.uid());
+
+-- REPORTS: user can insert, admin can read all (handled server-side)
+create policy "reports_insert_own" on reports for insert with check (user_id = auth.uid());
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- AUTH TRIGGER: Auto-create user profile on signup
+-- ═══════════════════════════════════════════════════════════════
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.users (id, email, name)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1))
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
 
 -- ═══════════════════════════════════════════════════════════════

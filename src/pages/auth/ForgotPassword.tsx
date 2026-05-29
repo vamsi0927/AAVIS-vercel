@@ -77,7 +77,7 @@ export function ForgotPassword() {
             <button
               type="submit"
               disabled={isSending}
-              className="w-full bg-gradient-brand hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
+              className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
             >
               {isSending ? (
                 <>

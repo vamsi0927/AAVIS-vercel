@@ -1,6 +1,11 @@
 import { AppState, UserProfile } from './types';
 
-const STORAGE_KEY = 'aavis_app_state';
+const BASE_KEY = 'aavis_app_state';
+
+/** Returns the localStorage key scoped to a specific user (or global fallback). */
+function storageKey(userId?: string | null): string {
+  return userId ? `${BASE_KEY}_${userId}` : BASE_KEY;
+}
 
 const DEFAULT_PROFILE: UserProfile = {
   name: '',
@@ -31,9 +36,9 @@ const DEFAULT_STATE: AppState = {
   }
 };
 
-export function loadState(): AppState {
+export function loadState(userId?: string | null): AppState {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(storageKey(userId));
     if (stored) {
       return { ...DEFAULT_STATE, ...JSON.parse(stored) };
     }
@@ -43,9 +48,9 @@ export function loadState(): AppState {
   return DEFAULT_STATE;
 }
 
-export function saveState(state: AppState): void {
+export function saveState(state: AppState, userId?: string | null): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(storageKey(userId), JSON.stringify(state));
   } catch (e) {
     console.error('Failed to save state', e);
   }

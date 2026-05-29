@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAppContext } from '../context/AppContext';
 import logoImg from '../assets/logo.png';
+import logoTextImg from '../assets/aavis_text.png';
 
 export function Splash() {
   const navigate = useNavigate();
@@ -48,21 +49,12 @@ export function Splash() {
         </div>
         
         <motion.h1
-          initial={{
-            y: 15,
-            opacity: 0
-          }}
-          animate={{
-            y: 0,
-            opacity: 1
-          }}
-          transition={{
-            delay: 0.4,
-            duration: 0.8,
-            ease: 'easeOut'
-          }}
-          className="text-4xl font-display font-black tracking-tight text-white mb-2 bg-gradient-brand bg-clip-text text-transparent">
-          Aavis
+          initial={{ y: 15, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.8, ease: 'easeOut' }}
+          className="text-5xl font-display font-bold tracking-[0.2em] mb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4]"
+        >
+          AAVIS
         </motion.h1>
         <motion.p
           initial={{

@@ -63,34 +63,22 @@ export interface DashboardData {
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Get or create user by email.
- * Used during app init — creates a local "anonymous" user if needed.
+ * Get user profile from the DB using the current Supabase auth session.
+ * User row creation is handled automatically by the on_auth_user_created trigger.
  */
-export async function getOrCreateUser(email: string, name?: string): Promise<DBUser | null> {
+export async function getOrCreateUser(_email: string, _name?: string): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;
 
-  // Try to find existing user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
   const { data: existing } = await supabase
     .from('users')
     .select('*')
-    .eq('email', email)
+    .eq('id', user.id)
     .single();
 
-  if (existing) return existing as DBUser;
-
-  // Create new user
-  const { data: created, error } = await supabase
-    .from('users')
-    .insert({ email, name: name || '' })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('[Aavis] Failed to create user:', error);
-    return null;
-  }
-
-  return created as DBUser;
+  return existing as DBUser | null;
 }
 
 /**

@@ -6,7 +6,7 @@ import { Chip } from '../../components/Chip';
 import { toast } from 'sonner';
 
 const DIETS = ['None', 'Veg', 'Nonveg', 'Vegan', 'Keto', 'Jain'];
-const ALLERGENS = ['peanuts', 'gluten', 'dairy', 'soy', 'eggs', 'shellfish', 'tree nuts'];
+const ALLERGENS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
 const CONDITIONS = ['Diabetes', 'Hypertension', 'Heart Disease', 'High Cholesterol', 'Obesity'];
 
 export function UpdateConditions() {

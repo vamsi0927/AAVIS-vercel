@@ -12,7 +12,7 @@
  *   hazardous  → Purple  — Dangerous additive / avoid
  */
 
-export type IngredientRiskLevel = 'safe' | 'mild' | 'moderate' | 'harmful' | 'hazardous';
+export type IngredientRiskLevel = 'safe' | 'mild' | 'moderate' | 'caution' | 'harmful' | 'hazardous';
 
 export interface IngredientRiskInfo {
   level: IngredientRiskLevel;
@@ -31,23 +31,22 @@ const RISK_DB: RiskEntry[] = [
   ['potassium bromate',     'hazardous', 'Banned in many countries. Possible carcinogen.'],
   ['butylated hydroxyanisole', 'hazardous', 'Synthetic antioxidant (BHA). Possible carcinogen.'],
   ['bha',                   'hazardous', 'Synthetic antioxidant. Possible carcinogen in high doses.'],
-  ['bht',                   'hazardous', 'Synthetic antioxidant. May disrupt hormones.'],
+  ['titanium dioxide',      'hazardous', 'White colorant. Banned in EU since 2022 due to genotoxicity concerns.'],
   ['sodium nitrite',        'hazardous', 'Preservative in processed meats. Forms carcinogenic nitrosamines.'],
   ['sodium nitrate',        'hazardous', 'Preservative. May form cancer-causing compounds when heated.'],
   ['partially hydrogenated', 'hazardous', 'Contains trans fats. Increases heart disease risk.'],
   ['trans fat',             'hazardous', 'Artificial fat that clogs arteries. Avoid completely.'],
-  ['acesulfame',            'hazardous', 'Artificial sweetener with limited long-term safety data.'],
 
   // ── HARMFUL (Red) ────────────────────────────────────────────────
   ['high fructose corn syrup', 'harmful', 'Highly processed sweetener linked to obesity and diabetes.'],
   ['hfcs',                  'harmful', 'Highly processed corn-based sweetener.'],
-  ['monosodium glutamate',  'harmful', 'Flavor enhancer (MSG). May cause headaches in sensitive people.'],
-  ['msg',                   'harmful', 'Flavor enhancer that can cause sensitivity reactions.'],
+  ['bht',                   'harmful', 'Synthetic antioxidant related to BHA. Potential endocrine disruptor.'],
+  ['acesulfame',            'harmful', 'Artificial sweetener with limited long-term safety data.'],
   ['artificial flavo',      'harmful', 'Lab-made chemicals that mimic natural taste.'],
   ['artificial colour',     'harmful', 'Synthetic dye with no nutritional value.'],
   ['artificial color',      'harmful', 'Synthetic dye with no nutritional value.'],
   ['sodium erythorbate',    'harmful', 'Chemical preservative used in processed meats.'],
-  ['tbhq',                  'harmful', 'Synthetic preservative. May cause nausea at high doses.'],
+  ['tbhq',                  'harmful', 'Synthetic petroleum-derived antioxidant (TBHQ). Linked to liver damage and immune disruption in studies.'],
   ['propyl gallate',        'harmful', 'Synthetic antioxidant. Potential endocrine disruptor.'],
   ['carrageenan',           'harmful', 'Thickener that may cause gut inflammation.'],
   ['polysorbate',           'harmful', 'Synthetic emulsifier that may affect gut bacteria.'],
@@ -82,7 +81,6 @@ const RISK_DB: RiskEntry[] = [
   ['caramel color',         'moderate', 'Processed coloring. Some types may contain 4-MEI.'],
   ['caramel colour',        'moderate', 'Processed coloring. Some types may contain 4-MEI.'],
   ['silicon dioxide',       'moderate', 'Anti-caking agent. Safe but ultra-processed indicator.'],
-  ['titanium dioxide',      'moderate', 'White colorant. Banned in some countries due to nano concerns.'],
   ['phosphoric acid',       'moderate', 'Acidifier in colas. May weaken bones over time.'],
   ['sodium phosphate',      'moderate', 'Preservative. Excess phosphates can strain kidneys.'],
   ['xanthan gum',           'moderate', 'Thickener. Safe for most, but can cause bloating.'],
@@ -91,9 +89,12 @@ const RISK_DB: RiskEntry[] = [
   ['sulphur dioxide',       'moderate', 'Preservative. Can trigger allergic reactions.'],
   ['potassium sorbate',     'moderate', 'Common preservative. Safe for most.'],
   ['calcium propionate',    'moderate', 'Bread preservative. May cause irritability in children.'],
-  ['sodium benzoate',       'moderate', 'Common preservative in acidic foods.'],
 
   // ── MILD (Yellow) ───────────────────────────────────────────────
+  ['monosodium glutamate',  'mild', 'Flavor enhancer (MSG). Safe for most, but adds to sodium load.'],
+  ['msg',                   'mild', 'Flavor enhancer (MSG). Safe for most, but adds to sodium load.'],
+  ['disodium guanylate',    'mild', 'Flavor enhancer. Avoid with gout. Indicates heavy flavor engineering.'],
+  ['disodium inosinate',    'mild', 'Flavor enhancer. Avoid with gout. Often animal-derived.'],
   ['sugar',                 'mild', 'Added sweetener. Excess consumption leads to weight gain.'],
   ['cane sugar',            'mild', 'Refined cane sweetener. Use in moderation.'],
   ['starch',                'mild', 'Processed carbohydrate used as thickener.'],
@@ -190,9 +191,51 @@ const RISK_DB: RiskEntry[] = [
 
 // ─── Classification Engine ─────────────────────────────────────────
 
+// Map of known high-risk E-codes for quick lookup
+const HIGH_RISK_E_CODES: Record<string, [IngredientRiskLevel, string]> = {
+  'e102': ['hazardous', 'Tartrazine — synthetic dye linked to hyperactivity in children.'],
+  'e104': ['harmful',   'Quinoline Yellow — synthetic dye. Banned in US and Australia.'],
+  'e110': ['hazardous', 'Sunset Yellow — synthetic dye linked to hyperactivity.'],
+  'e120': ['harmful',   'Carmine — insect-derived dye. Risk of severe allergic reaction.'],
+  'e122': ['hazardous', 'Carmoisine — synthetic azo dye. Banned in some countries.'],
+  'e124': ['hazardous', 'Ponceau 4R — synthetic dye. Banned in US.'],
+  'e129': ['hazardous', 'Allura Red — synthetic dye linked to hyperactivity.'],
+  'e133': ['harmful',   'Brilliant Blue — synthetic dye. Banned in some countries.'],
+  'e150d':['harmful',   'Sulphite Ammonia Caramel — may contain 4-MEI, linked to cancer in animals.'],
+  'e171': ['hazardous', 'Titanium Dioxide — banned in EU since 2022. Potential genotoxicity.'],
+  'e210': ['hazardous', 'Benzoic Acid — forms benzene with Vitamin C. Carcinogen risk.'],
+  'e211': ['hazardous', 'Sodium Benzoate — forms benzene with Vitamin C. ADHD risk in children.'],
+  'e202': ['moderate',  'Potassium Sorbate — preservative. Safe for most but an industrial additive.'],
+  'e212': ['hazardous', 'Potassium Benzoate — same benzene-formation risk as E211.'],
+  'e220': ['moderate',  'Sulphur Dioxide — preservative. Can trigger asthma in sensitive people.'],
+  'e223': ['moderate',  'Sodium Metabisulphite — preservative. Can trigger asthma in sensitive people.'],
+  'e250': ['hazardous', 'Sodium Nitrite — forms carcinogenic nitrosamines. IARC Group 1.'],
+  'e251': ['hazardous', 'Sodium Nitrate — converts to nitrite in body. Cancer risk.'],
+  'e282': ['moderate',  'Calcium Propionate — bread preservative. Linked to irritability in children.'],
+  'e319': ['harmful',   'TBHQ — petroleum-derived synthetic antioxidant. Linked to liver damage.'],
+  'e320': ['hazardous', 'BHA — possible carcinogen (IARC 2B). Tumor-promoting in animal studies.'],
+  'e321': ['harmful',   'BHT — controversial synthetic antioxidant. Potential endocrine disruptor.'],
+  'e322': ['moderate',  'Lecithin — emulsifier. Common marker of industrial food.'],
+  'e407': ['harmful',   'Carrageenan — may cause gut inflammation. Concern for IBS/Crohn\'s.'],
+  'e433': ['harmful',   'Polysorbate 80 — disrupts gut microbiome in studies.'],
+  'e466': ['harmful',   'CMC — chemically modified cellulose. Disrupts gut microbiome.'],
+  'e471': ['mild',      'Mono- and Diglycerides — industrial emulsifier. May be animal-derived.'],
+  'e621': ['mild',      'MSG — flavor enhancer. Safe for most, but adds to sodium load.'],
+  'e627': ['mild',      'Disodium Guanylate — avoid with gout. Indicates heavy flavor engineering.'],
+  'e631': ['mild',      'Disodium Inosinate — avoid with gout. Often animal-derived.'],
+  'e950': ['harmful',   'Acesulfame K — artificial sweetener. Limited long-term safety data.'],
+  'e951': ['hazardous', 'Aspartame — IARC Group 2B possible carcinogen. Avoid with PKU.'],
+  'e954': ['harmful',   'Saccharin — oldest artificial sweetener. Controversial safety history.'],
+  'e955': ['harmful',   'Sucralose — may disrupt gut microbiome with regular use.'],
+};
+
 /**
  * Classify a single ingredient string into a risk tier.
- * Returns the risk info, or a default 'safe' if nothing matches.
+ * Handles:
+ *  - Direct keyword matches from RISK_DB (e.g. "tbhq", "palm oil")
+ *  - E-number codes embedded anywhere in the string (e.g. "Antioxidant (E319-TBHQ)")
+ *  - Bare E-code strings (e.g. "E211", "INS 621")
+ *  - Generic chemical compound heuristics
  */
 export function classifyIngredient(ingredient: string): IngredientRiskInfo {
   const lower = ingredient.toLowerCase().trim();
@@ -202,42 +245,57 @@ export function classifyIngredient(ingredient: string): IngredientRiskInfo {
     return { level: 'safe', explanation: '' };
   }
 
-  // Check against the database — first match wins, so the DB is ordered
-  // from most severe to least severe
+  // ── Step 1: Extract any E-number mentioned anywhere in the string ──
+  // Matches patterns like E319, E319-TBHQ, INS 319, (E319), E319a etc.
+  const eCodeMatches = lower.match(/\be(\d{3,4}[a-z]?)\b|\bins\s?(\d{3,4})\b/gi);
+  if (eCodeMatches) {
+    for (const match of eCodeMatches) {
+      // Normalise to e-number format: strip 'ins', spaces
+      const normalised = match.replace(/^ins\s?/i, 'e').replace(/\s/g, '').toLowerCase();
+      const hit = HIGH_RISK_E_CODES[normalised];
+      if (hit) return { level: hit[0], explanation: hit[1] };
+    }
+    // Unknown E-number — flag as moderate, not safe
+    return { level: 'moderate', explanation: 'Food additive (E-number). Specific risk level unknown — exercise caution.' };
+  }
+
+  // ── Step 2: Keyword database scan (most severe → least severe) ──
   for (const [keyword, level, explanation] of RISK_DB) {
     if (lower.includes(keyword)) {
       return { level, explanation };
     }
   }
 
-  // Heuristic fallbacks for patterns not in the DB
-  if (/^e\d{3,4}[a-z]?$/i.test(lower)) {
-    return { level: 'moderate', explanation: 'Food additive (E-number). Check specific code for details.' };
-  }
-  if (/^ins\s?\d{3,4}/i.test(lower)) {
-    return { level: 'moderate', explanation: 'INS-coded food additive. Refer to specific number.' };
-  }
+  // ── Step 3: Generic chemical compound heuristics ──
   if (/sodium|potassium|calcium\s+\w+ate/i.test(lower) && lower.length > 10) {
-    return { level: 'mild', explanation: 'Chemical compound used as a food additive.' };
+    return { level: 'mild', explanation: 'Chemical salt used as a food additive.' };
   }
 
-  // Default — unrecognized ingredients are neutral
+  // Default — genuinely unrecognized, assume neutral
   return { level: 'safe', explanation: '' };
 }
 
 // ─── Color & Style Helpers ─────────────────────────────────────────
+//
+// Colour logic (traffic-light extended to 5 levels):
+//   hazardous → deep crimson red   (avoid entirely)
+//   harmful   → rose/orange-red    (significant risk)
+//   moderate  → amber              (notable concern, limit)
+//   mild      → yellow             (minor concern)
+//   safe      → emerald green      (clean ingredient)
 
 /** Tailwind classes for the ingredient chip background + border */
 export function getRiskChipClasses(level: IngredientRiskLevel): string {
   switch (level) {
     case 'hazardous':
-      return 'bg-purple-500/15 border-purple-500/40 text-purple-300';
+      return 'bg-red-600/20 border-red-500/50 text-red-300';
     case 'harmful':
-      return 'bg-red-500/15 border-red-500/40 text-red-300';
+      return 'bg-rose-500/20 border-rose-400/50 text-rose-300';
+    case 'caution':
     case 'moderate':
-      return 'bg-orange-500/15 border-orange-500/40 text-orange-300';
+      return 'bg-amber-500/15 border-amber-400/40 text-amber-300';
     case 'mild':
-      return 'bg-yellow-500/15 border-yellow-500/40 text-yellow-300';
+      return 'bg-yellow-400/10 border-yellow-400/35 text-yellow-300';
     case 'safe':
     default:
       return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300';
@@ -247,33 +305,43 @@ export function getRiskChipClasses(level: IngredientRiskLevel): string {
 /** Small colored dot for the risk level */
 export function getRiskDotColor(level: IngredientRiskLevel): string {
   switch (level) {
-    case 'hazardous': return 'bg-purple-400';
-    case 'harmful':   return 'bg-red-400';
-    case 'moderate':  return 'bg-orange-400';
+    case 'hazardous': return 'bg-red-500';
+    case 'harmful':   return 'bg-rose-400';
+    case 'caution':
+    case 'moderate':  return 'bg-amber-400';
     case 'mild':      return 'bg-yellow-400';
     case 'safe':
     default:          return 'bg-emerald-400';
   }
 }
 
-/** Additive hazard level → 5-tier color mapping for the badge */
+/** Additive hazard level → color mapping for the left border */
 export function getAdditiveCardBorder(hazard: string): string {
   switch (hazard) {
-    case 'hazardous': return 'border-l-purple-500';
-    case 'caution':   return 'border-l-orange-400';
-    case 'safe':
-    default:          return 'border-l-emerald-400';
+    case 'hazardous': return 'border-l-red-500';      // Deep Crimson
+    case 'harmful':   return 'border-l-rose-400';     // Rose/Orange-Red (Harmful)
+    case 'caution':
+    case 'moderate':  return 'border-l-amber-400';    // Amber (Caution)
+    case 'mild':      return 'border-l-yellow-400';   // Yellow (Mild)
+    case 'safe':      return 'border-l-emerald-400';  // Emerald/Green (Safe)
+    default:          return 'border-l-amber-400';
   }
 }
 
 export function getAdditiveBadgeClasses(hazard: string): string {
   switch (hazard) {
     case 'hazardous':
-      return 'bg-purple-500/20 text-purple-300';
+      return 'bg-red-600/20 border-red-500/50 text-red-300 border';
+    case 'harmful':
+      return 'bg-rose-500/20 border-rose-400/50 text-rose-300 border';
     case 'caution':
-      return 'bg-orange-500/20 text-orange-300';
+    case 'moderate':
+      return 'bg-amber-500/15 border-amber-400/40 text-amber-300 border';
+    case 'mild':
+      return 'bg-yellow-400/10 border-yellow-400/35 text-yellow-300 border';
     case 'safe':
+      return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 border';
     default:
-      return 'bg-emerald-500/20 text-emerald-300';
+      return 'bg-amber-500/15 border-amber-400/40 text-amber-300 border';
   }
 }

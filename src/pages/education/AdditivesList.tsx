@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronLeft, AlertTriangle, Info } from 'lucide-react';
+import { Search, ChevronLeft } from 'lucide-react';
 import { ADDITIVES_DB } from '../../data/additives';
+import { AdditiveCard } from '../../components/AdditiveCard';
 export function AdditivesList() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<
-    'all' | 'safe' | 'caution' | 'hazardous'>(
+    'all' | 'safe' | 'mild' | 'moderate' | 'caution' | 'hazardous'>(
     'all');
   const additives = Object.values(ADDITIVES_DB);
   const filtered = additives.filter((a) => {
@@ -43,12 +44,11 @@ export function AdditivesList() {
             
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {(['all', 'safe', 'caution', 'hazardous'] as const).map((f) =>
+            {(['all', 'safe', 'mild', 'moderate', 'caution', 'hazardous'] as const).map((f) =>
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize whitespace-nowrap transition-colors ${filter === f ? 'bg-brand-primary text-white' : 'bg-navy-800 text-content-secondary border border-navy-700'}`}>
-              
                 {f}
               </button>
             )}
@@ -62,47 +62,9 @@ export function AdditivesList() {
             No additives found matching your search.
           </div> :
 
-        filtered.map((additive) => {
-          const isHazardous = additive.hazard === 'hazardous';
-          const isCaution = additive.hazard === 'caution';
-          let badgeColor = 'bg-brand-safe/20 text-brand-safe';
-          let Icon = Info;
-          if (isHazardous) {
-            badgeColor = 'bg-brand-hazardous/20 text-brand-hazardous';
-            Icon = AlertTriangle;
-          } else if (isCaution) {
-            badgeColor = 'bg-brand-caution/20 text-brand-caution';
-            Icon = AlertTriangle;
-          }
-          return (
-            <div
-              key={additive.code}
-              className="bg-navy-800 rounded-xl p-4 border border-navy-700">
-              
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                    className={`px-2 py-1 rounded-md text-xs font-bold ${badgeColor}`}>
-                    
-                      {additive.code}
-                    </span>
-                    <h4 className="font-semibold text-content-primary">
-                      {additive.name}
-                    </h4>
-                  </div>
-                  <Icon
-                  className={`w-5 h-5 ${isHazardous ? 'text-brand-hazardous' : isCaution ? 'text-brand-caution' : 'text-brand-safe'}`} />
-                
-                </div>
-                <p className="text-xs text-content-secondary mb-2 uppercase tracking-wider">
-                  {additive.category}
-                </p>
-                <p className="text-sm text-content-primary/80 leading-relaxed">
-                  {additive.description}
-                </p>
-              </div>);
-
-        })
+        filtered.map((additive) => (
+          <AdditiveCard key={additive.code} additive={additive} />
+        ))
         }
       </div>
     </div>);

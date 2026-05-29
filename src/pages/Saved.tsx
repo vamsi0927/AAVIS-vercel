@@ -30,7 +30,7 @@ export function Saved() {
 
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
-      <header className="pt-safe pt-8 px-6 pb-4 bg-navy-900/95 backdrop-blur-md sticky top-0 z-20">
+      <header className="pt-safe pt-8 px-6 pb-4 bg-navy-900/95 backdrop-blur-md sticky top-0 z-20 md:max-w-3xl md:mx-auto md:w-full md:px-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-display font-bold">Saved Items</h1>
           <button className="p-2 text-content-secondary hover:text-white rounded-full bg-navy-800">
@@ -50,7 +50,7 @@ export function Saved() {
         )}
       </header>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar px-6 pt-4 flex flex-col">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-6 pt-4 flex flex-col md:max-w-3xl md:mx-auto md:w-full md:px-8 md:py-4">
         {savedProducts.length === 0 ? (
           <div className="flex-1 flex flex-col justify-center items-center text-center px-6">
             <div className="w-16 h-16 bg-navy-800 rounded-full flex items-center justify-center mb-4 border border-navy-700">

@@ -89,7 +89,7 @@ export function Search() {
 
   return (
     <div className="flex flex-col h-full bg-navy-900">
-      <header className="pt-safe pt-6 px-4 pb-4 flex items-center gap-2 border-b border-navy-800">
+      <header className="pt-safe pt-6 px-4 pb-4 flex items-center gap-2 border-b border-navy-800 md:max-w-3xl md:mx-auto md:w-full md:px-8">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
@@ -108,7 +108,7 @@ export function Search() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar p-6">
+      <div className="flex-1 overflow-y-auto no-scrollbar p-6 md:max-w-3xl md:mx-auto md:w-full md:px-8 md:py-4">
         {!query.trim() ? (
           <div>
             {/* Suggested Search Chips */}

@@ -27,7 +27,11 @@ export function Login() {
       });
 
       if (error) {
-        toast.error(error.message || 'Invalid email or password');
+        let msg = error.message || 'Invalid email or password';
+        if (msg === 'Invalid login credentials') {
+          msg = 'Invalid email or password. Please check for typos. If you recently signed up, you may need to confirm your email first.';
+        }
+        toast.error(msg);
         setIsLoading(false);
         return;
       }
@@ -100,7 +104,7 @@ export function Login() {
             <button
               type="submit"
               disabled={!email || !password || isLoading}
-              className="w-full bg-gradient-brand hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
+              className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
             >
               {isLoading ? (
                 <>

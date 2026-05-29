@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import { askGeminiChat } from '../../lib/geminiAnalysis';
 import { motion } from 'framer-motion';
+import aiAssistantImg from '../../assets/ai-assistant.jpg';
 
 type Message = {
   role: 'user' | 'model';
@@ -55,8 +56,8 @@ export function NutritionChat() {
           <ChevronLeft className="w-6 h-6" />
         </button>
         <div className="flex items-center gap-2 ml-2">
-          <div className="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center border border-brand-primary/30">
-            <Sparkles className="w-4 h-4 text-brand-primary" />
+          <div className="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center border border-brand-primary/30 overflow-hidden">
+            <img src={aiAssistantImg} alt="AI" className="w-full h-full object-cover" />
           </div>
           <h1 className="font-display font-bold text-lg">AI Nutritionist</h1>
         </div>
@@ -71,8 +72,8 @@ export function NutritionChat() {
             className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.role === 'model' && (
-              <div className="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center flex-shrink-0 mt-1">
-                <Bot className="w-4 h-4 text-brand-primary" />
+              <div className="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden">
+                <img src={aiAssistantImg} alt="AI" className="w-full h-full object-cover" />
               </div>
             )}
             
@@ -94,8 +95,8 @@ export function NutritionChat() {
 
         {isTyping && (
           <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center flex-shrink-0 mt-1">
-              <Bot className="w-4 h-4 text-brand-primary" />
+            <div className="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden">
+              <img src={aiAssistantImg} alt="AI" className="w-full h-full object-cover" />
             </div>
             <div className="bg-navy-800 rounded-2xl rounded-tl-sm p-4 border border-navy-700 flex gap-1 items-center">
               <div className="w-2 h-2 rounded-full bg-brand-primary/50 animate-bounce"></div>

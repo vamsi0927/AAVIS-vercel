@@ -1,7 +1,7 @@
 import React, { useState, createElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ScanLine, ShieldAlert, HeartPulse, ChevronRight, Droplet, Skull } from 'lucide-react';
+import { ScanLine, ShieldAlert, ChevronRight, Droplet, Skull } from 'lucide-react';
 
 const SLIDES = [
   {
@@ -35,14 +35,6 @@ const SLIDES = [
     description: 'Instantly scan any label. Aavis AI translates confusing chemicals into clear, personalized health warnings.',
     color: 'from-brand-primary/20 to-transparent',
     iconColor: 'text-brand-primary'
-  },
-  {
-    id: 'personalize',
-    icon: HeartPulse,
-    title: 'Personalized For You',
-    description: 'Get custom health scores tailored strictly to your own allergies, diet, and health conditions.',
-    color: 'from-emerald-500/20 to-transparent',
-    iconColor: 'text-emerald-400'
   }
 ];
 
@@ -68,10 +60,10 @@ export function Onboarding() {
       <div className={`absolute top-0 left-0 right-0 h-[60vh] bg-gradient-to-b ${SLIDES[currentSlide].color} blur-3xl opacity-65 transition-all duration-1000 -z-10`} />
 
       {/* Skip Button */}
-      <div className="absolute top-safe pt-6 right-6 z-20">
+      <div className="absolute top-0 right-0 pt-safe pr-6 z-20">
         <button
           onClick={finishOnboarding}
-          className="text-content-secondary hover:text-white transition-colors text-sm font-semibold tracking-wide">
+          className="text-content-secondary hover:text-white transition-colors text-sm font-semibold tracking-wide mt-2">
           Skip
         </button>
       </div>
@@ -121,7 +113,7 @@ export function Onboarding() {
         {/* Action Button */}
         <button
           onClick={handleNext}
-          className="w-full bg-gradient-brand text-white hover:opacity-95 rounded-2xl py-4 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-brand-primary/20">
+          className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white hover:opacity-95 rounded-2xl py-4 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-brand-primary/20">
           {currentSlide === SLIDES.length - 1 ? 'Build Your Profile' : 'Continue'}
           <ChevronRight className="w-5 h-5" />
         </button>

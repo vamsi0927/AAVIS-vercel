@@ -1,4 +1,4 @@
-export type HazardLevel = 'safe' | 'caution' | 'hazardous';
+export type HazardLevel = 'safe' | 'mild' | 'moderate' | 'caution' | 'harmful' | 'hazardous';
 
 export interface Additive {
   code: string; // e.g., E102

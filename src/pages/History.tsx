@@ -10,6 +10,7 @@ export function History() {
   const { scans, clearHistory, loadCloudScans, supabaseUserId } = useAppContext();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'safe' | 'caution' | 'hazardous'>('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
   const [isLoadingCloud, setIsLoadingCloud] = useState(false);
 
   // Load cloud scans on mount
@@ -31,9 +32,25 @@ export function History() {
     return matchesSearch && matchesFilter;
   });
 
+  const sortedScans = [...filteredScans].sort((a, b) => {
+    if (sortBy === 'newest') {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+    if (sortBy === 'oldest') {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    }
+    if (sortBy === 'highest') {
+      return b.score - a.score;
+    }
+    if (sortBy === 'lowest') {
+      return a.score - b.score;
+    }
+    return 0;
+  });
+
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
-      <header className="pt-safe pt-8 px-6 pb-4">
+      <header className="pt-safe pt-8 px-6 pb-4 md:max-w-7xl md:mx-auto md:w-full md:px-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-display font-bold">History</h1>
           <div className="flex items-center gap-2">
@@ -61,33 +78,50 @@ export function History() {
           </div>
         )}
 
-        {/* Search & Filter */}
+        {/* Search & Filter Toolbar */}
         {scans.length > 0 &&
-          <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary" />
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-navy-800/40 p-4 rounded-2xl border border-white/5">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
               <input
                 type="text"
-                placeholder="Search scans..."
+                placeholder="Search scans by name or brand..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 pl-10 pr-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary transition-colors" />
+                className="w-full bg-navy-900/60 border border-white/5 rounded-xl py-2 pl-9 pr-4 text-sm text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary transition-colors" />
             </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-              {(['all', 'safe', 'caution', 'hazardous'] as const).map((f) =>
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize whitespace-nowrap transition-colors ${filter === f ? 'bg-brand-primary text-white' : 'bg-navy-800 text-content-secondary border border-navy-700'}`}>
-                  {f}
-                </button>
-              )}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Filter */}
+              <div className="flex bg-navy-900 p-1 rounded-xl border border-white/5">
+                {(['all', 'safe', 'caution', 'hazardous'] as const).map((f) =>
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`px-3 py-1 rounded-lg text-xs font-medium capitalize transition-colors ${filter === f ? 'bg-brand-primary text-white font-bold' : 'text-content-secondary hover:text-content-primary'}`}>
+                    {f}
+                  </button>
+                )}
+              </div>
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-2 bg-navy-900 px-3 py-1.5 rounded-xl border border-white/5">
+                <span className="text-xs font-semibold text-content-secondary">Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="highest">Highest Score</option>
+                  <option value="lowest">Lowest Score</option>
+                </select>
+              </div>
             </div>
           </div>
         }
       </header>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar px-6">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-6 md:max-w-7xl md:mx-auto md:w-full md:px-8 md:py-4">
         {scans.length === 0 ?
           <EmptyState
             icon={HistoryIcon}
@@ -100,12 +134,12 @@ export function History() {
                 Scan a Product
               </button>
             } /> :
-          filteredScans.length === 0 ?
+          sortedScans.length === 0 ?
             <div className="text-center py-12 text-content-secondary">
               No results found for your search.
             </div> :
-            <div className="space-y-3 pb-6">
-              {filteredScans.map((scan) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-6">
+              {sortedScans.map((scan) => {
                 const product = scan.product || SAMPLE_PRODUCTS.find((p) => p.id === scan.productId);
                 if (!product) return null;
                 const date = new Date(scan.date);

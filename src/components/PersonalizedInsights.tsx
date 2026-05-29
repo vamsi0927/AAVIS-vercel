@@ -49,6 +49,15 @@ export function PersonalizedInsights() {
       bgColor: 'bg-blue-500/10',
       borderColor: 'border-blue-500/20',
     });
+  } else if (diet === 'Non-Vegetarian') {
+    insights.push({
+      id: 'nonveg',
+      icon: <Info className="w-5 h-5 text-red-400" />,
+      title: 'Non-Vegetarian Profile',
+      desc: 'We will focus on flagging harmful additives, artificial colors, and your specific allergens.',
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/20',
+    });
   }
 
   if (insights.length === 0) {
@@ -71,7 +80,7 @@ export function PersonalizedInsights() {
         {insights.map((insight) => (
           <div
             key={insight.id}
-            className={`flex-shrink-0 w-[280px] p-4 rounded-2xl border ${insight.bgColor} ${insight.borderColor} snap-start`}
+            className={`flex-shrink-0 w-[280px] p-4 rounded-3xl ${insight.bgColor} snap-start`}
           >
             <div className="flex items-start gap-3 mb-2">
               <div className="mt-0.5">{insight.icon}</div>
