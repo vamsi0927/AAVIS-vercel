@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { getCroppedImg } from '../lib/cropImage';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 type ScanStep = 'ingredients' | 'nutrition_prompt' | 'nutrition_scan' | 'processing';
 type PreviewMode = 'none' | 'ingredients' | 'nutrition';
@@ -30,6 +31,51 @@ export function Scan() {
   const [ocrProgress, setOcrProgress] = useState('');
   const [ocrPercent, setOcrPercent] = useState(0);
   const [scanError, setScanError] = useState<string | null>(null);
+  
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+
+  React.useEffect(() => {
+    if (showBarcodeScanner) {
+      const scanner = new Html5QrcodeScanner('reader', { qrbox: { width: 250, height: 250 }, fps: 5 }, false);
+      scanner.render(
+        async (decodedText) => {
+          scanner.clear();
+          setShowBarcodeScanner(false);
+          handleBarcodeScanned(decodedText);
+        },
+        (error) => {}
+      );
+      return () => {
+        scanner.clear().catch(console.error);
+      };
+    }
+  }, [showBarcodeScanner]);
+
+  const handleBarcodeScanned = async (barcode: string) => {
+    setScanStep('processing');
+    setOcrProgress(`Found barcode ${barcode}...`);
+    setIsScanning(true);
+    setOcrPercent(30);
+    
+    try {
+      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+      const data = await res.json();
+      setOcrPercent(80);
+      
+      if (data.status === 1 && data.product) {
+        const ingredients = data.product.ingredients_text || 'Ingredients not listed in Open Food Facts.';
+        const productName = data.product.product_name || 'Unknown Product';
+        setIngredientsText(ingredients);
+        runFinalAnalysis(`Product: ${productName}\nIngredients: ${ingredients}`, null);
+      } else {
+        setScanError('Product not found in barcode database. Please scan the ingredients label directly.');
+        setIsScanning(false);
+      }
+    } catch (err) {
+      setScanError('Failed to fetch product data.');
+      setIsScanning(false);
+    }
+  };
   
   const [isDesktop, setIsDesktop] = React.useState(() => window.innerWidth >= 768);
   const [isDragOver, setIsDragOver] = React.useState(false);
@@ -361,7 +407,7 @@ export function Scan() {
         <div className="grid grid-cols-12 gap-8 flex-1 h-[calc(100vh-12rem)] relative z-10">
           {/* Left Panel: Upload Zone / Cropper / Scanning Loader */}
           <div className="col-span-7 flex flex-col h-full bg-navy-800/40 border border-white/5 rounded-3xl overflow-hidden p-6 relative">
-            {previewMode === 'none' && !isScanning && (
+            {previewMode === 'none' && !isScanning && !showBarcodeScanner && (
               <div 
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -382,9 +428,17 @@ export function Scan() {
                 <p className="text-sm text-content-secondary max-w-sm mb-6">
                   Drag & drop your food package photo here, or <span className="text-brand-primary font-semibold hover:underline">browse files</span>.
                 </p>
+                <button onClick={(e) => { e.stopPropagation(); setShowBarcodeScanner(true); }} className="mb-4 px-4 py-2 bg-brand-primary/20 text-brand-primary rounded-xl font-bold text-xs border border-brand-primary/30">Scan Barcode using WebCam</button>
                 <div className="flex gap-2 text-[10px] uppercase font-bold text-content-secondary tracking-widest bg-navy-900/60 px-4 py-2 rounded-full border border-white/5">
                   <span>PNG, JPG or WEBP</span>
                 </div>
+              </div>
+            )}
+
+            {showBarcodeScanner && (
+              <div className="flex-1 flex flex-col items-center justify-center relative">
+                 <div id="reader" className="w-full max-w-md bg-black rounded-2xl overflow-hidden" />
+                 <button onClick={() => setShowBarcodeScanner(false)} className="mt-4 px-4 py-2 bg-navy-700 text-white rounded-xl">Cancel Barcode Scan</button>
               </div>
             )}
 
@@ -657,9 +711,29 @@ export function Scan() {
 
       {/* 2. Scan Area / Viewfinder */}
       <div className="flex-1 relative flex items-center justify-center px-6">
+        
+        {/* Got a barcode floating banner */}
+        {!showBarcodeScanner && !isScanning && previewMode === 'none' && (
+          <div className="absolute top-4 left-0 right-0 z-50 flex justify-center">
+            <button 
+              onClick={() => setShowBarcodeScanner(true)}
+              className="bg-brand-primary/20 backdrop-blur-xl border border-brand-primary/50 text-brand-primary font-bold px-4 py-2 rounded-full text-xs animate-bounce shadow-lg shadow-brand-primary/20 flex items-center gap-2"
+            >
+              <Camera className="w-4 h-4" /> Got a barcode?
+            </button>
+          </div>
+        )}
+
         <div className="relative w-full aspect-square max-w-[320px]">
           
-          {/* Futuristic Brackets */}
+          {showBarcodeScanner ? (
+            <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden z-40 flex flex-col">
+               <div id="reader" className="w-full h-full" />
+               <button onClick={() => setShowBarcodeScanner(false)} className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full z-50"><X className="w-5 h-5"/></button>
+            </div>
+          ) : (
+            <>
+              {/* Futuristic Brackets */}
           <div className={`scanner-corner scanner-corner-tl ${isNutritionScanActive ? 'scanner-corner-active' : ''}`} />
           <div className={`scanner-corner scanner-corner-tr ${isNutritionScanActive ? 'scanner-corner-active' : ''}`} />
           <div className={`scanner-corner scanner-corner-bl ${isNutritionScanActive ? 'scanner-corner-active' : ''}`} />
@@ -703,6 +777,8 @@ export function Scan() {
               )}
             </div>
           )}
+          </>
+        )}
 
           {/* Scanning Line */}
           {isShowingViewfinder && cameraReady && <div className={`scanner-line ${isNutritionScanActive ? 'scanner-line-nutrition' : ''}`} />}
