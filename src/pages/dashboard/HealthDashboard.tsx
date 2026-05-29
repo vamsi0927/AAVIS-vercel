@@ -201,14 +201,20 @@ export function HealthDashboard() {
                     }} />
 
                   <Tooltip
-                    cursor={{
-                      fill: '#2a2f45'
-                    }}
+                    cursor={false}
                     contentStyle={{
                       backgroundColor: '#1f2335',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: '#f4f5fb'
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)'
+                    }}
+                    itemStyle={{
+                      color: '#ffffff',
+                      fontWeight: 'bold'
+                    }}
+                    labelStyle={{
+                      color: '#9ca3b8',
+                      marginBottom: '4px'
                     }} />
 
                   <Bar dataKey="score" radius={[4, 4, 0, 0]}>
