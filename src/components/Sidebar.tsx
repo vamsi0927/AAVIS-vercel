@@ -39,12 +39,9 @@ export function Sidebar({ className = '' }: { className?: string }) {
         <div className="flex items-center gap-3 px-2">
           <img src={logoImg} alt="Aavis Logo" className="w-10 h-10 object-contain" />
           <div>
-            <h1 className="text-xl font-display font-black text-white leading-none mb-0.5">
+            <h1 className="text-xl font-display font-black text-white leading-none">
               Aavis
             </h1>
-            <p className="text-[10px] text-content-secondary uppercase tracking-[0.15em] font-bold">
-              AI Nutritionist
-            </p>
           </div>
         </div>
 
