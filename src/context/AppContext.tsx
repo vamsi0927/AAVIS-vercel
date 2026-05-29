@@ -286,10 +286,12 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           const cloudOnly = cloudConverted.filter(c => !localIds.has(c.id));
           const merged = [...prev.scans, ...cloudOnly];
 
-          // Deduplicate by product name and date to clean up any existing duplicate bugs
+          // Deduplicate by product name and the hour it was scanned (to group rapid duplicates)
           const seen = new Set();
           const deduped = merged.filter(scan => {
-            const key = `${scan.product?.name}-${scan.date}`;
+            // scan.date is ISO string: "2026-05-29T12:05:55Z", slice to 13 gives "2026-05-29T12"
+            const timeKey = scan.date.substring(0, 13);
+            const key = `${scan.product?.name}-${timeKey}`;
             if (seen.has(key)) return false;
             seen.add(key);
             return true;
