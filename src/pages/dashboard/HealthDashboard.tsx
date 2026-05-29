@@ -85,13 +85,17 @@ export function HealthDashboard() {
   let chartData: { day: string; score: number }[] = [];
 
   if (timeRange === 'week') {
-    const days = [];
     const today = new Date();
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
+    const sunday = new Date(today);
+    sunday.setDate(today.getDate() - today.getDay()); // Go back to Sunday
+    
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(sunday);
+      d.setDate(sunday.getDate() + i);
       days.push(d);
     }
+    
     chartData = days.map(d => {
       const dateStr = d.toLocaleDateString(undefined, { weekday: 'short' });
       const scansOnDay = scans.filter(s => {
@@ -104,19 +108,25 @@ export function HealthDashboard() {
       return { day: dateStr, score: avgScoreOnDay };
     });
   } else {
-    // Group into 4 weeks of the last 30 days
+    // Current calendar month divided into 4 weeks
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
     const weeks = [
-      { label: 'Wk 4', minDays: 22, maxDays: 30 },
-      { label: 'Wk 3', minDays: 15, maxDays: 21 },
-      { label: 'Wk 2', minDays: 8, maxDays: 14 },
-      { label: 'Wk 1', minDays: 0, maxDays: 7 }
+      { label: 'Wk 1', minDate: 1, maxDate: 7 },
+      { label: 'Wk 2', minDate: 8, maxDate: 14 },
+      { label: 'Wk 3', minDate: 15, maxDate: 21 },
+      { label: 'Wk 4', minDate: 22, maxDate: 31 }
     ];
+    
     chartData = weeks.map(w => {
       const scansInWeek = scans.filter(s => {
         const scanDate = new Date(s.date);
-        const diffTime = Math.abs(new Date().getTime() - scanDate.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays >= w.minDays && diffDays <= w.maxDays;
+        return scanDate.getMonth() === currentMonth && 
+               scanDate.getFullYear() === currentYear &&
+               scanDate.getDate() >= w.minDate && 
+               scanDate.getDate() <= w.maxDate;
       });
       const avgScoreInWeek = scansInWeek.length > 0
         ? Math.round(scansInWeek.reduce((acc, s) => acc + s.score, 0) / scansInWeek.length)
