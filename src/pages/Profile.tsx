@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const DIET_OPTIONS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
-const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'IBS', 'Celiac'];
+const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'PCOS', 'Thyroid Issues'];
 
 export function Profile() {
   const navigate = useNavigate();
@@ -102,13 +102,27 @@ export function Profile() {
                         placeholder="Your Name"
                         className="w-full glass-input rounded-xl px-4 py-2 text-white placeholder:text-content-secondary font-bold text-base"
                       />
-                      <div className="flex gap-3">
+                      <div className="flex gap-3 flex-wrap">
                         <input
                           type="number"
                           value={editData.age || ''}
                           onChange={(e) => setEditData({...editData, age: parseInt(e.target.value) || ''})}
                           placeholder="Age"
                           className="w-20 glass-input rounded-xl px-4 py-2 text-white placeholder:text-content-secondary text-sm"
+                        />
+                        <input
+                          type="number"
+                          value={editData.height || ''}
+                          onChange={(e) => setEditData({...editData, height: parseInt(e.target.value) || ''})}
+                          placeholder="Height (cm)"
+                          className="w-28 glass-input rounded-xl px-4 py-2 text-white placeholder:text-content-secondary text-sm"
+                        />
+                        <input
+                          type="number"
+                          value={editData.weight || ''}
+                          onChange={(e) => setEditData({...editData, weight: parseInt(e.target.value) || ''})}
+                          placeholder="Weight (kg)"
+                          className="w-28 glass-input rounded-xl px-4 py-2 text-white placeholder:text-content-secondary text-sm"
                         />
                       </div>
                     </div>

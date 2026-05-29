@@ -140,27 +140,27 @@ export function HealthDashboard() {
         
         {/* Left Column: Toggle, Chart, Ask AI, Grade Breakdown */}
         <div className="md:col-span-7 lg:col-span-8 flex flex-col gap-6 mb-6 md:mb-0">
-          {/* Toggle */}
-          <div className="flex bg-navy-800 p-1 rounded-xl">
-            <button
-              onClick={() => setTimeRange('week')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${timeRange === 'week' ? 'bg-navy-600 text-white shadow-sm' : 'text-content-secondary hover:text-content-primary'}`}>
-
-              This Week
-            </button>
-            <button
-              onClick={() => setTimeRange('month')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${timeRange === 'month' ? 'bg-navy-600 text-white shadow-sm' : 'text-content-secondary hover:text-content-primary'}`}>
-
-              This Month
-            </button>
-          </div>
-
-          {/* Chart */}
-          <div className="bg-navy-800 border border-navy-700 rounded-2xl p-5">
-            <h3 className="font-semibold mb-6 text-content-primary">
-              Score Trend
-            </h3>
+          {/* Chart & Toggle Combined */}
+          <div className="glass-card border border-white/5 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-[80px] pointer-events-none" />
+            
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 relative z-10">
+              <h3 className="text-lg font-display font-bold text-white">
+                Score Trend
+              </h3>
+              <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 w-full sm:w-auto">
+                <button
+                  onClick={() => setTimeRange('week')}
+                  className={`flex-1 sm:flex-none px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 ${timeRange === 'week' ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-content-secondary hover:text-white hover:bg-white/5'}`}>
+                  This Week
+                </button>
+                <button
+                  onClick={() => setTimeRange('month')}
+                  className={`flex-1 sm:flex-none px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 ${timeRange === 'month' ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-content-secondary hover:text-white hover:bg-white/5'}`}>
+                  This Month
+                </button>
+              </div>
+            </div>
             <div className="h-48 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart

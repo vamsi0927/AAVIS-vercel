@@ -5,7 +5,7 @@ import { ChevronLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 const DIET_OPTIONS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
-const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'IBS', 'Celiac'];
+const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'PCOS', 'Thyroid Issues'];
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
 
 export function ProfileSetup() {
@@ -119,6 +119,26 @@ export function ProfileSetup() {
                       value={setupData.age}
                       onChange={(e) => setSetupData({...setupData, age: e.target.value ? Number(e.target.value) : ''})}
                       placeholder="e.g. 28"
+                      className="w-full bg-navy-800 border border-navy-700 rounded-2xl py-4 px-5 text-white placeholder:text-content-secondary focus:border-brand-primary focus:outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Height (cm)</label>
+                    <input
+                      type="number"
+                      value={setupData.height}
+                      onChange={(e) => setSetupData({...setupData, height: e.target.value ? Number(e.target.value) : ''})}
+                      placeholder="e.g. 175"
+                      className="w-full bg-navy-800 border border-navy-700 rounded-2xl py-4 px-5 text-white placeholder:text-content-secondary focus:border-brand-primary focus:outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Weight (kg)</label>
+                    <input
+                      type="number"
+                      value={setupData.weight}
+                      onChange={(e) => setSetupData({...setupData, weight: e.target.value ? Number(e.target.value) : ''})}
+                      placeholder="e.g. 70"
                       className="w-full bg-navy-800 border border-navy-700 rounded-2xl py-4 px-5 text-white placeholder:text-content-secondary focus:border-brand-primary focus:outline-none transition-colors"
                     />
                   </div>
