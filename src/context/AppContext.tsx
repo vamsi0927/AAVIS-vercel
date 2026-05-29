@@ -269,6 +269,13 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
                   diet_advice: scan.dietAdvice,
                   ai_summary: scan.aiSummary,
                   image_url: scan.product?.imageUrl
+                }).then(savedRow => {
+                  if (savedRow && savedRow.id) {
+                    setState(s => ({
+                      ...s,
+                      scans: s.scans.map(x => x.id === scan.id ? { ...x, id: savedRow.id, productId: savedRow.id } : x)
+                    }));
+                  }
                 }).catch(err => console.error('Failed to sync local scan:', err));
               });
             });
@@ -277,10 +284,18 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           // Merge: keep local scans that aren't in cloud, add cloud scans
           const localIds = new Set(prev.scans.map(s => s.id));
           const cloudOnly = cloudConverted.filter(c => !localIds.has(c.id));
-          const merged = [...prev.scans, ...cloudOnly].sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          );
-          return { ...prev, scans: merged, scanCount: merged.length };
+          const merged = [...prev.scans, ...cloudOnly];
+
+          // Deduplicate by product name and date to clean up any existing duplicate bugs
+          const seen = new Set();
+          const deduped = merged.filter(scan => {
+            const key = `${scan.product?.name}-${scan.date}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+          return { ...prev, scans: deduped, scanCount: deduped.length };
         });
       }
     } catch (err) {
