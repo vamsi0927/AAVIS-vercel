@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 const DIET_OPTIONS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
 const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'IBS', 'Celiac'];
-const GOAL_OPTIONS = ['Weight Loss', 'Muscle Gain', 'Maintenance', 'Energy', 'Heart Health'];
 
 export function Profile() {
   const navigate = useNavigate();
@@ -201,24 +200,6 @@ export function Profile() {
                           }`}
                         >
                           {condition}
-                        </button>
-                      ))}
-                    </div>
-                  </section>
-
-                  {/* Goals */}
-                  <section>
-                    <h3 className="text-xs font-bold text-content-secondary uppercase tracking-widest mb-3 px-1">Fitness Goals</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-                      {GOAL_OPTIONS.map(goal => (
-                        <button
-                          key={goal}
-                          onClick={() => toggleArrayItem('fitnessGoals', goal)}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all text-center ${
-                            (editData.fitnessGoals || []).some(g => g.toLowerCase() === goal.toLowerCase()) ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white shadow-lg shadow-brand-primary/20' : 'bg-white/5 text-content-secondary border border-white/5 hover:bg-white/10'
-                          }`}
-                        >
-                          {goal}
                         </button>
                       ))}
                     </div>
