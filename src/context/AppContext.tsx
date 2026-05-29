@@ -248,6 +248,32 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         }));
 
         setState(prev => {
+          const cloudIds = new Set(cloudConverted.map(c => c.id));
+          const localOnlyScans = prev.scans.filter(s => !cloudIds.has(s.id));
+          
+          // 2-WAY SYNC: Push any scans that only exist on this device up to the cloud!
+          if (localOnlyScans.length > 0) {
+            import('../lib/supabaseService').then(({ saveScan }) => {
+              localOnlyScans.forEach(scan => {
+                // Background upload
+                saveScan(userId, {
+                  product_name: scan.product?.name || 'Unknown Product',
+                  brand: scan.product?.brand || 'Unknown Brand',
+                  barcode: scan.product?.id,
+                  ingredients: scan.product?.ingredients || [],
+                  nutrients: scan.product?.nutrients || {},
+                  additives: scan.product?.additives || [],
+                  allergens_detected: scan.product?.allergens || [],
+                  health_score: scan.score,
+                  verdict: scan.verdict,
+                  diet_advice: scan.dietAdvice,
+                  ai_summary: scan.aiSummary,
+                  image_url: scan.product?.imageUrl
+                }).catch(err => console.error('Failed to sync local scan:', err));
+              });
+            });
+          }
+
           // Merge: keep local scans that aren't in cloud, add cloud scans
           const localIds = new Set(prev.scans.map(s => s.id));
           const cloudOnly = cloudConverted.filter(c => !localIds.has(c.id));
