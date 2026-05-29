@@ -206,6 +206,10 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           }
         }));
       }
+
+      // FIRE THE SYNC: Automatically fetch user's scan history when they log in!
+      await loadCloudScans();
+
     } catch (err) {
       console.error('[Aavis] Auth sync error:', err);
       setState(prev => ({ ...prev, isAuthenticated: true }));
