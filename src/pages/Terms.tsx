@@ -48,7 +48,7 @@ export function Terms() {
         <section className="space-y-2">
           <h3 className="text-white font-display font-black text-base">3. OCR Accuracy and Verification</h3>
           <p>
-            While Aavis uses state-of-the-art Optical Character Recognition (OCR) and Gemini AI models, text extraction from camera images is dependent on lighting, print quality, and curvature.
+            While Aavis uses state-of-the-art Optical Character Recognition (OCR) and Aavis AI models, text extraction from camera images is dependent on lighting, print quality, and curvature.
           </p>
           <p>
             Users are required to review the extracted text using our in-app verification layer. Aavis is not liable for errors in AI analysis resulting from inaccurate OCR text or packaging variations.

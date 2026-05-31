@@ -40,7 +40,7 @@ export function Privacy() {
         <section className="space-y-2">
           <h3 className="text-white font-display font-black text-base">3. API Connections & Data Sync</h3>
           <p>
-            To provide health ratings, the verified label text is analyzed by our integrated Gemini AI backend service, and barcode requests call public nutritional repositories (e.g., Open Food Facts API). Only anonymous product codes or ingredients strings are sent to perform analyses.
+            To provide health ratings, the verified label text is analyzed by our integrated Aavis AI backend service, and barcode requests call public nutritional repositories (e.g., Open Food Facts API). Only anonymous product codes or ingredients strings are sent to perform analyses.
           </p>
         </section>
 

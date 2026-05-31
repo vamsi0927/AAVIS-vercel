@@ -175,7 +175,7 @@ export async function analyzeMultiStepScan(
 ): Promise<GeminiAnalysisResult> {
 
   onProgress?.('Enhancing image quality...', 5);
-  onProgress?.('Processing with Groq Llama 3...', 30);
+  onProgress?.('Processing with Aavis AI...', 30);
   
   const profileContext = `Age: ${profile.age}, Diet: ${profile.diet}, Allergies: ${profile.allergens.join(', ')}, Conditions: ${profile.conditions.join(', ')}`;
   

@@ -87,7 +87,7 @@ export function ApiSettings() {
           </div>
         </motion.div>
 
-        {/* ─── Aavis AI (Groq) — Locked & Read-only ─── */}
+        {/* ─── Aavis AI — Locked & Read-only ─── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -98,7 +98,7 @@ export function ApiSettings() {
             <Sparkles className="w-6 h-6 text-cyan-400" />
           </div>
           <div className="flex-1">
-            <p className="font-semibold text-white">Aavis AI (Groq Llama 3)</p>
+            <p className="font-semibold text-white">Aavis AI Models</p>
             <p className="text-xs text-content-secondary mt-0.5 flex items-center gap-1.5">
               <Lock className="w-3 h-3" />
               Built-in &amp; secured — no changes needed
