@@ -234,19 +234,19 @@ export function analyzeOCRText(rawText: string): OCRAnalysisResult {
 
   // High sugar / sodium warnings from extracted nutrition
   if (nutrition.sugar > 10) {
-    generalWarnings.push(`⚠️ High sugar content detected (${nutrition.sugar}g per 100g). FSSAI limit: 10g.`);
+    generalWarnings.push(`⚠️ High sugar content detected (${nutrition.sugar}g per ${nutrition.unit || '100g'}). FSSAI limit: 10g.`);
     if (!seenDiseaseWarnings.has('Diabetes')) {
       diseaseWarnings.push(`🏥 Diabetes: High sugar content (${nutrition.sugar}g).`);
     }
   }
   if (nutrition.sodium > 400) {
-    generalWarnings.push(`⚠️ High sodium detected (${nutrition.sodium}mg per 100g). FSSAI limit: 400mg.`);
+    generalWarnings.push(`⚠️ High sodium detected (${nutrition.sodium}mg per ${nutrition.unit || '100g'}). FSSAI limit: 400mg.`);
     if (!seenDiseaseWarnings.has('Hypertension')) {
       diseaseWarnings.push(`🏥 Hypertension: High sodium (${nutrition.sodium}mg).`);
     }
   }
   if (nutrition.satFat > 5) {
-    generalWarnings.push(`⚠️ High saturated fat (${nutrition.satFat}g per 100g).`);
+    generalWarnings.push(`⚠️ High saturated fat (${nutrition.satFat}g per ${nutrition.unit || '100g'}).`);
   }
 
   // 7. Build a Product object for the scoring engine

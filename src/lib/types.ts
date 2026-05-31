@@ -11,14 +11,15 @@ export interface Additive {
 }
 
 export interface Nutrients {
-  calories: number | null; // kcal per 100g
-  sugar: number | null; // g per 100g
-  sodium: number | null; // mg per 100g
-  fat: number | null; // g per 100g
-  satFat: number | null; // g per 100g
-  protein: number | null; // g per 100g
-  fiber: number | null; // g per 100g
-  carbs: number | null; // g per 100g
+  unit?: string; // e.g., '100g', '100ml'
+  calories: number | null; // kcal
+  sugar: number | null; // g
+  sodium: number | null; // mg
+  fat: number | null; // g
+  satFat: number | null; // g
+  protein: number | null; // g
+  fiber: number | null; // g
+  carbs: number | null; // g
 }
 
 export interface Product {

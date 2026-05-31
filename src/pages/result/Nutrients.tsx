@@ -49,9 +49,9 @@ export function ResultNutrients() {
       </header>
 
       <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-6">
-        <p className="text-xs text-content-secondary uppercase tracking-wider">
-          Per 100g / 100ml
-        </p>
+        <span className="text-xs font-medium text-navy-400 bg-white px-3 py-1 rounded-full border border-navy-100">
+          Per {product.nutrients.unit || '100g'}
+        </span>
 
         <div className="space-y-1">
           <NutrientBar

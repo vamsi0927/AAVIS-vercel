@@ -104,14 +104,15 @@ const ANALYSIS_PROMPT = `Analyze this food label text. Return a concise JSON obj
   "brand": "string - brand name, or 'Unknown Brand' if not visible",
   "ingredients": ["array of individual ingredient strings"],
   "nutrients": {
-    "calories": number (kcal per 100g, 0 if not found),
-    "sugar": number (g per 100g, 0 if not found),
-    "sodium": number (mg per 100g, 0 if not found),
-    "fat": number (g per 100g, 0 if not found),
-    "satFat": number (g per 100g, 0 if not found),
-    "protein": number (g per 100g, 0 if not found),
-    "fiber": number (g per 100g, 0 if not found),
-    "carbs": number (g per 100g, 0 if not found)
+    "unit": "string - either '100g', '100ml', or whatever is specified on the label. Default to '100g' if unclear.",
+    "calories": number (kcal, 0 if not found),
+    "sugar": number (g, 0 if not found),
+    "sodium": number (mg, 0 if not found),
+    "fat": number (g, 0 if not found),
+    "satFat": number (g, 0 if not found),
+    "protein": number (g, 0 if not found),
+    "fiber": number (g, 0 if not found),
+    "carbs": number (g, 0 if not found)
   },
   "additives": ["array of E-number codes found, e.g. 'E102', 'E211'"],
   "allergens": ["array of allergen categories"],

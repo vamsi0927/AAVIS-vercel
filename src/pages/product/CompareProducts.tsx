@@ -79,7 +79,7 @@ export function CompareProducts() {
         {/* Nutritional Comparison */}
         <div className="px-4 py-6">
           <h4 className="text-xs font-medium text-content-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Scale className="w-4 h-4" /> Nutrition per 100g
+            <Scale className="w-4 h-4" /> Nutrition per {p.nutrients.unit || '100g'}
           </h4>
           
           <div className="space-y-1 border border-navy-700 rounded-2xl overflow-hidden bg-navy-800">
