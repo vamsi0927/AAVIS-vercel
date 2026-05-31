@@ -140,6 +140,8 @@ export function Scan() {
         width: completedCrop.width * scaleX,
         height: completedCrop.height * scaleY,
       };
+      
+      console.log(`[STEP 1] Upload Started - Preview Mode: ${previewMode}`);
 
       const croppedFile = await getCroppedImg(previewImageUrl, scaledCrop, 0, previewFile.name);
       const mode = previewMode;
@@ -217,6 +219,7 @@ export function Scan() {
     setOcrPercent(0);
 
     try {
+      console.log(`[STEP 2] OCR Started for step: ${step}`);
       setOcrProgress(step === 'ingredients' ? 'Reading Ingredients...' : 'Reading Nutrition Facts...');
       
       const ocrMode = step === 'ingredients' ? 'ingredients' : 'nutrition';
@@ -241,6 +244,7 @@ export function Scan() {
       }
 
       if (step === 'ingredients') {
+        console.log(`[STEP 2] OCR Completed for ingredients`);
         const thumbnail = await generateThumbnail(file);
         setIngredientsImage(thumbnail);
         setOcrPercent(100);
@@ -249,6 +253,7 @@ export function Scan() {
           setReviewingText({ type: 'ingredients', text });
         }, 500);
       } else {
+        console.log(`[STEP 2] OCR Completed for nutrition`);
         setOcrPercent(100);
         setTimeout(() => {
           setIsScanning(false);
@@ -269,6 +274,7 @@ export function Scan() {
     setOcrProgress('Generating Health Report...');
 
     try {
+      console.log(`[STEP 3] Profile Fetch & AI Analysis Started`);
       const result = await analyzeMultiStepScan(ingText, nutText, profile, (msg, p) => {
         setOcrProgress(msg);
         setOcrPercent(p);
@@ -314,6 +320,9 @@ export function Scan() {
       if (isSupabaseConfigured()) {
         const { data: { session } } = await supabase.auth.getSession();
         const userId = session?.user?.id;
+        
+        console.log(`[STEP 4] Report Save Started (User: ${userId})`);
+        
         if (userId) {
           const savedRow = await saveScan(userId, {
             product_name: result.product.name,
@@ -339,12 +348,14 @@ export function Scan() {
       }
 
       setOcrPercent(100);
+      console.log(`[STEP 4] Report Save Completed`);
       addScan(scanRecord);
       setTimeout(() => {
         navigate(`/result/${finalScanId}`, { replace: true });
       }, 500);
 
     } catch (error: any) {
+      console.error(`[STEP 3/4] Failed:`, error);
       setScanError(getGeminiErrorMessage(error.message || 'UNKNOWN'));
       setIsScanning(false);
       setScanStep('ingredients');
