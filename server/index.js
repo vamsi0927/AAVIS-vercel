@@ -115,6 +115,14 @@ const ANALYSIS_PROMPT = `Analyze this food label text. Return a concise JSON obj
     "carbs": number (g, 0 if not found)
   },
   "additives": ["array of E-number codes found, e.g. 'E102', 'E211'"],
+  "dynamicAdditives": {
+    "E-number": {
+      "name": "string",
+      "hazard": "safe|mild|caution|harmful|hazardous",
+      "function": "string - purpose",
+      "healthExplanation": "string - brief health impact"
+    }
+  },
   "allergens": ["array of allergen categories"],
   "warnings": ["array of health warning strings"],
   "aiSummary": "A short funny line about the product (AI roast)"
