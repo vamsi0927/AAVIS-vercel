@@ -70,23 +70,15 @@ export async function getOrCreateUser(_email: string, _name?: string): Promise<D
   if (!isSupabaseConfigured()) return null;
 
   const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
   if (!user) return null;
 
-  try {
-    const { data: existing, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-    
-    console.log('[DB QUERY] profiles (getOrCreateUser) Result:', existing, 'Error:', error);
-    if (error) throw error;
-    return existing as DBUser | null;
-  } catch (err) {
-    console.error('[DB ERROR] profiles (getOrCreateUser) User ID:', user.id, err);
-    throw err;
-  }
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  return existing as DBUser | null;
 }
 
 /**
@@ -109,27 +101,16 @@ export async function updateUserProfile(
 ): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;
 
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(profile)
+    .eq('id', userId)
+    .select()
+    .single();
 
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(profile)
-      .eq('id', userId)
-      .select()
-      .single();
-
-    console.log('[DB QUERY] profiles (updateUserProfile) Result:', data, 'Error:', error);
-    
-    if (error) {
-      console.error('[Aavis] Failed to update profile:', error);
-      throw error;
-    }
-    return data as DBUser;
-  } catch (err) {
-    console.error('[DB ERROR] profiles (updateUserProfile) User ID:', userId, err);
-    throw err;
+  if (error) {
+    console.error('[Aavis] Failed to update profile:', error);
+    return null;
   }
 
   return data as DBUser;
@@ -141,23 +122,13 @@ export async function updateUserProfile(
 export async function getUserById(userId: string): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;
 
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
 
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    console.log('[DB QUERY] profiles (getUserById) Result:', data, 'Error:', error);
-    if (error) throw error;
-    return data as DBUser;
-  } catch (err) {
-    console.error('[DB ERROR] profiles (getUserById) User ID:', userId, err);
-    throw err;
-  }
+  if (error) return null;
   return data as DBUser;
 }
 
@@ -238,7 +209,12 @@ export async function fetchMemeFromDB(condition: string, language = 'en'): Promi
       .eq('condition', condition)
       .eq('language', language);
 
-    if (error || !data || data.length === 0) return null;
+    if (error) {
+      console.warn('[Aavis] Meme table error (missing or permission):', error);
+      return null;
+    }
+
+    if (!data || data.length === 0) return null;
 
     // Pick a random meme
     const randomIdx = Math.floor(Math.random() * data.length);
@@ -275,14 +251,13 @@ export async function saveScan(
     thumbnail_url?: string;
   }
 ): Promise<DBScan | null> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return null;
 
-  try {
-    const { data: scan, error } = await supabase
-      .from('scans')
-      .insert({
-        user_id: userId,
+  // 1. Save the scan (excluding massive AI response data to save space)
+  const { data: scan, error } = await supabase
+    .from('scans')
+    .insert({
+      user_id: userId,
       product_name: scanData.product_name,
       brand: scanData.brand,
       barcode: scanData.barcode,
@@ -302,15 +277,9 @@ export async function saveScan(
     .select()
     .single();
 
-    console.log('[DB QUERY] scans (saveScan) Result:', scan, 'Error:', error);
-
-    if (error) {
-      console.error('[Aavis] Failed to save scan:', error);
-      throw error;
-    }
-  } catch (err) {
-    console.error('[DB ERROR] scans (saveScan) User ID:', userId, err);
-    throw err;
+  if (error) {
+    console.error('[Aavis] Failed to save scan:', error);
+    return null;
   }
 
   // 2. Update streak
@@ -326,24 +295,18 @@ export async function saveScan(
  * Update user scan streak.
  */
 async function updateStreak(userId: string): Promise<void> {
-  const { data: { user: authUser } } = await supabase.auth.getUser();
-  console.log('[AUTH]', authUser?.id, authUser?.email);
+  const { data: user } = await supabase
+    .from('profiles')
+    .select('streak, last_scan_date')
+    .eq('id', userId)
+    .single();
 
-  try {
-    const { data: user, error } = await supabase
-      .from('profiles')
-      .select('streak, last_scan_date')
-      .eq('id', userId)
-      .single();
+  if (!user) return;
 
-    console.log('[DB QUERY] profiles (updateStreak fetch) Result:', user, 'Error:', error);
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const lastScan = user.last_scan_date;
 
-    if (!user) return;
-
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const lastScan = user.last_scan_date;
-
-    let newStreak = 1;
+  let newStreak = 1;
 
   if (lastScan) {
     const lastDate = new Date(lastScan);
@@ -361,17 +324,10 @@ async function updateStreak(userId: string): Promise<void> {
     // else: gap > 1 day — reset to 1
   }
 
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ streak: newStreak, last_scan_date: today })
-      .eq('id', userId);
-      
-    console.log('[DB QUERY] profiles (updateStreak update) Error:', updateError);
-    if (updateError) throw updateError;
-  } catch (err) {
-    console.error('[DB ERROR] profiles (updateStreak) User ID:', userId, err);
-    throw err;
-  }
+  await supabase
+    .from('profiles')
+    .update({ streak: newStreak, last_scan_date: today })
+    .eq('id', userId);
 }
 
 /**
@@ -411,24 +367,17 @@ async function cacheProduct(productData: {
  * Get scan history for a user.
  */
 export async function getUserScans(userId: string, limit = 50): Promise<DBScan[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return [];
 
-  try {
-    const { data, error } = await supabase
-      .from('scans')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
+  const { data, error } = await supabase
+    .from('scans')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
 
-    console.log('[DB QUERY] scans (getUserScans) Result:', data?.length, 'Error:', error);
-    if (error) throw error;
-    return (data || []) as DBScan[];
-  } catch (err) {
-    console.error('[DB ERROR] scans (getUserScans) User ID:', userId, err);
-    throw err;
-  }
+  if (error) return [];
+  return (data || []) as DBScan[];
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -442,32 +391,25 @@ export async function searchWithCache(
   userId: string,
   query: string
 ): Promise<{ response: string; cached: boolean } | null> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return null;
 
-  try {
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    
-    const { data: cached, error } = await supabase
-      .from('search_history')
-      .select('ai_response')
-      .eq('query', query.toLowerCase().trim())
-      .gte('searched_at', twentyFourHoursAgo)
-      .order('searched_at', { ascending: false })
-      .limit(1)
-      .single();
+  // Check cache (same query in last 24 hours)
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  
+  const { data: cached } = await supabase
+    .from('search_history')
+    .select('ai_response')
+    .eq('query', query.toLowerCase().trim())
+    .gte('searched_at', twentyFourHoursAgo)
+    .order('searched_at', { ascending: false })
+    .limit(1)
+    .single();
 
-    console.log('[DB QUERY] search_history (searchWithCache) Result:', cached, 'Error:', error);
-    if (error && error.code !== 'PGRST116') throw error; // ignore 0 rows found
-
-    if (cached?.ai_response) {
-      return { response: cached.ai_response, cached: true };
-    }
-    return null;
-  } catch (err) {
-    console.error('[DB ERROR] search_history (searchWithCache) User ID:', userId, err);
-    throw err;
+  if (cached?.ai_response) {
+    return { response: cached.ai_response, cached: true };
   }
+
+  return null; // No cache — caller should do AI search then call saveSearchResult
 }
 
 /**
@@ -478,48 +420,32 @@ export async function saveSearchResult(
   query: string,
   aiResponse: string
 ): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return;
 
-  try {
-    const { error } = await supabase
-      .from('search_history')
-      .insert({
-        user_id: userId,
-        query: query.toLowerCase().trim(),
-        ai_response: aiResponse
-      });
-      
-    console.log('[DB QUERY] search_history (saveSearchResult) Error:', error);
-    if (error) throw error;
-  } catch (err) {
-    console.error('[DB ERROR] search_history (saveSearchResult) User ID:', userId, err);
-    throw err;
-  }
+  await supabase
+    .from('search_history')
+    .insert({
+      user_id: userId,
+      query: query.toLowerCase().trim(),
+      ai_response: aiResponse
+    });
 }
 
 /**
  * Get recent search history for a user.
  */
 export async function getSearchHistory(userId: string, limit = 10): Promise<{ query: string; ai_response: string; searched_at: string }[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return [];
 
-  try {
-    const { data, error } = await supabase
-      .from('search_history')
-      .select('query, ai_response, searched_at')
-      .eq('user_id', userId)
-      .order('searched_at', { ascending: false })
-      .limit(limit);
+  const { data, error } = await supabase
+    .from('search_history')
+    .select('query, ai_response, searched_at')
+    .eq('user_id', userId)
+    .order('searched_at', { ascending: false })
+    .limit(limit);
 
-    console.log('[DB QUERY] search_history (getSearchHistory) Result:', data?.length, 'Error:', error);
-    if (error) throw error;
-    return data || [];
-  } catch (err) {
-    console.error('[DB ERROR] search_history (getSearchHistory) User ID:', userId, err);
-    throw err;
-  }
+  if (error) return [];
+  return data || [];
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -530,32 +456,24 @@ export async function getSearchHistory(userId: string, limit = 10): Promise<{ qu
  * Get full dashboard data for a user.
  */
 export async function getDashboardData(userId: string): Promise<DashboardData | null> {
-  const { data: { user: authUser } } = await supabase.auth.getUser();
-  console.log('[AUTH]', authUser?.id, authUser?.email);
+  if (!isSupabaseConfigured()) return null;
 
-  try {
-    // 1. Get user
-    const { data: user, error: userError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-      
-    console.log('[DB QUERY] profiles (getDashboardData 1) Result:', user, 'Error:', userError);
-    if (userError) throw userError;
+  // 1. Get user
+  const { data: user } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
 
   // 2. Get last 7 days scans
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const { data: weekScans, error: weekScansError } = await supabase
+  const { data: weekScans } = await supabase
     .from('scans')
     .select('*')
     .eq('user_id', userId)
     .gte('created_at', sevenDaysAgo)
     .order('created_at', { ascending: false });
-    
-  console.log('[DB QUERY] scans (getDashboardData 2) Result:', weekScans?.length, 'Error:', weekScansError);
-  if (weekScansError) throw weekScansError;
 
   const scans = (weekScans || []) as DBScan[];
 
@@ -588,19 +506,15 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
     count: chartMap[day]?.count || 0
   }));
 
-    return {
-      user: user as DBUser,
-      recentScans: scans,
-      weeklyGrade,
-      weeklyAvgScore,
-      hazardousCount,
-      totalScansThisWeek: scans.length,
-      chartData
-    };
-  } catch (err) {
-    console.error('[DB ERROR] profiles/scans (getDashboardData) User ID:', userId, err);
-    throw err;
-  }
+  return {
+    user: user as DBUser,
+    recentScans: scans,
+    weeklyGrade,
+    weeklyAvgScore,
+    hazardousCount,
+    totalScansThisWeek: scans.length,
+    chartData
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -612,44 +526,28 @@ export async function toggleBookmarkDB(
   scanId: string,
   action: 'add' | 'remove'
 ): Promise<boolean> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return false;
 
-  try {
-    const { error } = await supabase
-      .from('scans')
-      .update({ is_bookmarked: action === 'add' })
-      .eq('user_id', userId)
-      .eq('id', scanId);
-      
-    console.log('[DB QUERY] scans (toggleBookmarkDB) Error:', error);
-    if (error) throw error;
-    return true;
-  } catch (err) {
-    console.error('[DB ERROR] scans (toggleBookmarkDB) User ID:', userId, err);
-    throw err;
-  }
+  const { error } = await supabase
+    .from('scans')
+    .update({ is_bookmarked: action === 'add' })
+    .eq('user_id', userId)
+    .eq('id', scanId);
+  return !error;
 }
 
 export async function getUserBookmarks(userId: string): Promise<any[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return [];
 
-  try {
-    const { data, error } = await supabase
-      .from('scans')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_bookmarked', true)
-      .order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from('scans')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_bookmarked', true)
+    .order('created_at', { ascending: false });
 
-    console.log('[DB QUERY] scans (getUserBookmarks) Result:', data?.length, 'Error:', error);
-    if (error) throw error;
-    return data || [];
-  } catch (err) {
-    console.error('[DB ERROR] scans (getUserBookmarks) User ID:', userId, err);
-    throw err;
-  }
+  if (error) return [];
+  return data || [];
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -662,26 +560,18 @@ export async function submitReport(
   reason: string,
   details: string
 ): Promise<boolean> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('[AUTH]', user?.id, user?.email);
+  if (!isSupabaseConfigured()) return false;
 
-  try {
-    const { error } = await supabase
-      .from('reports')
-      .insert({
-        user_id: userId,
-        product_id: productId,
-        reason,
-        details
-      });
+  const { error } = await supabase
+    .from('reports')
+    .insert({
+      user_id: userId,
+      product_id: productId,
+      reason,
+      details
+    });
 
-    console.log('[DB QUERY] reports (submitReport) Error:', error);
-    if (error) throw error;
-    return true;
-  } catch (err) {
-    console.error('[DB ERROR] reports (submitReport) User ID:', userId, err);
-    throw err;
-  }
+  return !error;
 }
 
 // ═══════════════════════════════════════════════════════════════

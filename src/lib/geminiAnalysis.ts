@@ -60,8 +60,6 @@ export interface GeminiAnalysisResult {
 
 // ─── Helper: call backend ─────────────────────────────────────────
 async function callBackend(endpoint: string, body: object): Promise<any> {
-  console.log(`[API CALL] Starting ${endpoint}`, { method: 'POST', body });
-  
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -70,14 +68,10 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const errMsg = `API_ERROR: ${errorData?.error || response.statusText}`;
-    console.error(`[API ERROR] ${endpoint}`, response.status, errorData);
-    throw new Error(errMsg);
+    throw new Error(`API_ERROR: ${errorData?.error || response.statusText}`);
   }
 
-  const data = await response.json();
-  console.log(`[API SUCCESS] ${endpoint} Status: ${response.status}`, data);
-  return data;
+  return response.json();
 }
 
 // ─── Helper: build Product from parsed JSON ───────────────────────
