@@ -196,11 +196,65 @@ export function getMemeCondition(
   return 'safe';
 }
 
+// Local fallback memes when Supabase table does not exist
+const LOCAL_MEMES: Record<string, string[]> = {
+  trans_fat: [
+    "Trans fat detected. Your arteries are typing a strongly worded letter.",
+    "Eating trans fat is like inviting a clog to a pipe party. Avoid!",
+    "Trans fats? More like: Transfer this back to the shelf."
+  ],
+  additives_3plus: [
+    "More E-numbers than a math textbook. Proceed with caution.",
+    "This ingredient list looks like a periodic table. Are we eating or doing chemistry?",
+    "Three or more additives detected. Chemistry class is in session!"
+  ],
+  artificial_colors: [
+    "Colors not found in nature. Your tongue might glow in the dark.",
+    "If it looks like a neon sign, it probably shouldn't be inside you.",
+    "Artificial colors: great for highlighters, questionable for human ingestion."
+  ],
+  high_sugar: [
+    "Sugar rush incoming! Fasten your seatbelt and prepare for the crash.",
+    "This has enough sugar to make a dentist buy a yacht.",
+    "Sweet, sweeter, diabetes speedrun. Drink some water instead!"
+  ],
+  high_sodium: [
+    "Salter than a Call of Duty lobby. Keep a gallon of water nearby.",
+    "Sodium level: dehydration speedrun. Your blood pressure has entered the chat.",
+    "More salt than the Dead Sea. Your kidneys are requesting an intervention."
+  ],
+  high_calories: [
+    "Calories: High. Energy level: ready to run a marathon. Are you going to run a marathon?",
+    "Dense energy pack! Enjoy in moderation unless you are climbing Mount Everest.",
+    "High calories detected. Treat this like a rare boss fight — occasionally!"
+  ],
+  hazardous_overall: [
+    "Verdict: Hazardous. Put down the box and slowly back away.",
+    "This is technically food, but your body might disagree. Proceed at your own risk.",
+    "Hazardous overall. Your gut bacteria are packing their bags."
+  ],
+  safe: [
+    "Clean scan! Your body says thank you.",
+    "Looks clean and green. Enjoy your healthy snack!",
+    "Approved! Finally, something that won't make your future self regret life choices."
+  ]
+};
+
+function getRandomLocalMeme(condition: string): string {
+  const memesList = LOCAL_MEMES[condition] || LOCAL_MEMES['safe'];
+  const randomIdx = Math.floor(Math.random() * memesList.length);
+  return memesList[randomIdx];
+}
+
+let isMemeTableAvailable = true;
+
 /**
  * Fetch a random meme from the database for a given condition.
  */
 export async function fetchMemeFromDB(condition: string, language = 'en'): Promise<string | null> {
-  if (!isSupabaseConfigured()) return null;
+  if (!isSupabaseConfigured() || !isMemeTableAvailable) {
+    return getRandomLocalMeme(condition);
+  }
 
   try {
     const { data, error } = await supabase
@@ -210,20 +264,25 @@ export async function fetchMemeFromDB(condition: string, language = 'en'): Promi
       .eq('language', language);
 
     if (error) {
-      console.warn('[Aavis] Meme table error (missing or permission):', error);
-      return null;
+      if (error.code === 'PGRST205') {
+        console.warn('[Aavis] Meme table does not exist in schema cache. Disabling memes DB query and falling back to local memes.');
+        isMemeTableAvailable = false;
+      } else {
+        console.warn('[Aavis] Meme table error:', error);
+      }
+      return getRandomLocalMeme(condition);
     }
 
-    if (!data || data.length === 0) return null;
+    if (!data || data.length === 0) {
+      return getRandomLocalMeme(condition);
+    }
 
     // Pick a random meme
     const randomIdx = Math.floor(Math.random() * data.length);
-    const meme = data[randomIdx];
-
-    return meme.text;
+    return data[randomIdx].text;
   } catch (err) {
-    console.error('Error fetching meme from database:', err);
-    return null;
+    console.error('Error fetching meme from database, using local fallback:', err);
+    return getRandomLocalMeme(condition);
   }
 }
 
