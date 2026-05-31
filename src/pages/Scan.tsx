@@ -8,7 +8,7 @@ import { computeHealthScore } from '../lib/scoring';
 import { analyzeMultiStepScan, performOCR, getGeminiErrorMessage } from '../lib/geminiAnalysis';
 import { intelligentOcrCorrection } from '../lib/ocrCorrection';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { getMemeCondition, fetchMemeFromDB, saveScan } from '../lib/supabaseService';
+import { saveScan } from '../lib/supabaseService';
 import Webcam from 'react-webcam';
 import { toast } from 'sonner';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
@@ -276,26 +276,6 @@ export function Scan() {
 
       const scoreResult = computeHealthScore(result.product, profile);
       
-      const memeCondition = getMemeCondition(
-        result.product.nutrients,
-        result.product.additives,
-        scoreResult.score,
-        result.product.ingredients
-      );
-
-      let memeText: string | null = null;
-      if (isSupabaseConfigured()) {
-        try {
-          memeText = await fetchMemeFromDB(memeCondition);
-        } catch (memeErr) {
-          console.warn('Failed to fetch meme, continuing without it:', memeErr);
-        }
-      }
-
-      if (!memeText) {
-        memeText = "Your health is your wealth. Choose wisely!";
-      }
-
       // Add imageUrl to product if we have an ingredientsImage
       if (ingredientsImage) {
         result.product.imageUrl = ingredientsImage;
@@ -310,8 +290,6 @@ export function Scan() {
         warnings: scoreResult.warnings,
         product: result.product,
         aiSummary: result.aiSummary,
-        memeText: memeText,
-        memeCondition: memeCondition,
         dietAdvice: scoreResult.dietAdvice || result.dietAdvice,
         scoreReasons: scoreResult.scoreReasons,
         mainConcerns: scoreResult.mainConcerns || result.mainConcerns,
@@ -332,7 +310,6 @@ export function Scan() {
             allergens_detected: result.product.allergens,
             health_score: scoreResult.score,
             verdict: scoreResult.verdict,
-            meme_shown: memeText || undefined,
             diet_advice: scanRecord.dietAdvice,
             ai_summary: result.aiSummary,
             image_url: ingredientsImage || undefined,
