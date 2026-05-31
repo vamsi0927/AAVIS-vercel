@@ -186,6 +186,13 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- ═══════════════════════════════════════════════════════════════
+-- BACKFILL EXISTING USERS
+-- ═══════════════════════════════════════════════════════════════
+insert into public.profiles (id, email, name)
+select id, email, raw_user_meta_data->>'name' from auth.users
+on conflict (id) do nothing;
+
 
 -- ═══════════════════════════════════════════════════════════════
 -- SUPABASE AUTH SETTINGS (configure in Dashboard)
