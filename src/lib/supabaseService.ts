@@ -72,11 +72,26 @@ export async function getOrCreateUser(_email: string, _name?: string): Promise<D
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: existing } = await supabase
+  const { data: existing, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
+
+  if (!existing) {
+    // Row missing, create it
+    const { data: newUser } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        email: _email || user.email,
+        name: _name || user.user_metadata?.name || 'User'
+      })
+      .select()
+      .single();
+    
+    return newUser as DBUser | null;
+  }
 
   return existing as DBUser | null;
 }
