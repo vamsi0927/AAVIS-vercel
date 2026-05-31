@@ -4,7 +4,7 @@
 -- ═══════════════════════════════════════════════════════════════
 
 -- ─── 1. Users (profiles linked to Supabase Auth) ──────────────
-create table if not exists users (
+create table if not exists profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
   name text,
@@ -42,7 +42,7 @@ create table if not exists products (
 -- ─── 3. Scans ──────────────────────────────────────────────────
 create table if not exists scans (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references users(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
   product_name text,
   brand text,
   barcode text,
@@ -64,7 +64,7 @@ create table if not exists scans (
 -- ─── 4. Bookmarks ──────────────────────────────────────────────
 create table if not exists bookmarks (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references users(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
   product_id uuid references products(id) on delete cascade,
   created_at timestamp with time zone default now(),
   unique(user_id, product_id)
@@ -75,7 +75,7 @@ create table if not exists bookmarks (
 -- ─── 6. Search History ─────────────────────────────────────────
 create table if not exists search_history (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references users(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
   query text,
   ai_response text,
   searched_at timestamp with time zone default now()
@@ -84,7 +84,7 @@ create table if not exists search_history (
 -- ─── 7. Reports ────────────────────────────────────────────────
 create table if not exists reports (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references users(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
   product_id uuid references products(id) on delete set null,
   reason text,
   details text,
@@ -103,7 +103,7 @@ create index if not exists idx_search_history_user_id on search_history(user_id)
 create index if not exists idx_search_history_searched_at on search_history(searched_at);
 
 create index if not exists idx_products_barcode on products(barcode);
-create index if not exists idx_users_email on users(email);
+create index if not exists idx_profiles_email on profiles(email);
 
 
 -- ═══════════════════════════════════════════════════════════════
@@ -111,7 +111,7 @@ create index if not exists idx_users_email on users(email);
 -- Users can only access their own data.
 -- Products are public-read.
 -- ═══════════════════════════════════════════════════════════════
-alter table users enable row level security;
+alter table profiles enable row level security;
 alter table scans enable row level security;
 alter table products enable row level security;
 alter table bookmarks enable row level security;
@@ -120,7 +120,7 @@ alter table search_history enable row level security;
 alter table reports enable row level security;
 
 -- Drop old permissive policies first
-drop policy if exists "Allow all for users" on users;
+drop policy if exists "Allow all for profiles" on profiles;
 drop policy if exists "Allow all for scans" on scans;
 drop policy if exists "Allow all for products" on products;
 drop policy if exists "Allow all for bookmarks" on bookmarks;
@@ -128,10 +128,10 @@ drop policy if exists "Allow all for bookmarks" on bookmarks;
 drop policy if exists "Allow all for search_history" on search_history;
 drop policy if exists "Allow all for reports" on reports;
 
--- USERS: each user can only see/edit their own row
-create policy "users_select_own" on users for select using (id = auth.uid());
-create policy "users_update_own" on users for update using (id = auth.uid());
-create policy "users_insert_own" on users for insert with check (id = auth.uid());
+-- PROFILES: each user can only see/edit their own row
+create policy "profiles_select_own" on profiles for select using (id = auth.uid());
+create policy "profiles_update_own" on profiles for update using (id = auth.uid());
+create policy "profiles_insert_own" on profiles for insert with check (id = auth.uid());
 
 -- SCANS: user can only access their own scans
 create policy "scans_select_own" on scans for select using (user_id = auth.uid());
@@ -162,7 +162,7 @@ create policy "reports_insert_own" on reports for insert with check (user_id = a
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.users (id, email, name)
+  insert into public.profiles (id, email, name)
   values (
     new.id,
     new.email,
