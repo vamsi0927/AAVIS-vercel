@@ -310,7 +310,7 @@ export function Scan() {
         personalizedWarnings: scoreResult.personalizedWarnings,
       };
 
-      let finalScanId = scanId;
+      let finalScanId = scanRecord.id;
       if (isSupabaseConfigured()) {
         const { data: { session } } = await supabase.auth.getSession();
         const userId = session?.user?.id;
