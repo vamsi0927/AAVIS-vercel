@@ -116,10 +116,16 @@ export async function updateUserProfile(
 ): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
   const { data, error } = await supabase
     .from('profiles')
-    .update(profile)
-    .eq('id', userId)
+    .upsert({ 
+      id: userId, 
+      email: user.email!, 
+      ...profile 
+    }, { onConflict: 'id' })
     .select()
     .single();
 
