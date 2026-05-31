@@ -239,7 +239,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         const cloudConverted: ScanResult[] = cloudScans.map(cs => ({
           id: cs.id,
           productId: cs.id,
-          date: cs.scanned_at,
+          date: cs.created_at,
           score: cs.health_score,
           verdict: cs.verdict as any,
           warnings: [],

@@ -3,6 +3,14 @@
 -- Run this in Supabase SQL Editor (supabase.com → SQL Editor)
 -- ═══════════════════════════════════════════════════════════════
 
+-- Ensure a clean slate (warning: deletes existing data)
+drop table if exists scans cascade;
+drop table if exists bookmarks cascade;
+drop table if exists search_history cascade;
+drop table if exists reports cascade;
+drop table if exists products cascade;
+drop table if exists profiles cascade;
+
 -- ─── 1. Users (profiles linked to Supabase Auth) ──────────────
 create table if not exists profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -58,7 +66,7 @@ create table if not exists scans (
   gemini_analysis jsonb,
   ai_summary text,
   image_url text,
-  scanned_at timestamp with time zone default now()
+  created_at timestamp with time zone default now()
 );
 
 -- ─── 4. Bookmarks ──────────────────────────────────────────────
@@ -97,7 +105,7 @@ create table if not exists reports (
 -- INDEXES for performance
 -- ═══════════════════════════════════════════════════════════════
 create index if not exists idx_scans_user_id on scans(user_id);
-create index if not exists idx_scans_scanned_at on scans(scanned_at);
+create index if not exists idx_scans_created_at on scans(created_at);
 create index if not exists idx_bookmarks_user_id on bookmarks(user_id);
 create index if not exists idx_search_history_user_id on search_history(user_id);
 create index if not exists idx_search_history_searched_at on search_history(searched_at);
