@@ -27,8 +27,9 @@ export function ScanManual() {
       // Score it based on user's health profile
       const scoredResult = computeHealthScore(aiResult.product, profile);
       
-      const scan = {
+      const scan: any = {
         id: `scan_${Date.now()}`,
+        productId: aiResult.product.id,
         date: new Date().toISOString(),
         product: aiResult.product,
         aiSummary: aiResult.aiSummary,
@@ -37,9 +38,39 @@ export function ScanManual() {
         dietAdvice: scoredResult.dietAdvice || aiResult.dietAdvice,
       };
       
+      let finalScanId = scan.id;
+      const { supabase, isSupabaseConfigured } = await import('../../lib/supabase');
+      if (isSupabaseConfigured()) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
+        if (userId) {
+          const { saveScan } = await import('../../lib/supabaseService');
+          const savedRow = await saveScan(userId, {
+            product_name: aiResult.product.name,
+            brand: aiResult.product.brand,
+            barcode: aiResult.product.id,
+            ingredients: aiResult.product.ingredients,
+            nutrients: aiResult.product.nutrients,
+            additives: aiResult.product.additives,
+            allergens_detected: aiResult.product.allergens,
+            health_score: scoredResult.score,
+            verdict: scoredResult.verdict,
+            diet_advice: scan.dietAdvice,
+            ai_summary: aiResult.aiSummary,
+            image_url: aiResult.product.imageUrl,
+          });
+          if (savedRow) {
+            finalScanId = savedRow.id;
+            scan.id = finalScanId;
+            scan.productId = finalScanId;
+            scan.product.id = finalScanId;
+          }
+        }
+      }
+
       addScan(scan);
       
-      navigate(`/result/${scan.id}`, { replace: true });
+      navigate(`/result/${finalScanId}`, { replace: true });
     } catch (err: any) {
       setError(getGeminiErrorMessage(err.message));
     } finally {

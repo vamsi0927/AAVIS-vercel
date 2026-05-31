@@ -310,10 +310,12 @@ export function Scan() {
         personalizedWarnings: scoreResult.personalizedWarnings,
       };
 
+      let finalScanId = scanId;
       if (isSupabaseConfigured()) {
-        const userId = localStorage.getItem('aavis_user_id');
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
         if (userId) {
-          saveScan(userId, {
+          const savedRow = await saveScan(userId, {
             product_name: result.product.name,
             brand: result.product.brand,
             ingredients: result.product.ingredients,
@@ -326,14 +328,20 @@ export function Scan() {
             diet_advice: scanRecord.dietAdvice,
             ai_summary: result.aiSummary,
             image_url: ingredientsImage || undefined,
-          }).catch(console.error);
+          });
+          if (savedRow) {
+            finalScanId = savedRow.id;
+            scanRecord.id = finalScanId;
+            scanRecord.productId = finalScanId;
+            scanRecord.product!.id = finalScanId;
+          }
         }
       }
 
       setOcrPercent(100);
       addScan(scanRecord);
       setTimeout(() => {
-        navigate(`/result/${scanRecord.id}`, { replace: true });
+        navigate(`/result/${finalScanId}`, { replace: true });
       }, 500);
 
     } catch (error: any) {

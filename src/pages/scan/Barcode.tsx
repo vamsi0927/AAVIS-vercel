@@ -9,19 +9,49 @@ export function ScanBarcode() {
   const navigate = useNavigate();
   const { profile, addScan } = useAppContext();
   const [isScanning, setIsScanning] = useState(false);
-  const handleCapture = () => {
+  const handleCapture = async () => {
     setIsScanning(true);
-    setTimeout(() => {
+    setTimeout(async () => {
       const product =
       SAMPLE_PRODUCTS[Math.floor(Math.random() * SAMPLE_PRODUCTS.length)];
       const result = computeHealthScore(product, profile);
-      const scan = {
+      const scan: any = {
         id: `scan_${Date.now()}`,
+        productId: product.id,
         date: new Date().toISOString(),
         ...result
       };
+
+      let finalScanId = scan.id;
+      const { supabase, isSupabaseConfigured } = await import('../../lib/supabase');
+      if (isSupabaseConfigured()) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
+        if (userId) {
+          const { saveScan } = await import('../../lib/supabaseService');
+          const savedRow = await saveScan(userId, {
+            product_name: product.name,
+            brand: product.brand,
+            barcode: product.id,
+            ingredients: product.ingredients,
+            nutrients: product.nutrients,
+            additives: product.additives,
+            allergens_detected: product.allergens,
+            health_score: result.score,
+            verdict: result.verdict,
+            diet_advice: result.dietAdvice,
+            image_url: product.imageUrl,
+          });
+          if (savedRow) {
+            finalScanId = savedRow.id;
+            scan.id = finalScanId;
+            scan.productId = finalScanId;
+          }
+        }
+      }
+
       addScan(scan);
-      navigate(`/result/${scan.id}`, {
+      navigate(`/result/${finalScanId}`, {
         replace: true
       });
     }, 1500);

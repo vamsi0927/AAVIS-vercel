@@ -6,6 +6,7 @@ import { askGeminiAboutFood, getGeminiErrorMessage } from '../lib/geminiAnalysis
 import { motion, AnimatePresence } from 'framer-motion';
 import { searchWithCache, saveSearchResult, getSearchHistory } from '../lib/supabaseService';
 import { isSupabaseConfigured } from '../lib/supabase';
+import { useAppContext } from '../context/AppContext';
 
 const SUGGESTED_CHIPS = ['E319', 'TBHQ', 'Trans Fat', 'MSG', 'Aspartame', 'Tartrazine', 'Refined Oil', 'High Fructose Corn Syrup'];
 
@@ -22,15 +23,16 @@ export function Search() {
   // Search history
   const [recentSearches, setRecentSearches] = useState<{ query: string; ai_response: string; searched_at: string }[]>([]);
 
+  const { supabaseUserId: userId } = useAppContext();
+
   // Load recent searches on mount
   useEffect(() => {
-    const userId = localStorage.getItem('aavis_user_id');
     if (userId && isSupabaseConfigured()) {
       getSearchHistory(userId, 8).then(history => {
         setRecentSearches(history);
       });
     }
-  }, []);
+  }, [userId]);
 
   // Local product match
   const results = query.trim() ?
@@ -50,8 +52,6 @@ export function Search() {
     setError(null);
 
     try {
-      const userId = localStorage.getItem('aavis_user_id');
-
       // 1. Check cache first
       if (userId && isSupabaseConfigured()) {
         const cached = await searchWithCache(userId, searchQuery);

@@ -6,7 +6,7 @@ import {
   NotificationPrefs,
   AppNotification } from
 '../lib/types';
-import { loadState, saveState } from '../lib/storage';
+import { loadLocalPrefs, saveLocalPrefs } from '../lib/storage';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { getOrCreateUser, updateUserProfile, getUserScans } from '../lib/supabaseService';
 import { computeHealthScore } from '../lib/scoring';
@@ -69,52 +69,51 @@ const defaultNotifications: AppNotification[] = [
   }
 ];
 
-// Ensure new state fields exist for users with old local storage
-const ensureCompleteState = (state: any): AppState => ({
-  isAuthenticated: state.isAuthenticated ?? false,
-  profile: state.profile ?? {
-    name: '',
-    age: '',
-    gender: 'Prefer not to say',
-    height: '',
-    weight: '',
-    activityLevel: 'Moderately Active',
-    diet: 'None',
-    allergens: [],
-    conditions: []
-  },
-  scans: state.scans ?? [],
-  bookmarkedProductIds: state.bookmarkedProductIds ?? [],
-  hasCompletedOnboarding: state.hasCompletedOnboarding ?? false,
-  scanCount: state.scanCount ?? 0,
-  hasRated: state.hasRated ?? false,
-  language: state.language ?? 'en',
-  notificationPrefs: state.notificationPrefs ?? {
-    dailyTips: true,
-    scanReminders: true,
-    productAlerts: true,
-    weeklyReport: true,
-    mealReminders: false,
-    healthAlerts: true,
-  },
-  theme: state.theme ?? 'dark',
-  cameraPermission: state.cameraPermission ?? 'unknown',
-  notificationsEnabled: state.notificationsEnabled ?? false,
-  notifications: state.notifications ?? defaultNotifications,
-});
+const getInitialState = (): AppState => {
+  const prefs = loadLocalPrefs();
+  return {
+    isAuthenticated: false,
+    profile: {
+      name: '',
+      age: '',
+      gender: 'Prefer not to say',
+      height: '',
+      weight: '',
+      activityLevel: 'Moderately Active',
+      diet: 'None',
+      allergens: [],
+      conditions: []
+    },
+    scans: [],
+    bookmarkedProductIds: [],
+    scanCount: 0,
+    hasRated: false,
+    notifications: defaultNotifications,
+    // Loaded from local preferences
+    theme: prefs.theme,
+    language: prefs.language,
+    notificationPrefs: prefs.notificationPrefs,
+    cameraPermission: prefs.cameraPermission,
+    notificationsEnabled: prefs.notificationsEnabled,
+    hasCompletedOnboarding: prefs.hasCompletedOnboarding,
+  };
+};
 
 export function AppProvider({ children }: {children: React.ReactNode;}) {
-  const [supabaseUserId, setSupabaseUserId] = useState<string | null>(
-    () => localStorage.getItem('aavis_supabase_user_id')
-  );
-  const [state, setState] = useState<AppState>(() =>
-    ensureCompleteState(loadState(localStorage.getItem('aavis_supabase_user_id')))
-  );
+  const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
+  const [state, setState] = useState<AppState>(getInitialState);
 
-  // Persist state to localStorage (scoped by user ID when available)
+  // Persist only local preferences
   useEffect(() => {
-    saveState(state, supabaseUserId);
-  }, [state, supabaseUserId]);
+    saveLocalPrefs({
+      theme: state.theme,
+      language: state.language,
+      notificationPrefs: state.notificationPrefs,
+      cameraPermission: state.cameraPermission,
+      notificationsEnabled: state.notificationsEnabled,
+      hasCompletedOnboarding: state.hasCompletedOnboarding,
+    });
+  }, [state.theme, state.language, state.notificationPrefs, state.cameraPermission, state.notificationsEnabled, state.hasCompletedOnboarding]);
 
 
   // ── Supabase Auth Listener ──
@@ -135,8 +134,6 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           handleAuthUser(session.user);
         } else if (event === 'SIGNED_OUT') {
           setSupabaseUserId(null);
-          localStorage.removeItem('aavis_supabase_user_id');
-          localStorage.removeItem('aavis_user_id');
           // Clear all user-specific state on logout so a new login starts fresh
           setState(prev => ({
             ...prev,
@@ -171,8 +168,6 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       // authUser.id IS the auth.uid() — always use it as the canonical user ID
       const authUid = authUser.id as string;
       setSupabaseUserId(authUid);
-      localStorage.setItem('aavis_supabase_user_id', authUid);
-      localStorage.setItem('aavis_user_id', authUid);
 
       // Fetch profile from Supabase users table (row created by trigger on signup)
       const dbUser = await getOrCreateUser(email, name);
@@ -218,7 +213,10 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
 
   // ── Load scans from cloud ──
   const loadCloudScans = async () => {
-    const userId = supabaseUserId || localStorage.getItem('aavis_supabase_user_id');
+    // Wait until authUid is available from state (either setupAuthListener or manual pass)
+    // Actually, we pass userId directly if we want, or use supabase.auth.getSession
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
     if (!userId || !isSupabaseConfigured()) return;
 
     try {
@@ -249,50 +247,14 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
 
         setState(prev => {
           const cloudIds = new Set(cloudConverted.map(c => c.id));
-          const localOnlyScans = prev.scans.filter(s => !cloudIds.has(s.id));
-          
-          // Extract bookmarks from cloud scans
           const cloudBookmarkedIds = cloudScans.filter(cs => (cs as any).is_bookmarked).map(cs => cs.id);
-          
-          // 2-WAY SYNC: Push any scans that only exist on this device up to the cloud!
-          if (localOnlyScans.length > 0) {
-            import('../lib/supabaseService').then(({ saveScan }) => {
-              localOnlyScans.forEach(scan => {
-                // Background upload
-                saveScan(userId, {
-                  product_name: scan.product?.name || 'Unknown Product',
-                  brand: scan.product?.brand || 'Unknown Brand',
-                  barcode: scan.product?.id,
-                  ingredients: scan.product?.ingredients || [],
-                  nutrients: scan.product?.nutrients || {},
-                  additives: scan.product?.additives || [],
-                  allergens_detected: scan.product?.allergens || [],
-                  health_score: scan.score,
-                  verdict: scan.verdict,
-                  diet_advice: scan.dietAdvice,
-                  ai_summary: scan.aiSummary,
-                  image_url: scan.product?.imageUrl
-                }).then(savedRow => {
-                  if (savedRow && savedRow.id) {
-                    setState(s => ({
-                      ...s,
-                      scans: s.scans.map(x => x.id === scan.id ? { ...x, id: savedRow.id, productId: savedRow.id } : x)
-                    }));
-                  }
-                }).catch(err => console.error('Failed to sync local scan:', err));
-              });
-            });
-          }
+          // Since we are cloud-first now, we do not upload local scans from localStorage anymore.
+          // Any local scans that exist but aren't in the cloud are discarded because we no longer 
+          // support offline guest-to-account scan merging via localStorage.
 
-          // Merge: keep local scans that aren't in cloud, add cloud scans
-          const localIds = new Set(prev.scans.map(s => s.id));
-          const cloudOnly = cloudConverted.filter(c => !localIds.has(c.id));
-          const merged = [...prev.scans, ...cloudOnly];
-
-          // Deduplicate by product name and the hour it was scanned (to group rapid duplicates)
+          // Replace local scans completely with cloud scans (strict cloud-first)
           const seen = new Set();
-          const deduped = merged.filter(scan => {
-            // scan.date is ISO string: "2026-05-29T12:05:55Z", slice to 13 gives "2026-05-29T12"
+          const deduped = cloudConverted.filter(scan => {
             const timeKey = scan.date.substring(0, 13);
             const key = `${scan.product?.name}-${timeKey}`;
             if (seen.has(key)) return false;
@@ -326,8 +288,6 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       await supabase.auth.signOut();
     }
     setSupabaseUserId(null);
-    localStorage.removeItem('aavis_supabase_user_id');
-    localStorage.removeItem('aavis_user_id');
     setState((prev) => ({
       ...prev,
       isAuthenticated: false
@@ -375,7 +335,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     });
 
     // Sync profile to Supabase
-    const userId = supabaseUserId || localStorage.getItem('aavis_supabase_user_id');
+    const userId = supabaseUserId;
     if (userId && isSupabaseConfigured()) {
       updateUserProfile(userId, {
         name: profile.name,
