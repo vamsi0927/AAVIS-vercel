@@ -73,7 +73,7 @@ export async function getOrCreateUser(_email: string, _name?: string): Promise<D
   if (!user) return null;
 
   const { data: existing } = await supabase
-    .from('users')
+    .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
@@ -93,16 +93,16 @@ export async function updateUserProfile(
     height?: number | null;
     weight?: number | null;
     activity_level?: string;
-    diet_type?: string;
+    dietary_preferences?: string[];
+    allergies?: string[];
     health_conditions?: string[];
-    allergens?: string[];
     language?: string;
   }
 ): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;
 
   const { data, error } = await supabase
-    .from('users')
+    .from('profiles')
     .update(profile)
     .eq('id', userId)
     .select()
@@ -123,7 +123,7 @@ export async function getUserById(userId: string): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;
 
   const { data, error } = await supabase
-    .from('users')
+    .from('profiles')
     .select('*')
     .eq('id', userId)
     .single();
@@ -244,6 +244,7 @@ export async function saveScan(
     gemini_analysis?: any;
     ai_summary?: string;
     image_url?: string;
+    thumbnail_url?: string;
   }
 ): Promise<DBScan | null> {
   if (!isSupabaseConfigured()) return null;
@@ -266,6 +267,7 @@ export async function saveScan(
       diet_advice: scanData.diet_advice,
       ai_summary: scanData.ai_summary,
       image_url: scanData.image_url,
+      thumbnail_url: scanData.thumbnail_url,
       // Intentionally omitting gemini_analysis and raw_ocr_text
     })
     .select()
@@ -290,7 +292,7 @@ export async function saveScan(
  */
 async function updateStreak(userId: string): Promise<void> {
   const { data: user } = await supabase
-    .from('users')
+    .from('profiles')
     .select('streak, last_scan_date')
     .eq('id', userId)
     .single();
@@ -319,7 +321,7 @@ async function updateStreak(userId: string): Promise<void> {
   }
 
   await supabase
-    .from('users')
+    .from('profiles')
     .update({ streak: newStreak, last_scan_date: today })
     .eq('id', userId);
 }
@@ -517,33 +519,27 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
 
 export async function toggleBookmarkDB(
   userId: string,
-  productId: string,
+  scanId: string,
   action: 'add' | 'remove'
 ): Promise<boolean> {
   if (!isSupabaseConfigured()) return false;
 
-  if (action === 'add') {
-    const { error } = await supabase
-      .from('bookmarks')
-      .upsert({ user_id: userId, product_id: productId }, { onConflict: 'user_id,product_id' });
-    return !error;
-  } else {
-    const { error } = await supabase
-      .from('bookmarks')
-      .delete()
-      .eq('user_id', userId)
-      .eq('product_id', productId);
-    return !error;
-  }
+  const { error } = await supabase
+    .from('scans')
+    .update({ is_bookmarked: action === 'add' })
+    .eq('user_id', userId)
+    .eq('id', scanId);
+  return !error;
 }
 
 export async function getUserBookmarks(userId: string): Promise<any[]> {
   if (!isSupabaseConfigured()) return [];
 
   const { data, error } = await supabase
-    .from('bookmarks')
-    .select('*, products(*)')
+    .from('scans')
+    .select('*')
     .eq('user_id', userId)
+    .eq('is_bookmarked', true)
     .order('created_at', { ascending: false });
 
   if (error) return [];

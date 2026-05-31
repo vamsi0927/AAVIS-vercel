@@ -6,7 +6,7 @@ import { useAppContext } from '../context/AppContext';
 
 export function Saved() {
   const navigate = useNavigate();
-  const { bookmarkedProductIds, scans } = useAppContext();
+  const { bookmarkedProductIds, scans, toggleBookmark } = useAppContext();
 
   // Find all products that are bookmarked.
   // Bookmarks can either be a sample product or a custom scanned product.
@@ -89,7 +89,10 @@ export function Saved() {
                 
                 return (
                   <div key={product.id} className="bg-navy-800 border border-navy-700 hover:border-navy-600 transition-colors rounded-2xl p-4 flex flex-col relative group cursor-pointer" onClick={() => navigate(`/result/${product.id}`)}>
-                    <button className="absolute top-3 right-3 text-brand-primary z-10 p-1">
+                    <button 
+                      className="absolute top-3 right-3 text-brand-primary z-10 p-1"
+                      onClick={(e) => { e.stopPropagation(); toggleBookmark(product.id); }}
+                    >
                       <Bookmark className="w-4 h-4 fill-current" />
                     </button>
                     

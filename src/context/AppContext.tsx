@@ -251,6 +251,9 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           const cloudIds = new Set(cloudConverted.map(c => c.id));
           const localOnlyScans = prev.scans.filter(s => !cloudIds.has(s.id));
           
+          // Extract bookmarks from cloud scans
+          const cloudBookmarkedIds = cloudScans.filter(cs => (cs as any).is_bookmarked).map(cs => cs.id);
+          
           // 2-WAY SYNC: Push any scans that only exist on this device up to the cloud!
           if (localOnlyScans.length > 0) {
             import('../lib/supabaseService').then(({ saveScan }) => {
@@ -297,7 +300,9 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
             return true;
           }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-          return { ...prev, scans: deduped, scanCount: deduped.length };
+          const allBookmarks = Array.from(new Set([...prev.bookmarkedProductIds, ...cloudBookmarkedIds]));
+
+          return { ...prev, scans: deduped, scanCount: deduped.length, bookmarkedProductIds: allBookmarks };
         });
       }
     } catch (err) {
@@ -418,14 +423,23 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       scans: []
     }));
   };
-  const toggleBookmark = (productId: string) => {
+  const toggleBookmark = (scanId: string) => {
     setState((prev) => {
-      const isBookmarked = prev.bookmarkedProductIds.includes(productId);
+      const isBookmarked = prev.bookmarkedProductIds.includes(scanId);
+      const newAction = isBookmarked ? 'remove' : 'add';
+      
+      // Sync to cloud
+      if (supabaseUserId) {
+        import('../lib/supabaseService').then(({ toggleBookmarkDB }) => {
+          toggleBookmarkDB(supabaseUserId, scanId, newAction).catch(console.error);
+        });
+      }
+
       return {
         ...prev,
         bookmarkedProductIds: isBookmarked ?
-        prev.bookmarkedProductIds.filter((id) => id !== productId) :
-        [...prev.bookmarkedProductIds, productId]
+        prev.bookmarkedProductIds.filter((id) => id !== scanId) :
+        [...prev.bookmarkedProductIds, scanId]
       };
     });
   };
