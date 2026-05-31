@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { X, Keyboard, ScanLine } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { SAMPLE_PRODUCTS } from '../../data/sampleProducts';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { computeHealthScore } from '../../lib/scoring';
 export function ScanBarcode() {
   const navigate = useNavigate();

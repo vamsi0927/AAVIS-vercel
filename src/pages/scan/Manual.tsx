@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { analyzeTextWithGemini, getGeminiErrorMessage } from '../../lib/geminiAnalysis';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { computeHealthScore } from '../../lib/scoring';
 
 export function ScanManual() {

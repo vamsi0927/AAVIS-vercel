@@ -7,7 +7,7 @@ import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { computeHealthScore } from '../lib/scoring';
 import { analyzeMultiStepScan, performOCR, getGeminiErrorMessage } from '../lib/geminiAnalysis';
 import { intelligentOcrCorrection } from '../lib/ocrCorrection';
-import { isSupabaseConfigured } from '../lib/supabase';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { saveScan } from '../lib/supabaseService';
 import Webcam from 'react-webcam';
 import { toast } from 'sonner';
