@@ -4,7 +4,7 @@ Backend server for the **Aavis Food Label Scanner** app — an AI-powered nutrit
 
 ## 🚀 Features
 
-- **`POST /api/analyze`** — Analyze food label text using AI (Groq primary, Gemini fallback)
+- **`POST /api/analyze`** — Analyze food label text using AI (Google Gemini)
 - **`POST /api/chat`** — Chat with Aavis, the AI nutrition assistant
 - **`POST /api/signup`** — Register a new user
 - **`POST /api/login`** — Authenticate an existing user
@@ -29,7 +29,7 @@ Edit `.env` and add your API keys:
 | Variable | Required | Description |
 |---|---|---|
 | `PORT` | No | Server port (default: `3001`) |
-| `GROQ_API_KEY` | Yes* | Groq API key for Llama 3.3 |
+| `GEMINI_API_KEY` | Yes* | Google Gemini API key |
 | `VITE_GEMINI_API_KEY` | Yes* | Google Gemini API key (fallback) |
 
 *At least one API key is required.
@@ -82,5 +82,5 @@ curl -X POST http://localhost:3001/api/chat \
 
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js
-- **AI**: Groq (Llama 3.3) + Google Gemini (fallback)
+- **AI**: Google Gemini (gemini-3.1-flash-lite)
 - **Auth**: bcryptjs (password hashing)

@@ -1,6 +1,6 @@
 /**
  * Aavis AI Analysis Integration
- * All AI calls go through the secure Groq Llama 3 backend (server/index.cjs)
+ * All AI calls go through the secure Gemini backend (server/index.js)
  */
 
 import { Product } from './types';

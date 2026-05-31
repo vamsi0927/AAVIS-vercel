@@ -20,7 +20,7 @@
 
 import Tesseract from 'tesseract.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import Groq from 'groq-sdk';
+// Groq removed
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const Groq = require('groq-sdk');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -122,7 +121,7 @@ const ANALYSIS_PROMPT = `Analyze this food label text. Return a concise JSON obj
 
 Return ONLY a valid JSON object. No markdown. No backticks. No explanation. Just raw JSON.`;
 
-// ─── ANALYZE ROUTE (Groq + Gemini fallback) ───────────────────────
+// ─── ANALYZE ROUTE (Gemini) ───────────────────────────────────────
 
 app.post('/api/analyze', async (req, res) => {
   const { text } = req.body;
@@ -133,75 +132,27 @@ app.post('/api/analyze', async (req, res) => {
 
   console.log('[Server] Received analysis request, text length:', text.length);
 
-  // Try Groq first, then fallback to Gemini
-  const groqKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
-  if (!groqKey && !geminiKey) {
-    return res.status(500).json({ error: 'No API keys configured on server' });
+  if (!geminiKey) {
+    return res.status(500).json({ error: 'Gemini API key missing on server' });
   }
 
   try {
-    let parsed;
-
-    if (groqKey) {
-      parsed = await analyzeWithGroq(text, groqKey);
-    } else {
-      parsed = await analyzeWithGemini(text, geminiKey);
-    }
-
+    const parsed = await analyzeWithGemini(text, geminiKey);
     console.log('[Server] Analysis complete!');
     return res.json(parsed);
   } catch (error) {
     console.error('[Server] Analysis error:', error.message);
-
-    // If Groq fails and Gemini key exists, try fallback
-    if (groqKey && geminiKey) {
-      try {
-        console.log('[Server] Groq failed, trying Gemini fallback...');
-        const parsed = await analyzeWithGemini(text, geminiKey);
-        console.log('[Server] Gemini fallback succeeded!');
-        return res.json(parsed);
-      } catch (fallbackError) {
-        console.error('[Server] Gemini fallback also failed:', fallbackError.message);
-      }
-    }
-
     return res.status(500).json({ error: error.message || 'Analysis failed' });
   }
 });
-
-// ─── GROQ ANALYSIS ───────────────────────────────────────────────
-
-async function analyzeWithGroq(text, apiKey) {
-  const groq = new Groq({ apiKey });
-
-  const completion = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [
-      {
-        role: 'system',
-        content:
-          'You are Aavis, a professional nutrition and food safety expert. Always return strict valid JSON only. No extra text.',
-      },
-      {
-        role: 'user',
-        content: `${ANALYSIS_PROMPT}\n\nExtracted Text from Label:\n${text}`,
-      },
-    ],
-    temperature: 0.1,
-    max_tokens: 2048,
-  });
-
-  const textResponse = completion.choices[0].message.content;
-  return parseAIResponse(textResponse);
-}
 
 // ─── GEMINI ANALYSIS ──────────────────────────────────────────────
 
 async function analyzeWithGemini(text, apiKey) {
   const GEMINI_API_URL =
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
 
   const prompt = `${ANALYSIS_PROMPT}\n\nExtracted Text from Label:\n${text}`;
 
@@ -262,32 +213,44 @@ app.post('/api/chat', async (req, res) => {
     return res.status(400).json({ error: 'No message provided' });
   }
 
-  const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Groq API key missing' });
+    return res.status(500).json({ error: 'Gemini API key missing' });
   }
 
   try {
-    const groq = new Groq({ apiKey });
+    // Convert OpenAI history format to Gemini format
+    const geminiContents = history.map((msg) => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    }));
+    geminiContents.push({ role: 'user', parts: [{ text: message }] });
 
-    const messages = [
-      {
-        role: 'system',
-        content:
-          'You are Aavis, a helpful and slightly humorous AI nutrition assistant for an Indian health app.',
+    const requestBody = {
+      systemInstruction: {
+        parts: [{ text: 'You are Aavis, a helpful and slightly humorous AI nutrition assistant for an Indian health app.' }]
       },
-      ...history,
-      { role: 'user', content: message },
-    ];
+      contents: geminiContents,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
+      }
+    };
 
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages,
-      temperature: 0.7,
-      max_tokens: 1024,
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
     });
 
-    return res.json({ reply: completion.choices[0].message.content });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'Gemini API error');
+    }
+
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    return res.json({ reply });
   } catch (error) {
     console.error('[Server] Chat error:', error.message);
     return res.status(500).json({ error: error.message });
@@ -314,6 +277,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`\n  🟢 Aavis Backend API running on port ${PORT}`);
   console.log(`  📡 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`  🔑 Groq API:    ${process.env.GROQ_API_KEY ? '✅ configured' : '❌ missing'}`);
-  console.log(`  🔑 Gemini API:  ${process.env.VITE_GEMINI_API_KEY ? '✅ configured' : '❌ missing'}\n`);
+  console.log(`  🔑 Gemini API:  ${process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY ? '✅ configured' : '❌ missing'}\n`);
 });

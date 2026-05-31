@@ -1,7 +1,7 @@
 /**
  * API Configuration Manager
  * Handles storage and retrieval of API keys for external services.
- * The AI backend uses Groq Llama 3 via the server — key is managed server-side.
+ * The AI backend uses Gemini via the server — key is managed server-side.
  */
 
 const STORAGE_KEYS = {
