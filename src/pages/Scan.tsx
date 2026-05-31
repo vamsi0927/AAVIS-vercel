@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { getCroppedImg } from '../lib/cropImage';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
 type ScanStep = 'ingredients' | 'nutrition_prompt' | 'nutrition_scan' | 'processing';
 type PreviewMode = 'none' | 'ingredients' | 'nutrition';
@@ -32,24 +32,29 @@ export function Scan() {
   const [ocrPercent, setOcrPercent] = useState(0);
   const [scanError, setScanError] = useState<string | null>(null);
   
-  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const barcodeInputRef = useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
-    if (showBarcodeScanner) {
-      const scanner = new Html5QrcodeScanner('reader', { qrbox: { width: 250, height: 250 }, fps: 5 }, false);
-      scanner.render(
-        async (decodedText) => {
-          scanner.clear();
-          setShowBarcodeScanner(false);
-          handleBarcodeScanned(decodedText);
-        },
-        (error) => {}
-      );
-      return () => {
-        scanner.clear().catch(console.error);
-      };
+  const handleBarcodeUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setScanStep('processing');
+    setOcrProgress('Detecting barcode in image...');
+    setIsScanning(true);
+    setOcrPercent(20);
+
+    try {
+      const html5QrCode = new Html5Qrcode("hidden-barcode-reader");
+      const decodedText = await html5QrCode.scanFile(file, true);
+      handleBarcodeScanned(decodedText);
+    } catch (err) {
+      setScanError('No barcode detected in this image. Please ensure the barcode is clear and well-lit.');
+      setIsScanning(false);
     }
-  }, [showBarcodeScanner]);
+    
+    // Clear input so same file can be uploaded again if needed
+    if (barcodeInputRef.current) barcodeInputRef.current.value = '';
+  };
 
   const handleBarcodeScanned = async (barcode: string) => {
     setScanStep('processing');
@@ -407,7 +412,7 @@ export function Scan() {
         <div className="grid grid-cols-12 gap-8 flex-1 h-[calc(100vh-12rem)] relative z-10">
           {/* Left Panel: Upload Zone / Cropper / Scanning Loader */}
           <div className="col-span-7 flex flex-col h-full bg-navy-800/40 border border-white/5 rounded-3xl overflow-hidden p-6 relative">
-            {previewMode === 'none' && !isScanning && !showBarcodeScanner && (
+            {previewMode === 'none' && !isScanning && (
               <div 
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -428,17 +433,15 @@ export function Scan() {
                 <p className="text-sm text-content-secondary max-w-sm mb-6">
                   Drag & drop your food package photo here, or <span className="text-brand-primary font-semibold hover:underline">browse files</span>.
                 </p>
-                <button onClick={(e) => { e.stopPropagation(); setShowBarcodeScanner(true); }} className="mb-4 px-4 py-2 bg-brand-primary/20 text-brand-primary rounded-xl font-bold text-xs border border-brand-primary/30">Scan Barcode using WebCam</button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); barcodeInputRef.current?.click(); }} 
+                  className="mb-4 px-4 py-2 bg-brand-primary/20 text-brand-primary rounded-xl font-bold text-xs border border-brand-primary/30"
+                >
+                  Upload Barcode Image Instead
+                </button>
                 <div className="flex gap-2 text-[10px] uppercase font-bold text-content-secondary tracking-widest bg-navy-900/60 px-4 py-2 rounded-full border border-white/5">
                   <span>PNG, JPG or WEBP</span>
                 </div>
-              </div>
-            )}
-
-            {showBarcodeScanner && (
-              <div className="flex-1 flex flex-col items-center justify-center relative">
-                 <div id="reader" className="w-full max-w-md bg-black rounded-2xl overflow-hidden" />
-                 <button onClick={() => setShowBarcodeScanner(false)} className="mt-4 px-4 py-2 bg-navy-700 text-white rounded-xl">Cancel Barcode Scan</button>
               </div>
             )}
 
@@ -675,6 +678,7 @@ export function Scan() {
         </div>
 
         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+        <input type="file" accept="image/*" ref={barcodeInputRef} onChange={handleBarcodeUpload} className="hidden" />
       </div>
     );
   };
@@ -713,26 +717,19 @@ export function Scan() {
       <div className="flex-1 relative flex items-center justify-center px-6">
         
         {/* Got a barcode floating banner */}
-        {!showBarcodeScanner && !isScanning && previewMode === 'none' && (
+        {!isScanning && previewMode === 'none' && (
           <div className="absolute top-4 left-0 right-0 z-50 flex justify-center">
             <button 
-              onClick={() => setShowBarcodeScanner(true)}
+              onClick={() => barcodeInputRef.current?.click()}
               className="bg-brand-primary/20 backdrop-blur-xl border border-brand-primary/50 text-brand-primary font-bold px-4 py-2 rounded-full text-xs animate-bounce shadow-lg shadow-brand-primary/20 flex items-center gap-2"
             >
-              <Camera className="w-4 h-4" /> Got a barcode?
+              <Camera className="w-4 h-4" /> Got a barcode? Upload it!
             </button>
           </div>
         )}
 
         <div className="relative w-full aspect-square max-w-[320px]">
           
-          {showBarcodeScanner ? (
-            <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden z-40 flex flex-col">
-               <div id="reader" className="w-full h-full" />
-               <button onClick={() => setShowBarcodeScanner(false)} className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full z-50"><X className="w-5 h-5"/></button>
-            </div>
-          ) : (
-            <>
               {/* Futuristic Brackets */}
           <div className={`scanner-corner scanner-corner-tl ${isNutritionScanActive ? 'scanner-corner-active' : ''}`} />
           <div className={`scanner-corner scanner-corner-tr ${isNutritionScanActive ? 'scanner-corner-active' : ''}`} />
@@ -777,8 +774,6 @@ export function Scan() {
               )}
             </div>
           )}
-          </>
-        )}
 
           {/* Scanning Line */}
           {isShowingViewfinder && cameraReady && <div className={`scanner-line ${isNutritionScanActive ? 'scanner-line-nutrition' : ''}`} />}
@@ -1110,6 +1105,7 @@ export function Scan() {
       </div>
 
       <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+      <input type="file" accept="image/*" ref={barcodeInputRef} onChange={handleBarcodeUpload} className="hidden" />
     </div>
   );
 }
