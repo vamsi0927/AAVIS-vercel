@@ -17,7 +17,7 @@ import { getCroppedImg } from '../lib/cropImage';
 import { Html5Qrcode } from 'html5-qrcode';
 
 type ScanStep = 'ingredients' | 'nutrition_prompt' | 'nutrition_scan' | 'processing';
-type PreviewMode = 'none' | 'ingredients' | 'nutrition';
+type PreviewMode = 'none' | 'ingredients' | 'nutrition' | 'barcode';
 
 export function Scan() {
   const navigate = useNavigate();
@@ -38,19 +38,7 @@ export function Scan() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setScanStep('processing');
-    setOcrProgress('Detecting barcode in image...');
-    setIsScanning(true);
-    setOcrPercent(20);
-
-    try {
-      const html5QrCode = new Html5Qrcode("hidden-barcode-reader");
-      const decodedText = await html5QrCode.scanFile(file, true);
-      handleBarcodeScanned(decodedText);
-    } catch (err) {
-      setScanError('No barcode detected in this image. Please ensure the barcode is clear and well-lit.');
-      setIsScanning(false);
-    }
+    showPreview(file, 'barcode');
     
     // Clear input so same file can be uploaded again if needed
     if (barcodeInputRef.current) barcodeInputRef.current.value = '';
@@ -156,7 +144,25 @@ export function Scan() {
       const croppedFile = await getCroppedImg(previewImageUrl, scaledCrop, 0, previewFile.name);
       const mode = previewMode;
       clearPreview();
-      handleOcrStep(croppedFile, mode === 'nutrition' ? 'nutrition_scan' : 'ingredients');
+
+      if (mode === 'barcode') {
+        setScanStep('processing');
+        setOcrProgress('Detecting barcode in image...');
+        setIsScanning(true);
+        setOcrPercent(20);
+
+        try {
+          const html5QrCode = new Html5Qrcode("hidden-barcode-reader");
+          const fileToScan = new File([croppedFile], 'barcode.jpg', { type: 'image/jpeg' });
+          const decodedText = await html5QrCode.scanFile(fileToScan, true);
+          handleBarcodeScanned(decodedText);
+        } catch (err) {
+          setScanError('No barcode detected in this image. Please ensure the barcode is clear and well-lit.');
+          setIsScanning(false);
+        }
+      } else {
+        handleOcrStep(croppedFile, mode === 'nutrition' ? 'nutrition_scan' : 'ingredients');
+      }
     } catch (e) {
       console.error(e);
       setScanError('Failed to crop. Please try again.');
@@ -449,7 +455,7 @@ export function Scan() {
               <div className="flex-1 flex flex-col h-full justify-between">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">
-                    {previewMode === 'ingredients' ? '📋 Adjust Ingredients Crop Area' : '📊 Adjust Nutrition Crop Area'}
+                    {previewMode === 'ingredients' ? '📋 Adjust Ingredients Crop Area' : previewMode === 'barcode' ? '📷 Adjust Barcode Crop Area' : '📊 Adjust Nutrition Crop Area'}
                   </span>
                   <button 
                     onClick={cancelPreview} 
@@ -844,7 +850,7 @@ export function Scan() {
               </button>
               <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                 <span className="text-[10px] font-bold text-white uppercase tracking-wider">
-                  {previewMode === 'ingredients' ? '📋 Ingredients Preview' : '📊 Nutrition Preview'}
+                  {previewMode === 'ingredients' ? '📋 Ingredients Preview' : previewMode === 'barcode' ? '📷 Barcode Preview' : '📊 Nutrition Preview'}
                 </span>
               </div>
               <div className="w-10 h-10" />
