@@ -4,6 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { SAMPLE_PRODUCTS } from '../../data/sampleProducts';
 import { NutrientBar } from '../../components/NutrientBar';
+import { isBeverage } from '../../lib/scoring';
 const RDA = {
   calories: 2000,
   sugar: 50,
@@ -50,7 +51,7 @@ export function ResultNutrients() {
 
       <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-6">
         <span className="text-xs font-medium text-navy-400 bg-white px-3 py-1 rounded-full border border-navy-100">
-          Per {product.nutrients.unit || '100g'}
+          Per {product.nutrients.unit || (isBeverage(product) ? '100ml' : '100g')}
         </span>
 
         <div className="space-y-1">

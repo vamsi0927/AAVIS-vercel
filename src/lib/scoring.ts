@@ -2,7 +2,7 @@ import { Product, UserProfile, HazardLevel, ScanResult } from './types';
 import { ADDITIVES_DB } from '../data/additives';
 import { classifyIngredient } from './ingredientRisk';
 
-function isBeverage(product: Product): boolean {
+export function isBeverage(product: Product): boolean {
   const nameL = product.name.toLowerCase();
   const ingrL = product.ingredients.join(' ').toLowerCase();
   const beverageKeywords = ['drink', 'soda', 'juice', 'water', 'cola', 'beverage', 'tea', 'coffee', 'liquid', 'syrup', 'squash', 'nectar'];

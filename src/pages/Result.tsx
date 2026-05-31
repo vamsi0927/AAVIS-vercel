@@ -23,6 +23,7 @@ import {
   getAdditiveBadgeClasses,
   type IngredientRiskLevel
 } from '../lib/ingredientRisk';
+import { computeHealthScore, isBeverage } from '../lib/scoring';
 import type { Additive } from '../lib/types';
 
 function IngredientChip({ name, level, explanation, dynamicInfo }: { name: string; level: IngredientRiskLevel; explanation: string; dynamicInfo?: Additive }) {
@@ -402,7 +403,7 @@ export function Result() {
               <h3 className="font-bold text-sm flex items-center gap-2 text-white">
                 <FileText className="w-4 h-4 text-brand-primary" /> Nutritional Facts
               </h3>
-              <span className="text-[9px] text-content-secondary font-bold uppercase tracking-wider bg-white/5 px-2 py-1 rounded-lg">per {product.nutrients.unit || '100g'}</span>
+              <span className="text-[9px] text-content-secondary font-bold uppercase tracking-wider bg-white/5 px-2 py-1 rounded-lg">per {product.nutrients.unit || (isBeverage(product) ? '100ml' : '100g')}</span>
             </div>
             {[
               { label: 'Calories', icon: '🔥', val: product.nutrients.calories, unit: 'kcal', warn: false, good: false },
