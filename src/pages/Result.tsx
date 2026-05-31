@@ -70,7 +70,7 @@ export function Result() {
   const navigate = useNavigate();
   const { scans, bookmarkedProductIds, toggleBookmark, theme } = useAppContext();
   
-  const scan = scans.find((s) => s.id === id);
+  const scan = scans.find((s) => s.id === id || s.productId === id || s.product?.id === id);
   const product = scan?.product || (scan ? SAMPLE_PRODUCTS.find((p) => p.id === scan.productId) : null);
   
   const [showAllIngredients, setShowAllIngredients] = useState(false);

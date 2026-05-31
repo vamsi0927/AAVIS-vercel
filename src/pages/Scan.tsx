@@ -799,7 +799,7 @@ export function Scan() {
                 </div>
                 <p className="text-white font-bold text-base mb-1">{ocrProgress}</p>
                 <p className="text-content-secondary text-[11px]">
-                  {scanStep === 'processing' ? 'Processing with Aavis AI...' : 'Extracting text via OCR...'}
+                  {scanStep === 'processing' ? 'Processing...' : 'Extracting text via OCR...'}
                 </p>
                 
                 <div className="w-full h-1 bg-navy-700 rounded-full mt-6 overflow-hidden">
