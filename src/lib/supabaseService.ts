@@ -73,7 +73,7 @@ export async function getOrCreateUser(_email: string, _name?: string): Promise<D
   if (!user) return null;
 
   const { data: existing } = await supabase
-    .from('profiles')
+    .from('users')
     .select('*')
     .eq('id', user.id)
     .single();
@@ -102,7 +102,7 @@ export async function updateUserProfile(
   if (!isSupabaseConfigured()) return null;
 
   const { data, error } = await supabase
-    .from('profiles')
+    .from('users')
     .update(profile)
     .eq('id', userId)
     .select()
@@ -123,7 +123,7 @@ export async function getUserById(userId: string): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;
 
   const { data, error } = await supabase
-    .from('profiles')
+    .from('users')
     .select('*')
     .eq('id', userId)
     .single();
@@ -291,7 +291,7 @@ export async function saveScan(
  */
 async function updateStreak(userId: string): Promise<void> {
   const { data: user } = await supabase
-    .from('profiles')
+    .from('users')
     .select('streak, last_scan_date')
     .eq('id', userId)
     .single();
@@ -320,7 +320,7 @@ async function updateStreak(userId: string): Promise<void> {
   }
 
   await supabase
-    .from('profiles')
+    .from('users')
     .update({ streak: newStreak, last_scan_date: today })
     .eq('id', userId);
 }

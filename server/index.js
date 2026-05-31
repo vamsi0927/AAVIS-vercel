@@ -122,8 +122,8 @@ app.post('/api/analyze', async (req, res) => {
   console.log('[Server] Received analysis request, text length:', text.length);
 
   // Try Groq first, then fallback to Gemini
-  const groqKey = process.env.GROQ_API_KEY;
-  const geminiKey = process.env.VITE_GEMINI_API_KEY;
+  const groqKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
   if (!groqKey && !geminiKey) {
     return res.status(500).json({ error: 'No API keys configured on server' });
@@ -250,7 +250,7 @@ app.post('/api/chat', async (req, res) => {
     return res.status(400).json({ error: 'No message provided' });
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'Groq API key missing' });
   }
