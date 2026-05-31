@@ -93,8 +93,8 @@ export async function updateUserProfile(
     height?: number | null;
     weight?: number | null;
     activity_level?: string;
-    dietary_preferences?: string[];
-    allergies?: string[];
+    diet_type?: string;
+    allergens?: string[];
     health_conditions?: string[];
     language?: string;
   }
