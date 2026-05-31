@@ -12,6 +12,7 @@ import { getOrCreateUser, updateUserProfile, getUserScans } from '../lib/supabas
 import { computeHealthScore } from '../lib/scoring';
 
 interface AppContextType extends AppState {
+  isLoadingAuth: boolean;
   login: (userData: { username: string; name?: string }) => void;
   logout: () => void;
   updateProfile: (profile: UserProfile) => void;
@@ -101,6 +102,7 @@ const getInitialState = (): AppState => {
 
 export function AppProvider({ children }: {children: React.ReactNode;}) {
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [state, setState] = useState<AppState>(getInitialState);
 
   // Persist only local preferences
@@ -118,12 +120,19 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
 
   // ── Supabase Auth Listener ──
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) {
+      setIsLoadingAuth(false);
+      return;
+    }
 
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        handleAuthUser(session.user);
+        handleAuthUser(session.user).finally(() => {
+          setIsLoadingAuth(false);
+        });
+      } else {
+        setIsLoadingAuth(false);
       }
     });
 
@@ -131,7 +140,10 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
-          handleAuthUser(session.user);
+          setIsLoadingAuth(true);
+          handleAuthUser(session.user).finally(() => {
+            setIsLoadingAuth(false);
+          });
         } else if (event === 'SIGNED_OUT') {
           setSupabaseUserId(null);
           // Clear all user-specific state on logout so a new login starts fresh
@@ -152,6 +164,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
               conditions: []
             }
           }));
+          setIsLoadingAuth(false);
         }
       }
     );
@@ -475,6 +488,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     <AppContext.Provider
       value={{
         ...state,
+        isLoadingAuth,
         login,
         logout,
         updateProfile,

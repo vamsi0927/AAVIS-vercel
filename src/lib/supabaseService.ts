@@ -202,25 +202,24 @@ export function getMemeCondition(
 export async function fetchMemeFromDB(condition: string, language = 'en'): Promise<string | null> {
   if (!isSupabaseConfigured()) return null;
 
-  const { data, error } = await supabase
-    .from('memes')
-    .select('id, text')
-    .eq('condition', condition)
-    .eq('language', language);
+  try {
+    const { data, error } = await supabase
+      .from('memes')
+      .select('id, text')
+      .eq('condition', condition)
+      .eq('language', language);
 
-  if (error || !data || data.length === 0) return null;
+    if (error || !data || data.length === 0) return null;
 
-  // Pick a random meme
-  const randomIdx = Math.floor(Math.random() * data.length);
-  const meme = data[randomIdx];
+    // Pick a random meme
+    const randomIdx = Math.floor(Math.random() * data.length);
+    const meme = data[randomIdx];
 
-  // Increment used_count
-  await supabase
-    .from('memes')
-    .update({ used_count: undefined }) // rpc would be cleaner but this works
-    .eq('id', meme.id);
-
-  return meme.text;
+    return meme.text;
+  } catch (err) {
+    console.error('Error fetching meme from database:', err);
+    return null;
+  }
 }
 
 /**
