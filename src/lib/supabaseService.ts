@@ -45,7 +45,7 @@ export interface DBScan {
   gemini_analysis: any;
   ai_summary: string | null;
   image_url: string | null;
-  scanned_at: string;
+  created_at: string;
 }
 
 export interface DashboardData {
@@ -369,7 +369,7 @@ export async function getUserScans(userId: string, limit = 50): Promise<DBScan[]
     .from('scans')
     .select('*')
     .eq('user_id', userId)
-    .order('scanned_at', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(limit);
 
   if (error) return [];
@@ -468,8 +468,8 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
     .from('scans')
     .select('*')
     .eq('user_id', userId)
-    .gte('scanned_at', sevenDaysAgo)
-    .order('scanned_at', { ascending: false });
+    .gte('created_at', sevenDaysAgo)
+    .order('created_at', { ascending: false });
 
   const scans = (weekScans || []) as DBScan[];
 
@@ -490,7 +490,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   scans.forEach(scan => {
-    const day = dayNames[new Date(scan.scanned_at).getDay()];
+    const day = dayNames[new Date(scan.created_at).getDay()];
     if (!chartMap[day]) chartMap[day] = { totalScore: 0, count: 0 };
     chartMap[day].totalScore += scan.health_score || 0;
     chartMap[day].count += 1;

@@ -447,12 +447,7 @@ export function Scan() {
                 <p className="text-sm text-content-secondary max-w-sm mb-6">
                   Drag & drop your food package photo here, or <span className="text-brand-primary font-semibold hover:underline">browse files</span>.
                 </p>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); barcodeInputRef.current?.click(); }} 
-                  className="mb-4 px-4 py-2 bg-brand-primary/20 text-brand-primary rounded-xl font-bold text-xs border border-brand-primary/30"
-                >
-                  Upload Barcode Image Instead
-                </button>
+
                 <div className="flex gap-2 text-[10px] uppercase font-bold text-content-secondary tracking-widest bg-navy-900/60 px-4 py-2 rounded-full border border-white/5">
                   <span>PNG, JPG or WEBP</span>
                 </div>
@@ -730,17 +725,7 @@ export function Scan() {
       {/* 2. Scan Area / Viewfinder */}
       <div className="flex-1 relative flex items-center justify-center px-6">
         
-        {/* Got a barcode floating banner */}
-        {!isScanning && previewMode === 'none' && (
-          <div className="absolute top-4 left-0 right-0 z-50 flex justify-center">
-            <button 
-              onClick={() => barcodeInputRef.current?.click()}
-              className="bg-brand-primary/20 backdrop-blur-xl border border-brand-primary/50 text-brand-primary font-bold px-4 py-2 rounded-full text-xs animate-bounce shadow-lg shadow-brand-primary/20 flex items-center gap-2"
-            >
-              <Camera className="w-4 h-4" /> Got a barcode? Upload it!
-            </button>
-          </div>
-        )}
+
 
         <div className="relative w-full aspect-square max-w-[320px]">
           
