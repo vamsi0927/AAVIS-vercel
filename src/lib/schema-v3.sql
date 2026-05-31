@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS scans (
   health_score INTEGER,
   verdict TEXT,
   diet_advice TEXT,
-  meme_shown TEXT,
+
   is_bookmarked BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

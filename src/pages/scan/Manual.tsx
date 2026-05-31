@@ -72,6 +72,11 @@ export function ScanManual() {
       
       navigate(`/result/${finalScanId}`, { replace: true });
     } catch (err: any) {
+      console.error('--- AAVIS CRASH REPORT ---');
+      console.error('Failing Component: Manual.tsx');
+      console.error('Failing Action: analyzeTextWithGemini');
+      console.error('Stack trace:', err.stack || err);
+      console.error('--------------------------');
       setError(getGeminiErrorMessage(err.message));
     } finally {
       setIsAnalyzing(false);

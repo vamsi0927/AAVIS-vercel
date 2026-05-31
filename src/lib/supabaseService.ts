@@ -39,7 +39,7 @@ export interface DBScan {
   allergens_detected: string[];
   health_score: number;
   verdict: string;
-  meme_shown: string | null;
+
   diet_advice: string | null;
   raw_ocr_text: string | null;
   gemini_analysis: any;
@@ -188,7 +188,7 @@ export async function saveScan(
     allergens_detected: string[];
     health_score: number;
     verdict: string;
-    meme_shown?: string;
+
     diet_advice?: string;
     raw_ocr_text?: string;
     gemini_analysis?: any;
@@ -213,7 +213,7 @@ export async function saveScan(
       allergens_detected: scanData.allergens_detected,
       health_score: scanData.health_score,
       verdict: scanData.verdict,
-      meme_shown: scanData.meme_shown,
+
       diet_advice: scanData.diet_advice,
       ai_summary: scanData.ai_summary,
       image_url: scanData.image_url,

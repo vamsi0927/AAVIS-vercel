@@ -330,6 +330,11 @@ export function Scan() {
       }, 500);
 
     } catch (error: any) {
+      console.error('--- AAVIS CRASH REPORT ---');
+      console.error('Failing Component: Scan.tsx');
+      console.error('Failing Action: analyzeMultiStepScan / saveScan');
+      console.error('Stack trace:', error.stack || error);
+      console.error('--------------------------');
       setScanError(getGeminiErrorMessage(error.message || 'UNKNOWN'));
       setIsScanning(false);
       setScanStep('ingredients');

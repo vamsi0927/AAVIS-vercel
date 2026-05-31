@@ -60,6 +60,9 @@ export interface GeminiAnalysisResult {
 
 // ─── Helper: call backend ─────────────────────────────────────────
 async function callBackend(endpoint: string, body: object): Promise<any> {
+  console.log('[Analyze Request Payload]', body);
+  console.log('[Analyze Request JSON]', JSON.stringify(body));
+
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -365,18 +368,28 @@ Do not include any other text, markdown formatting, or backticks. Return raw JSO
 
 // ─── Error message mapping ────────────────────────────────────────
 export function getGeminiErrorMessage(error: string): string {
-  switch (error) {
-    case 'RATE_LIMITED':
-      return 'AI is busy — too many requests. Please wait 30 seconds and try again.';
-    case 'EMPTY_RESPONSE':
-      return 'AI could not analyze this image. Try a clearer photo with better lighting.';
-    case 'PARSE_ERROR':
-      return 'AI returned unexpected data. Please try scanning again.';
-    case 'NETWORK_ERROR':
-      return 'Network error. Check your internet connection and try again.';
-    default:
-      return error.startsWith('API_ERROR:')
-        ? `API Error: ${error.replace('API_ERROR: ', '')}`
-        : 'An unexpected error occurred. Please try again.';
+  const lowerError = error.toLowerCase();
+  
+  if (lowerError.includes('invalid request format')) {
+    return 'Invalid JSON request. Please check the data format.';
   }
+  if (lowerError.includes('429') || lowerError.includes('rate limit') || lowerError.includes('too many requests') || error === 'RATE_LIMITED') {
+    return 'AI API rate limit reached. Please wait 30 seconds and try again.';
+  }
+  if (lowerError.includes('save') && lowerError.includes('supabase')) {
+    return 'Supabase save failed. Could not store your scan data.';
+  }
+  if (lowerError.includes('failed to fetch') || lowerError.includes('network') || error === 'NETWORK_ERROR') {
+    return 'Network error. Check your internet connection and try again.';
+  }
+  if (error === 'PARSE_ERROR' || lowerError.includes('unexpected data')) {
+    return 'Missing analysis data. AI returned unexpected format. Please try scanning again.';
+  }
+  if (error === 'EMPTY_RESPONSE') {
+    return 'AI could not analyze this image. Try a clearer photo with better lighting.';
+  }
+
+  // Final fallback to show the exact error instead of a generic message
+  const exactError = error.startsWith('API_ERROR:') ? error.replace('API_ERROR: ', '') : error;
+  return `Scan analysis failed: ${exactError || 'Unknown Error'}`;
 }

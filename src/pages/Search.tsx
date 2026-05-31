@@ -75,6 +75,11 @@ export function Search() {
         getSearchHistory(userId, 8).then(history => setRecentSearches(history));
       }
     } catch (err: any) {
+      console.error('--- AAVIS CRASH REPORT ---');
+      console.error('Failing Component: Search.tsx');
+      console.error('Failing Action: askGeminiAboutFood');
+      console.error('Stack trace:', err.stack || err);
+      console.error('--------------------------');
       setError(getGeminiErrorMessage(err.message));
     } finally {
       setIsSearching(false);

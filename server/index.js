@@ -11,7 +11,19 @@ const PORT = process.env.PORT || 3001;
 
 // ─── MIDDLEWARE ────────────────────────────────────────────────────
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf, encoding) => {
+    try {
+      req.rawBody = buf.toString(encoding || 'utf8');
+      console.log(`[Raw Request] Method: ${req.method} Path: ${req.path} Size: ${buf.length} bytes Content-Type: ${req.headers['content-type']}`);
+      if (req.path === '/api/analyze' || req.path === '/api/chat') {
+        console.log(`[Raw Body Preview] ${req.rawBody.substring(0, 500)}`);
+      }
+    } catch (e) {
+      console.error('[Raw Request] Could not read raw body', e);
+    }
+  }
+}));
 
 // ─── HEALTH CHECK ─────────────────────────────────────────────────
 app.get('/', (req, res) => {
@@ -280,6 +292,21 @@ app.post('/api/chat', async (req, res) => {
     console.error('[Server] Chat error:', error.message);
     return res.status(500).json({ error: error.message });
   }
+});
+
+// ─── ERROR HANDLING MIDDLEWARE ────────────────────────────────────
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('[INVALID JSON]', err.message);
+    if (req.rawBody) {
+      console.error('[Malformed Body Dump]', req.rawBody);
+    }
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid request format'
+    });
+  }
+  next(err);
 });
 
 // ─── START SERVER ─────────────────────────────────────────────────

@@ -52,7 +52,7 @@ create table if not exists scans (
   allergens_detected text[] default '{}',
   health_score integer,
   verdict text,
-  meme_shown text,
+
   diet_advice text,
   raw_ocr_text text,
   gemini_analysis jsonb,
@@ -70,15 +70,7 @@ create table if not exists bookmarks (
   unique(user_id, product_id)
 );
 
--- ─── 5. Memes ──────────────────────────────────────────────────
-create table if not exists memes (
-  id uuid primary key default gen_random_uuid(),
-  condition text not null,
-  language text default 'en',
-  text text not null,
-  used_count integer default 0,
-  created_at timestamp with time zone default now()
-);
+
 
 -- ─── 6. Search History ─────────────────────────────────────────
 create table if not exists search_history (
@@ -109,7 +101,7 @@ create index if not exists idx_scans_scanned_at on scans(scanned_at);
 create index if not exists idx_bookmarks_user_id on bookmarks(user_id);
 create index if not exists idx_search_history_user_id on search_history(user_id);
 create index if not exists idx_search_history_searched_at on search_history(searched_at);
-create index if not exists idx_memes_condition on memes(condition);
+
 create index if not exists idx_products_barcode on products(barcode);
 create index if not exists idx_users_email on users(email);
 
@@ -117,13 +109,13 @@ create index if not exists idx_users_email on users(email);
 -- ═══════════════════════════════════════════════════════════════
 -- ROW LEVEL SECURITY (RLS)
 -- Users can only access their own data.
--- Memes and products are public-read.
+-- Products are public-read.
 -- ═══════════════════════════════════════════════════════════════
 alter table users enable row level security;
 alter table scans enable row level security;
 alter table products enable row level security;
 alter table bookmarks enable row level security;
-alter table memes enable row level security;
+
 alter table search_history enable row level security;
 alter table reports enable row level security;
 
@@ -132,7 +124,7 @@ drop policy if exists "Allow all for users" on users;
 drop policy if exists "Allow all for scans" on scans;
 drop policy if exists "Allow all for products" on products;
 drop policy if exists "Allow all for bookmarks" on bookmarks;
-drop policy if exists "Allow read for memes" on memes;
+
 drop policy if exists "Allow all for search_history" on search_history;
 drop policy if exists "Allow all for reports" on reports;
 
@@ -154,8 +146,7 @@ create policy "bookmarks_select_own" on bookmarks for select using (user_id = au
 create policy "bookmarks_insert_own" on bookmarks for insert with check (user_id = auth.uid());
 create policy "bookmarks_delete_own" on bookmarks for delete using (user_id = auth.uid());
 
--- MEMES: public read
-create policy "memes_read_all" on memes for select using (true);
+
 
 -- SEARCH HISTORY: user's own only
 create policy "search_history_select_own" on search_history for select using (user_id = auth.uid());
