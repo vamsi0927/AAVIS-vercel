@@ -8,8 +8,12 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+let supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Sanitize stringified "undefined" / "null" values injected by bundlers/hosting
+if (supabaseUrl === 'undefined' || supabaseUrl === 'null') supabaseUrl = '';
+if (supabaseAnonKey === 'undefined' || supabaseAnonKey === 'null') supabaseAnonKey = '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
