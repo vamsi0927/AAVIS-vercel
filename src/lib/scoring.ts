@@ -1,5 +1,6 @@
 import { Product, UserProfile, HazardLevel, ScanResult } from './types';
 import { ADDITIVES_DB } from '../data/additives';
+import { classifyIngredient } from './ingredientRisk';
 
 export function isBeverage(product: Product): boolean {
   if (product.productType === 'beverage') return true;
@@ -238,7 +239,7 @@ export function computeHealthScore(
   }
 
   // ── STEP 6: REFINED FLOUR PENALTY ─────────────────────────────────────────
-  const flourIdx = getIngredientIndex(ingredientsL, ['refined wheat', 'maida', 'bleached flour']);
+  const flourIdx = getIngredientIndex(ingredientsL, ['wheat flour', 'refined wheat', 'maida', 'bleached flour']);
   if (flourIdx === 0) {
     score -= 15;
     scoreReasons.push(`Refined Flour (Primary): -15`);
@@ -266,6 +267,27 @@ export function computeHealthScore(
     score -= processingPenalty; // v3.1 adjustment
     scoreReasons.push(`Ultra-Processed (NOVA 4): -${processingPenalty}`);
     mainConcerns.push('Ultra-Processed: Associated with poorer long-term health outcomes.');
+  }
+
+  // ── STEP 11.5: GENERAL INGREDIENT HAZARD PENALTY ──────────────────────────
+  let ingredientHazardPenalty = 0;
+  product.ingredients.forEach(ing => {
+    const risk = classifyIngredient(ing);
+    let pen = 0;
+    if (risk.level === 'hazardous') pen = 12;
+    else if (risk.level === 'harmful') pen = 6;
+    else if (risk.level === 'moderate' || risk.level === 'caution') pen = 2;
+    
+    if (pen > 0) {
+      ingredientHazardPenalty += pen;
+      scoreReasons.push(`Ingredient Risk (${ing}): -${pen}`);
+    }
+  });
+
+  if (ingredientHazardPenalty > 30) ingredientHazardPenalty = 30; // Cap
+  if (ingredientHazardPenalty > 0) {
+    score -= ingredientHazardPenalty;
+    if (ingredientHazardPenalty > 10) mainConcerns.push('Contains harmful or risky ingredients.');
   }
 
   // ── STEP 12: ADDITIVE SCORING ─────────────────────────────────────────────
