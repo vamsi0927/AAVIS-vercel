@@ -317,6 +317,9 @@ export function Scan() {
             nutrients: {
               ...result.product.nutrients,
               _productType: result.product.productType,
+              _productGenre: (result.product as any).productGenre,
+              _novaGroup: (result.product as any).novaGroup,
+              _allNutrientsExpanded: (result.product as any).allNutrientsExpanded,
               _servingSize: result.product.servingSize,
               _rawNutrients: result.product.rawNutrients
             },

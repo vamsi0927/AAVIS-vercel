@@ -109,6 +109,138 @@ function detectKeywords(ingredients: string[], keywords: string[]): boolean {
   return getIngredientIndex(ingredients, keywords) !== -1;
 }
 
+export const CATEGORY_RANGES: Record<string, { min: number; max: number }> = {
+  'Whole Fruits': { min: 90, max: 100 },
+  'Vegetables': { min: 85, max: 100 },
+  'Nuts & Seeds': { min: 75, max: 95 },
+  'Legumes': { min: 75, max: 95 },
+  'Dairy': { min: 70, max: 95 },
+  'Yogurt': { min: 75, max: 95 },
+  'Cheese': { min: 50, max: 85 },
+  'Beverages': { min: 30, max: 90 },
+  'Soft Drinks / Cola': { min: 0, max: 35 },
+  'Energy Drinks': { min: 0, max: 30 },
+  'Fruit Juices': { min: 40, max: 75 },
+  'Chips & Fried Snacks': { min: 15, max: 45 },
+  'Instant Noodles': { min: 10, max: 50 },
+  'Biscuits & Cookies': { min: 10, max: 45 },
+  'Chocolates & Candy': { min: 0, max: 25 },
+  'Breakfast Cereals': { min: 30, max: 75 },
+  'Sauces & Condiments': { min: 10, max: 60 },
+  'Processed Meats': { min: 5, max: 40 },
+  'Frozen Meals': { min: 20, max: 65 },
+  'Fast Food': { min: 5, max: 50 },
+  'Bakery Products': { min: 20, max: 65 },
+  'General Foods': { min: 5, max: 95 }
+};
+
+export function detectProductCategory(product: Product): string {
+  if (product.productGenre) {
+    // Exact match or fallback mapping
+    const match = Object.keys(CATEGORY_RANGES).find(
+      k => k.toLowerCase() === product.productGenre?.toLowerCase()
+    );
+    if (match) return match;
+  }
+
+  const nameL = product.name.toLowerCase();
+  const ingrL = product.ingredients.join(' ').toLowerCase();
+
+  if (nameL.includes('cola') || nameL.includes('pepsi') || nameL.includes('sprite') || nameL.includes('fanta') || nameL.includes('soda') || nameL.includes('coke') || nameL.includes('carbonated')) {
+    return 'Soft Drinks / Cola';
+  }
+  if (nameL.includes('energy drink') || nameL.includes('red bull') || nameL.includes('monster energy') || nameL.includes('sting') || nameL.includes('gatorade')) {
+    return 'Energy Drinks';
+  }
+  if (nameL.includes('juice') || nameL.includes('nectar') || nameL.includes('tropicana') || nameL.includes('real juice') || nameL.includes('pulpy')) {
+    return 'Fruit Juices';
+  }
+  if (isBeverage(product)) {
+    return 'Beverages';
+  }
+  if (nameL.includes('chips') || nameL.includes('crisps') || nameL.includes('kurkure') || nameL.includes('cheetos') || nameL.includes('lays') || nameL.includes('doritos') || nameL.includes('bhujia') || nameL.includes('namkeen') || nameL.includes('savory') || nameL.includes('popcorn') || nameL.includes('fry') || nameL.includes('puff') || nameL.includes('potato')) {
+    return 'Chips & Fried Snacks';
+  }
+  if (nameL.includes('noodle') || nameL.includes('ramen') || nameL.includes('maggi') || nameL.includes('yippee') || nameL.includes('pasta') || nameL.includes('spaghetti')) {
+    return 'Instant Noodles';
+  }
+  if (nameL.includes('cookie') || nameL.includes('biscuit') || nameL.includes('oreo') || nameL.includes('cookies')) {
+    return 'Biscuits & Cookies';
+  }
+  if (nameL.includes('chocolate') || nameL.includes('candy') || nameL.includes('gummy') || nameL.includes('lollipop') || nameL.includes('caramel') || nameL.includes('fudge') || nameL.includes('sweet') || nameL.includes('confectionery') || nameL.includes('snickers') || nameL.includes('dairy milk') || nameL.includes('gems')) {
+    return 'Chocolates & Candy';
+  }
+  if (nameL.includes('cereal') || nameL.includes('muesli') || nameL.includes('cornflakes') || nameL.includes('oats') || nameL.includes('granola') || nameL.includes('chocos')) {
+    return 'Breakfast Cereals';
+  }
+  if (nameL.includes('sauce') || nameL.includes('ketchup') || nameL.includes('mayo') || nameL.includes('mustard') || nameL.includes('chutney') || nameL.includes('dressing') || nameL.includes('dip') || nameL.includes('spread') || nameL.includes('jam') || nameL.includes('honey')) {
+    return 'Sauces & Condiments';
+  }
+  if (nameL.includes('sausage') || nameL.includes('bacon') || nameL.includes('salami') || nameL.includes('nugget') || nameL.includes('ham') || nameL.includes('meat') || nameL.includes('chicken') || nameL.includes('pepperoni') || nameL.includes('pork') || nameL.includes('beef') || nameL.includes('kabab')) {
+    return 'Processed Meats';
+  }
+  if (nameL.includes('frozen') || nameL.includes('ready to eat') || nameL.includes('meal') || nameL.includes('tv dinner')) {
+    return 'Frozen Meals';
+  }
+  if (nameL.includes('burger') || nameL.includes('pizza') || nameL.includes('fries') || nameL.includes('taco') || nameL.includes('hot dog') || nameL.includes('fast food')) {
+    return 'Fast Food';
+  }
+  if (nameL.includes('bread') || nameL.includes('bun') || nameL.includes('pastry') || nameL.includes('cake') || nameL.includes('donut') || nameL.includes('bakery') || nameL.includes('croissant')) {
+    return 'Bakery Products';
+  }
+  if (nameL.includes('yogurt') || nameL.includes('yoghurt') || nameL.includes('dahi') || nameL.includes('curd')) {
+    return 'Yogurt';
+  }
+  if (nameL.includes('cheese') || nameL.includes('mozzarella') || nameL.includes('cheddar') || nameL.includes('paneer')) {
+    return 'Cheese';
+  }
+  if (nameL.includes('milk') || nameL.includes('butter') || nameL.includes('ghee') || nameL.includes('cream')) {
+    return 'Dairy';
+  }
+  if (nameL.includes('fruit') || nameL.includes('apple') || nameL.includes('banana') || nameL.includes('orange') || nameL.includes('mango') || nameL.includes('berry') || nameL.includes('grape')) {
+    return 'Whole Fruits';
+  }
+  if (nameL.includes('vegetable') || nameL.includes('tomato') || nameL.includes('onion') || nameL.includes('spinach') || nameL.includes('carrot') || nameL.includes('salad')) {
+    return 'Vegetables';
+  }
+  if (nameL.includes('nut') || nameL.includes('seed') || nameL.includes('almond') || nameL.includes('cashew') || nameL.includes('peanut') || nameL.includes('walnut') || nameL.includes('chia') || nameL.includes('sunflower')) {
+    return 'Nuts & Seeds';
+  }
+  if (nameL.includes('legume') || nameL.includes('lentil') || nameL.includes('chickpea') || nameL.includes('pea') || nameL.includes('bean') || nameL.includes('dal')) {
+    return 'Legumes';
+  }
+
+  return 'General Foods';
+}
+
+export function detectNovaGroup(ingredients: string[]): number {
+  const ingrL = ingredients.map(i => i.toLowerCase());
+  const combined = ingrL.join(' ');
+
+  const upfKeywords = [
+    'artificial flavour', 'artificial flavor',
+    'artificial colour', 'artificial color',
+    'maltodextrin', 'modified starch', 'modified wheat starch', 'modified corn starch',
+    'flavor enhancer', 'flavour enhancer', 'e621', 'msg', 'monosodium glutamate', 'e627', 'e631',
+    'tripolyphosphate', 'sodium tripolyphosphate',
+    'sweetener', 'aspartame', 'sucralose', 'acesulfame', 'saccharin', 'neotame',
+    'hydrogenated oil', 'partially hydrogenated',
+    'emulsifier', 'soy lecithin', 'lecithin', 'polyglycerol polyricinoleate', 'pgpr',
+    'stabilizer', 'carrageenan', 'xanthan gum', 'guar gum', 'cellulose gum',
+    'preservative', 'sodium benzoate', 'potassium sorbate', 'calcium propionate'
+  ];
+
+  const hasUpfKeyword = upfKeywords.some(kw => combined.includes(kw) || ingrL.some(i => i.includes(kw)));
+  
+  if (hasUpfKeyword) return 4;
+  
+  const processedKeywords = ['salt', 'sugar', 'oil', 'yeast', 'vinegar'];
+  const hasProcessed = processedKeywords.some(kw => combined.includes(kw));
+  if (hasProcessed) return 3;
+
+  return 1;
+}
+
 export function computeHealthScore(
   rawProduct: Product,
   profile: UserProfile
@@ -121,8 +253,11 @@ export function computeHealthScore(
   const { normalized: product, confidence } = normalizeProduct(rawProduct, warnings);
   const n = product.normalizedNutrients || product.nutrients;
   const rawN = product.rawNutrients || product.nutrients;
-  const isDrink = isBeverage(product);
   
+  // ── STEP 1: IDENTIFY FOOD CATEGORY ──
+  const category = detectProductCategory(product);
+  scoreReasons.push(`Food Category: ${category}`);
+
   let score = 100;
   
   let consumptionImpact: 'Low' | 'Moderate' | 'High' = 'Moderate';
@@ -156,219 +291,248 @@ export function computeHealthScore(
     }
   }
 
-  const conditionsLower = (profile.conditions || []).map(c => c.toLowerCase());
   const ingredientsL = product.ingredients.map(i => i.toLowerCase());
   const combinedText = ingredientsL.join(' ') + ' ' + product.name.toLowerCase();
 
-  // ── Allergen Check ────────────────────────────────────────────────────────
-  const matchedAllergens = product.allergens.filter(a =>
-    (profile.allergens || []).map(x => x.toLowerCase()).includes(a.toLowerCase())
-  );
-  if (matchedAllergens.length > 0) {
-    score -= 30;
-    const allergenList = matchedAllergens.map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ');
-    scoreReasons.push(`Allergens Detected: -30`);
-    mainConcerns.push(`Allergen Alert: Contains ${allergenList}`);
-    personalizedWarnings.push(`Avoid this product due to ${allergenList} allergy.`);
+  // ── STEP 3: DETECT ULTRA-PROCESSED FOODS (NOVA Group) ──
+  const calculatedNova = detectNovaGroup(product.ingredients);
+  const nova = product.novaGroup || calculatedNova;
+  let processingPenalty = 0;
+  if (nova === 4) {
+    processingPenalty = 20;
+    score -= processingPenalty;
+    scoreReasons.push(`Ultra-Processed Food (NOVA 4): -${processingPenalty}`);
+    mainConcerns.push('Ultra-Processed: Contains industrial additives linked to negative health outcomes.');
   }
 
+  // ── STEP 4: ENERGY DENSITY PENALTY ──
+  let energyDensityPenalty = 0;
+  if (n.calories !== null) {
+    const isHighEnergyAffected = ['Chips & Fried Snacks', 'Chocolates & Candy', 'Biscuits & Cookies'].includes(category);
+    const multiplier = isHighEnergyAffected ? 1.5 : 1.0;
+    
+    if (n.calories > 500) {
+      energyDensityPenalty = Math.round(25 * multiplier);
+    } else if (n.calories > 400) {
+      energyDensityPenalty = Math.round(15 * multiplier);
+    } else if (n.calories > 300) {
+      energyDensityPenalty = Math.round(8 * multiplier);
+    }
+    
+    if (energyDensityPenalty > 0) {
+      score -= energyDensityPenalty;
+      scoreReasons.push(`Energy Density (${n.calories} kcal/100g): -${energyDensityPenalty}`);
+    }
+  }
+
+  // ── STEP 5: NUTRIENT ANALYSIS ──
   let sugarPenalty = 0;
   let sodiumPenalty = 0;
   let satFatPenalty = 0;
-  let processingPenalty = 0;
+  let transFatPenalty = 0;
   let proteinBonus = 0;
   let fiberBonus = 0;
 
-  // ── STEP 2: SUGAR PENALTY ─────────────────────────────────────────────────
-  if (n.sugar !== null) {
-    if (isDrink) {
-      if (n.sugar >= 15) sugarPenalty = 70;
-      else if (n.sugar >= 12) sugarPenalty = 55;
-      else if (n.sugar >= 10) sugarPenalty = 40;
-      else if (n.sugar >= 8) sugarPenalty = 25;
-      else if (n.sugar >= 5) sugarPenalty = 15;
-      else if (n.sugar >= 2) sugarPenalty = 5;
-    } else {
-      if (n.sugar >= 40) sugarPenalty = 60;
-      else if (n.sugar >= 30) sugarPenalty = 45;
-      else if (n.sugar >= 20) sugarPenalty = 30;
-      else if (n.sugar >= 15) sugarPenalty = 20;
-      else if (n.sugar >= 10) sugarPenalty = 10;
-      else if (n.sugar >= 5) sugarPenalty = 5;
-    }
+  const isBeverageCategory = ['Beverages', 'Soft Drinks / Cola', 'Energy Drinks', 'Fruit Juices'].includes(category);
 
+  // Sugar Penalty
+  if (n.sugar !== null) {
+    if (isBeverageCategory) {
+      if (n.sugar >= 10) sugarPenalty = 40;
+      else if (n.sugar >= 6) sugarPenalty = 25;
+      else if (n.sugar >= 3) sugarPenalty = 10;
+    } else {
+      if (n.sugar >= 30) sugarPenalty = 35;
+      else if (n.sugar >= 15) sugarPenalty = 20;
+      else if (n.sugar >= 5) sugarPenalty = 8;
+    }
     if (sugarPenalty > 0) {
       score -= sugarPenalty;
-      scoreReasons.push(`Sugar (${n.sugar}g): -${sugarPenalty}`);
-      if (sugarPenalty >= 30) mainConcerns.push(`High Sugar: Risk of obesity, diabetes, dental decay.`);
+      scoreReasons.push(`High Sugar (${n.sugar}g): -${sugarPenalty}`);
+      if (sugarPenalty >= 20) mainConcerns.push('Excessive Sugar: Risk of metabolic issues.');
     }
   }
 
-  // ── STEP 3: SODIUM PENALTY ────────────────────────────────────────────────
+  // Sodium Penalty
   if (n.sodium !== null) {
-    if (n.sodium >= 1200) sodiumPenalty = 40;
-    else if (n.sodium >= 900) sodiumPenalty = 30;
-    else if (n.sodium >= 600) sodiumPenalty = 20;
-    else if (n.sodium >= 300) sodiumPenalty = 10;
-    else if (n.sodium >= 120) sodiumPenalty = 5;
+    // Cheese and Processed Meats have different baseline expectations, but we stick to standardized limits with slight adjustments
+    let sodiumThreshMultiplier = category === 'Cheese' || category === 'Processed Meats' ? 1.2 : 1.0;
+    const adjustedSodium = n.sodium / sodiumThreshMultiplier;
+
+    if (adjustedSodium >= 1000) sodiumPenalty = 35;
+    else if (adjustedSodium >= 600) sodiumPenalty = 25;
+    else if (adjustedSodium >= 300) sodiumPenalty = 12;
+    else if (adjustedSodium >= 120) sodiumPenalty = 5;
 
     if (sodiumPenalty > 0) {
       score -= sodiumPenalty;
       scoreReasons.push(`Sodium (${n.sodium}mg): -${sodiumPenalty}`);
-      if (sodiumPenalty >= 20) mainConcerns.push('High Sodium: Risk of hypertension.');
+      if (sodiumPenalty >= 25) mainConcerns.push('High Sodium: Risk of high blood pressure.');
     }
   }
 
-  // ── STEP 4: SATURATED FAT PENALTY ─────────────────────────────────────────
+  // Saturated Fat Penalty
   if (n.satFat !== null) {
-    if (n.satFat >= 10) satFatPenalty = 25;
-    else if (n.satFat >= 5) satFatPenalty = 15;
-    else if (n.satFat >= 3) satFatPenalty = 8;
-    else if (n.satFat >= 1) satFatPenalty = 3;
+    let satFatThreshMultiplier = category === 'Cheese' || category === 'Dairy' || category === 'Yogurt' ? 1.5 : 1.0;
+    const adjustedSatFat = n.satFat / satFatThreshMultiplier;
+
+    if (adjustedSatFat >= 10) satFatPenalty = 25;
+    else if (adjustedSatFat >= 5) satFatPenalty = 15;
+    else if (adjustedSatFat >= 2) satFatPenalty = 5;
+
     if (satFatPenalty > 0) {
       score -= satFatPenalty;
       scoreReasons.push(`Saturated Fat (${n.satFat}g): -${satFatPenalty}`);
     }
   }
 
-  // ── STEP 5: TRANS FAT ─────────────────────────────────────────────────────
-  if (detectKeywords(ingredientsL, ['partially hydrogenated', 'hydrogenated oil', 'trans fat'])) {
-    score -= 25;
+  // Trans Fat Penalty
+  const hasTransFat = detectKeywords(ingredientsL, ['partially hydrogenated', 'hydrogenated oil', 'trans fat']) || (n.transFat !== undefined && (n as any).transFat > 0);
+  if (hasTransFat) {
+    transFatPenalty = 25;
+    score -= transFatPenalty;
     scoreReasons.push(`Trans Fat detected: -25`);
     mainConcerns.push('Trans Fats: Extremely harmful for cardiovascular health.');
   }
 
-  // ── STEP 6: REFINED FLOUR PENALTY ─────────────────────────────────────────
-  const flourIdx = getIngredientIndex(ingredientsL, ['wheat flour', 'refined wheat', 'maida', 'bleached flour']);
-  if (flourIdx === 0) {
-    score -= 15;
-    scoreReasons.push(`Refined Flour (Primary): -15`);
-  } else if (flourIdx > 0) {
-    score -= 8;
-    scoreReasons.push(`Refined Flour: -8`);
+  // ── STEP 6: INGREDIENT QUALITY ──
+  let flourPenalty = 0;
+  let oilPenalty = 0;
+  let sweetenerPenalty = 0;
+  let nitritesPenalty = 0;
+  let wholeFoodBonus = 0;
+
+  // Palm Oil / Hydrogenated Oils
+  if (detectKeywords(ingredientsL, ['palm oil', 'palmolein', 'hydrogenated oil', 'partially hydrogenated oil'])) {
+    oilPenalty = 15;
+    score -= oilPenalty;
+    scoreReasons.push(`Palm / Hydrogenated Oil: -${oilPenalty}`);
   }
 
-  // ── STEP 7: OIL QUALITY ───────────────────────────────────────────────────
-  if (detectKeywords(ingredientsL, ['palm oil', 'palmolein', 'hydrogenated oil', 'partially hydrogenated oil'])) {
-    score -= 8;
-    scoreReasons.push(`Bad Oils (Palm/Hydrogenated): -8`);
+  // Artificial Sweeteners
+  if (detectKeywords(ingredientsL, ['aspartame', 'sucralose', 'acesulfame', 'saccharin', 'neotame'])) {
+    sweetenerPenalty = 15;
+    score -= sweetenerPenalty;
+    scoreReasons.push(`Artificial Sweeteners: -${sweetenerPenalty}`);
   }
+
+  // Nitrites
+  if (detectKeywords(ingredientsL, ['e250', 'sodium nitrite', 'e251', 'sodium nitrate'])) {
+    nitritesPenalty = 30;
+    score -= nitritesPenalty;
+    scoreReasons.push(`Carcinogenic Nitrites (E250/E251): -${nitritesPenalty}`);
+    mainConcerns.push('Carcinogenic Nitrites: Linked to colorectal cancer risk.');
+  }
+
+  // Refined Flour (Maida)
+  const flourIdx = getIngredientIndex(ingredientsL, ['wheat flour', 'refined wheat', 'maida', 'bleached flour']);
+  if (flourIdx === 0) {
+    flourPenalty = 20;
+    score -= flourPenalty;
+    scoreReasons.push(`Refined Flour (Primary): -20`);
+  } else if (flourIdx > 0) {
+    flourPenalty = 10;
+    score -= flourPenalty;
+    scoreReasons.push(`Refined Flour: -10`);
+  }
+
+  // Rewards/Bonuses
   if (detectKeywords(ingredientsL, ['olive oil', 'avocado oil', 'mustard oil'])) {
     score += 5;
     scoreReasons.push(`Healthy Oil Bonus: +5`);
   }
 
-  // ── STEP 11: PROCESSING LEVEL (NOVA 4) ────────────────────────────────────
-  const upfMarkers = ['flavour enhancer', 'flavor enhancer', 'artificial flavour', 'artificial flavor', 'artificial colour', 'artificial color', 'sweetener', 'aspartame', 'sucralose', 'maltodextrin', 'dextrose', 'isolate'];
-  const upfHeuristic = combinedText.includes('instant noodle') || combinedText.includes('cola') || combinedText.includes('energy drink') || combinedText.includes('chips') || combinedText.includes('candy') || combinedText.includes('processed meat');
-  
-  if (upfHeuristic || detectKeywords(ingredientsL, upfMarkers)) {
-    processingPenalty = 15;
-    score -= processingPenalty; // v3.1 adjustment
-    scoreReasons.push(`Ultra-Processed (NOVA 4): -${processingPenalty}`);
-    mainConcerns.push('Ultra-Processed: Associated with poorer long-term health outcomes.');
+  let wfCount = 0;
+  if (detectKeywords(ingredientsL, ['whole grain', 'whole wheat', 'whole oats', 'oat'])) wfCount += 5;
+  if (detectKeywords(ingredientsL, ['fruit', 'apple', 'banana', 'berry', 'mango'])) wfCount += 5;
+  if (detectKeywords(ingredientsL, ['vegetable', 'spinach', 'carrot', 'tomato'])) wfCount += 5;
+  if (detectKeywords(ingredientsL, ['legume', 'lentil', 'chickpea', 'pea'])) wfCount += 5;
+  if (detectKeywords(ingredientsL, ['nut', 'almond', 'cashew', 'walnut'])) wfCount += 5;
+  if (detectKeywords(ingredientsL, ['seed', 'chia', 'flax', 'pumpkin'])) wfCount += 5;
+  if (detectKeywords(ingredientsL, ['probiotic', 'culture', 'kefir'])) wfCount += 5;
+
+  wholeFoodBonus = Math.min(20, wfCount);
+  if (wholeFoodBonus > 0) {
+    score += wholeFoodBonus;
+    scoreReasons.push(`Whole Foods & Probiotics: +${wholeFoodBonus}`);
   }
 
-  // ── STEP 11.5: GENERAL INGREDIENT HAZARD PENALTY ──────────────────────────
-  let ingredientHazardPenalty = 0;
-  product.ingredients.forEach(ing => {
-    const risk = classifyIngredient(ing);
-    let pen = 0;
-    if (risk.level === 'hazardous') pen = 12;
-    else if (risk.level === 'harmful') pen = 6;
-    else if (risk.level === 'moderate' || risk.level === 'caution') pen = 2;
-    
-    if (pen > 0) {
-      ingredientHazardPenalty += pen;
-      scoreReasons.push(`Ingredient Risk (${ing}): -${pen}`);
-    }
-  });
-
-  if (ingredientHazardPenalty > 30) ingredientHazardPenalty = 30; // Cap
-  if (ingredientHazardPenalty > 0) {
-    score -= ingredientHazardPenalty;
-    if (ingredientHazardPenalty > 10) mainConcerns.push('Contains harmful or risky ingredients.');
-  }
-
-  // ── STEP 12: ADDITIVE SCORING ─────────────────────────────────────────────
-  const allAdditives = [...new Set([...product.additives, ...Object.keys(product.dynamicAdditives || {})])];
-  let totalAdditivePenalty = 0;
-  
-  for (const code of allAdditives) {
-    const additive = product.dynamicAdditives?.[code] || ADDITIVES_DB[code];
-    let penalty = 0;
-    
-    if (additive) {
-      if (additive.hazard === 'hazardous' || additive.hazard === 'harmful') penalty = 7;
-      else if (additive.hazard === 'caution') penalty = 3;
-      else if (additive.hazard === 'mild') penalty = 1;
-    } else {
-      penalty = 3; // default
-    }
-
-    if (penalty > 0) {
-      totalAdditivePenalty += penalty;
-      scoreReasons.push(`${code} (${additive?.hazard || 'unknown'}): -${penalty}`);
-    }
-  }
-
-  if (totalAdditivePenalty > 25) totalAdditivePenalty = 25; // Capped at -25
-  score -= totalAdditivePenalty;
-
-  // ── BONUS GATING ──────────────────────────────────────────────────────────
-  const isBonusGated = (sugarPenalty >= 30 || sodiumPenalty >= 30);
-  const bonusMultiplier = isBonusGated ? 0.5 : 1;
-  if (isBonusGated) {
-    warnings.push("High sugar or sodium limits the positive impact of other nutrients.");
-  }
-
-  // ── STEP 8: FIBER BONUS ───────────────────────────────────────────────────
+  // Fiber Bonus
   if (n.fiber !== null) {
-    if (n.fiber >= 8) fiberBonus = 15;
-    else if (n.fiber >= 5) fiberBonus = 10;
-    else if (n.fiber >= 2) fiberBonus = 5;
-
-    fiberBonus = Math.round(fiberBonus * bonusMultiplier);
+    if (n.fiber >= 6) fiberBonus = 10;
+    else if (n.fiber >= 3) fiberBonus = 5;
     if (fiberBonus > 0) {
       score += fiberBonus;
       scoreReasons.push(`Fiber (${n.fiber}g): +${fiberBonus}`);
     }
   }
 
-  // ── STEP 9: PROTEIN BONUS ─────────────────────────────────────────────────
+  // Protein Bonus
   if (n.protein !== null) {
-    if (n.protein >= 20) proteinBonus = 15;
-    else if (n.protein >= 10) proteinBonus = 10;
-    else if (n.protein >= 5) proteinBonus = 5;
-
-    proteinBonus = Math.round(proteinBonus * bonusMultiplier);
+    if (n.protein >= 15) proteinBonus = 10;
+    else if (n.protein >= 8) proteinBonus = 5;
     if (proteinBonus > 0) {
       score += proteinBonus;
       scoreReasons.push(`Protein (${n.protein}g): +${proteinBonus}`);
     }
   }
 
-  // ── STEP 10: WHOLE FOOD BONUS ─────────────────────────────────────────────
-  let wfBonus = 0;
-  if (detectKeywords(ingredientsL, ['whole grain', 'whole wheat', 'oat'])) wfBonus += 5;
-  if (detectKeywords(ingredientsL, ['fruit', 'apple', 'banana', 'berry', 'mango'])) wfBonus += 5;
-  if (detectKeywords(ingredientsL, ['vegetable', 'spinach', 'carrot', 'tomato'])) wfBonus += 5;
-  if (detectKeywords(ingredientsL, ['nut', 'almond', 'cashew', 'walnut'])) wfBonus += 5;
-  if (detectKeywords(ingredientsL, ['seed', 'chia', 'flax', 'pumpkin'])) wfBonus += 5;
-  if (detectKeywords(ingredientsL, ['probiotic', 'culture', 'kefir'])) wfBonus += 5;
-  if (detectKeywords(ingredientsL, ['legume', 'lentil', 'chickpea', 'pea'])) wfBonus += 5;
-
-  wfBonus = Math.min(20, wfBonus);
-  wfBonus = Math.round(wfBonus * bonusMultiplier);
-  if (wfBonus > 0) {
-    score += wfBonus;
-    scoreReasons.push(`Whole Foods: +${wfBonus}`);
+  // ── STEP 2: APPLY CATEGORY REALITY CHECK (Caps) ──
+  const range = CATEGORY_RANGES[category] || CATEGORY_RANGES['General Foods'];
+  
+  // ── STEP 7: FINAL SANITY CHECK & USER PROFILE WARNINGS ──
+  // Check if a nutritionist would consider this food healthy
+  let nutritionistApproved = true;
+  if (
+    category === 'Chips & Fried Snacks' ||
+    category === 'Soft Drinks / Cola' ||
+    category === 'Energy Drinks' ||
+    category === 'Chocolates & Candy' ||
+    category === 'Processed Meats' ||
+    nova === 4
+  ) {
+    nutritionistApproved = false;
   }
 
-  // ── FINAL CAP ─────────────────────────────────────────────────────────────
-  score = Math.max(0, Math.min(100, Math.round(score)));
+  // Enforce the specific rules:
+  // - A fried potato chip product must never be labelled as 'Good Choice' (forced score < 70)
+  if (category === 'Chips & Fried Snacks') {
+    score = Math.min(69, score);
+  }
+  // - An ultra-processed instant noodle product must never be labelled as 'Excellent' (forced score < 90)
+  if (category === 'Instant Noodles' && nova === 4) {
+    score = Math.min(89, score);
+  }
+  // - A sugar-sweetened cola must never be labelled as 'Good' (forced score < 70)
+  if (category === 'Soft Drinks / Cola' && n.sugar !== null && n.sugar > 5) {
+    score = Math.min(69, score);
+  }
 
-  // ── STEP 16: FINAL VERDICT ────────────────────────────────────────────────
+  // Clamp the score strictly to the realistic range for its category
+  const previousScore = score;
+  score = Math.max(range.min, Math.min(range.max, Math.round(score)));
+  if (score !== previousScore) {
+    scoreReasons.push(`Category Reality Clamp (${category} range: ${range.min}-${range.max}): ${score}`);
+  }
+
+  // ── Allergen Check (Personalized - Deduct 30 points AFTER category clamp, or before? Let's do it after so it directly reflects user hazard) ──
+  let allergenPenalty = 0;
+  const matchedAllergens = product.allergens.filter(a =>
+    (profile.allergens || []).map(x => x.toLowerCase()).includes(a.toLowerCase())
+  );
+  if (matchedAllergens.length > 0) {
+    allergenPenalty = 30;
+    score -= allergenPenalty;
+    const allergenList = matchedAllergens.map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ');
+    scoreReasons.push(`Allergens Detected (${allergenList}): -30`);
+    mainConcerns.push(`Allergen Alert: Contains ${allergenList}`);
+    personalizedWarnings.push(`Avoid this product due to ${allergenList} allergy.`);
+  }
+
+  // Clamp absolute final score
+  score = Math.max(5, Math.min(100, score));
+
+  // ── STEP 7: FINAL VERDICT ──
   let verdict: HazardLevel = 'safe';
   let dietAdvice = '';
   let prefix = '';
@@ -389,34 +553,18 @@ export function computeHealthScore(
     verdict = 'hazardous'; prefix = 'High Concern.';
   }
 
-  // Synthesize dynamic reasoning for the verdict
   const drivingFactors = [];
-  if (sugarPenalty >= 30) drivingFactors.push("excessively high sugar (linked to diabetes and obesity)");
-  else if (sugarPenalty >= 15) drivingFactors.push("high sugar content");
-  
-  if (sodiumPenalty >= 20) drivingFactors.push("dangerous sodium levels (linked to hypertension)");
-  
-  if (detectKeywords(ingredientsL, ['partially hydrogenated', 'hydrogenated oil', 'trans fat'])) {
-    drivingFactors.push("toxic trans fats (linked to cardiovascular disease)");
-  }
-  
-  if (totalAdditivePenalty >= 10) {
-    drivingFactors.push("multiple chemical additives and preservatives (linked to long-term health risks and gut disruption)");
-  }
-  
-  if (upfHeuristic || detectKeywords(ingredientsL, upfMarkers)) {
-    drivingFactors.push("heavy ultra-processing (NOVA 4)");
-  }
-
-  if (flourIdx === 0) {
-    drivingFactors.push("refined flours lacking nutritional value");
-  }
+  if (sugarPenalty >= 25) drivingFactors.push("excess sugar");
+  if (sodiumPenalty >= 25) drivingFactors.push("high sodium levels");
+  if (hasTransFat) drivingFactors.push("toxic trans fats");
+  if (oilPenalty > 0) drivingFactors.push("palm/hydrogenated oils");
+  if (nova === 4) drivingFactors.push("ultra-processing (NOVA 4)");
 
   if (score < 70 && drivingFactors.length > 0) {
-    dietAdvice = `${prefix} This product's low score is primarily driven by ${drivingFactors.join(', and ')}. Frequent consumption is strongly discouraged.`;
+    dietAdvice = `${prefix} This product's score is primarily driven by ${drivingFactors.join(', and ')}. Frequent consumption is discouraged.`;
   } else if (score >= 70) {
     if (drivingFactors.length > 0) {
-      dietAdvice = `${prefix} Generally a reasonable nutritional choice, though it contains some ${drivingFactors[0]}. Suitable for regular consumption.`;
+      dietAdvice = `${prefix} Generally a reasonable choice, though it contains some ${drivingFactors[0]}. Suitable for moderate consumption.`;
     } else {
       dietAdvice = `${prefix} Clean nutritional profile with minimal processing. Excellent choice for regular consumption.`;
     }
@@ -440,11 +588,17 @@ export function computeHealthScore(
       sugarPenalty,
       sodiumPenalty,
       satFatPenalty,
+      transFatPenalty,
+      energyDensityPenalty,
+      flourPenalty,
+      oilPenalty,
       additivePenalty: totalAdditivePenalty,
       processingPenalty,
+      ingredientHazardPenalty: Math.min(30, sweetenerPenalty + nitritesPenalty),
+      allergenPenalty,
       proteinBonus,
       fiberBonus,
-      wholeFoodBonus: wfBonus,
+      wholeFoodBonus,
       finalScore: score
     }
   };

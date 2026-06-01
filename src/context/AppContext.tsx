@@ -248,6 +248,9 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
               imageUrl: cs.image_url || undefined,
               ingredients: cs.ingredients || [],
               productType: cs.nutrients?._productType || undefined,
+              productGenre: cs.nutrients?._productGenre || undefined,
+              novaGroup: cs.nutrients?._novaGroup || undefined,
+              allNutrientsExpanded: cs.nutrients?._allNutrientsExpanded || undefined,
               servingSize: cs.nutrients?._servingSize || undefined,
               rawNutrients: cs.nutrients?._rawNutrients || undefined,
               nutrients: cs.nutrients || {},
@@ -270,6 +273,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
               scoreReasons: dynamicScore.scoreReasons,
               mainConcerns: dynamicScore.mainConcerns,
               personalizedWarnings: dynamicScore.personalizedWarnings,
+              scoreBreakdown: dynamicScore.scoreBreakdown,
             };
           });
 
@@ -346,7 +350,8 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           scoreReasons: newScore.scoreReasons,
           mainConcerns: newScore.mainConcerns,
           personalizedWarnings: newScore.personalizedWarnings,
-          dietAdvice: newScore.dietAdvice || scan.dietAdvice
+          dietAdvice: newScore.dietAdvice || scan.dietAdvice,
+          scoreBreakdown: newScore.scoreBreakdown
         };
       });
 
