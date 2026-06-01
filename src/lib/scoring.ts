@@ -377,51 +377,62 @@ export function computeHealthScore(
     verdict = 'safe'; prefix = 'Excellent.';
   } else if (score >= 80) {
     verdict = 'safe'; prefix = 'Very Good.';
-  } else if (score >= 70) {
-    verdict = 'safe'; prefix = 'Good.';
-  } else if (score >= 55) {
-    verdict = 'caution'; prefix = 'Moderate.';
-  } else if (score >= 40) {
-    verdict = 'caution'; prefix = 'Poor.';
-  } else if (score >= 20) {
-    verdict = 'hazardous'; prefix = 'Bad.';
-  } else {
-    verdict = 'hazardous'; prefix = 'High Concern.';
-  }
+  let verdictText = '';
+  if (score >= 70) verdict = 'safe';
+  else if (score >= 40) verdict = 'caution';
+  else verdict = 'hazardous';
 
   // Synthesize dynamic reasoning for the verdict
   const drivingFactors = [];
-  if (sugarPenalty >= 30) drivingFactors.push("excessively high sugar (linked to diabetes and obesity)");
-  else if (sugarPenalty >= 15) drivingFactors.push("high sugar content");
+  if (sugarPenalty >= 30) drivingFactors.push("an excessively high amount of sugar");
+  else if (sugarPenalty >= 15) drivingFactors.push("a high amount of sugar");
   
-  if (sodiumPenalty >= 20) drivingFactors.push("dangerous sodium levels (linked to hypertension)");
+  if (sodiumPenalty >= 20) drivingFactors.push("dangerous sodium levels");
   
   if (detectKeywords(ingredientsL, ['partially hydrogenated', 'hydrogenated oil', 'trans fat'])) {
-    drivingFactors.push("toxic trans fats (linked to cardiovascular disease)");
+    drivingFactors.push("harmful trans fats");
   }
   
   if (totalAdditivePenalty >= 10) {
-    drivingFactors.push("multiple chemical additives and preservatives (linked to long-term health risks and gut disruption)");
+    drivingFactors.push("multiple chemical additives and preservatives");
   }
   
   if (upfHeuristic || detectKeywords(ingredientsL, upfMarkers)) {
-    drivingFactors.push("heavy ultra-processing (NOVA 4)");
+    drivingFactors.push("highly processed ingredients");
   }
 
   if (flourIdx === 0) {
-    drivingFactors.push("refined flours lacking nutritional value");
+    drivingFactors.push("mostly refined flours instead of whole grains");
   }
 
-  if (score < 70 && drivingFactors.length > 0) {
-    dietAdvice = `${prefix} This product's low score is primarily driven by ${drivingFactors.join(', and ')}. Frequent consumption is strongly discouraged.`;
-  } else if (score >= 70) {
-    if (drivingFactors.length > 0) {
-      dietAdvice = `${prefix} Generally a reasonable nutritional choice, though it contains some ${drivingFactors[0]}. Suitable for regular consumption.`;
+  let factorsText = "";
+  if (drivingFactors.length === 1) {
+    factorsText = drivingFactors[0];
+  } else if (drivingFactors.length === 2) {
+    factorsText = `${drivingFactors[0]} and ${drivingFactors[1]}`;
+  } else if (drivingFactors.length > 2) {
+    const last = drivingFactors.pop();
+    factorsText = `${drivingFactors.join(', ')}, and ${last}`;
+  }
+
+  if (score < 40) {
+    if (factorsText) {
+      dietAdvice = `This product scored poorly (${score}/100) mostly because it contains ${factorsText}. Because of these factors, we highly recommend avoiding it or consuming it only on rare occasions.`;
     } else {
-      dietAdvice = `${prefix} Clean nutritional profile with minimal processing. Excellent choice for regular consumption.`;
+      dietAdvice = `This product scored poorly (${score}/100). It lacks nutritional value and is highly processed. We recommend looking for healthier alternatives.`;
+    }
+  } else if (score < 70) {
+    if (factorsText) {
+      dietAdvice = `This product has a moderate score (${score}/100). While it's not the worst choice, you should be careful because it contains ${factorsText}. It's fine for occasional consumption, but try not to make it a daily habit.`;
+    } else {
+      dietAdvice = `This product has a moderate score (${score}/100). It's an okay choice for occasional consumption, but there are cleaner alternatives available.`;
     }
   } else {
-    dietAdvice = `${prefix} Proceed with caution due to nutritional imbalances.`;
+    if (factorsText) {
+      dietAdvice = `This product scored very well (${score}/100)! It's a great choice, though keep in mind it does contain some ${drivingFactors[0] || factorsText}. Overall, it is nutritious and safe for regular consumption.`;
+    } else {
+      dietAdvice = `This product scored excellently (${score}/100)! It has a very clean nutritional profile with minimal processing and no harmful additives. It is a fantastic choice to include in your daily diet.`;
+    }
   }
 
   return {
