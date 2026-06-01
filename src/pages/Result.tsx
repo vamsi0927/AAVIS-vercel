@@ -341,7 +341,7 @@ export function Result() {
                 
                 <div className="flex items-center justify-between border-t border-white/10 mt-3 pt-3 px-1">
                   <span className="text-xs font-black text-white">Final Score:</span>
-                  <span className="text-sm font-black" style={{ color: ringColor }}>{scan.scoreBreakdown.finalScore}</span>
+                  <span className="text-sm font-black" style={{ color: ringColor }}>{scan.scoreBreakdown?.finalScore ?? score}</span>
                 </div>
               </div>
             )}

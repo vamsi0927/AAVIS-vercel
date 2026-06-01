@@ -294,6 +294,7 @@ export function Scan() {
         scoreReasons: scoreResult.scoreReasons,
         mainConcerns: scoreResult.mainConcerns || result.mainConcerns,
         personalizedWarnings: scoreResult.personalizedWarnings,
+        scoreBreakdown: scoreResult.scoreBreakdown,
       };
 
       let finalScanId = scanRecord.id;
