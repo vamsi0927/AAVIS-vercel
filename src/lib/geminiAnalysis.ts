@@ -39,7 +39,7 @@ Return a concise JSON object with the following structure:
   },
   "allergens": ["array of detected allergens"],
   "mainConcerns": ["array of 2-3 short human-readable health risks"],
-  "dietAdvice": "short consumer-friendly verdict (1 sentence)",
+  "dietAdvice": "A strict, brutally honest, conversational 2-line verdict acting as a human nutrition expert explaining exactly why it is safe or hazardous",
   "aiSummary": "short funny AI roast line (Indian context)"
 }
 
