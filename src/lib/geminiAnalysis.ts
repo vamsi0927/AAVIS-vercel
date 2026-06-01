@@ -285,26 +285,16 @@ export async function aiOcrCorrection(rawText: string, mode: 'ingredients' | 'nu
   let prompt = '';
   
   if (mode === 'nutrition') {
-    prompt = `You are extracting nutrition label information from noisy OCR text.
+    prompt = `You are organizing nutrition label information from noisy OCR text.
 
-Your task has TWO PHASES:
+Your task is simple:
+1. Take whatever information is in the OCR text below.
+2. Fix obvious spelling or OCR mistakes (e.g., "S0dium" -> "Sodium").
+3. Organize all the extracted information neatly line by line.
+4. KEEP ALL valid label information including Serving Size, Portions, headers, and all nutrients. DO NOT delete or filter them out.
+5. If there are lists of nutrients and values separated into columns, pair them correctly.
 
-PHASE 1 — OCR RECONSTRUCTION
-* Fix OCR mistakes and broken words using nutrition-label context.
-* Reconstruct incomplete or split nutrient names when confidence is high.
-* Remove duplicate headers, random symbols, and OCR garbage text.
-* Ignore unrelated noise words.
-* Preserve all numeric values exactly as extracted.
-* Do not hallucinate missing numbers or values.
-
-PHASE 2 — STRUCTURED EXTRACTION
-* Reconstruct the nutrition table correctly.
-* CRITICAL: ALWAYS extract and preserve "Serving Size", "Portion Size", or "Servings Per Container" if present in the text. Put it at the very top of your output.
-* ONLY extract standard recognized nutrition facts (e.g., Calories/Energy, Fat, Carbohydrates, Sugar, Sodium, Protein, Fiber, Potassium, Cholesterol, etc.) and serving sizes.
-* COMPLETELY IGNORE all unrecognized words, acronyms, gibberish (e.g., "SHR", "Laas"), and OCR errors. Do not include them in your output.
-* COLUMN ALIGNMENT: If the OCR text presents a list of nutrient names followed by a separate list of numeric values (like two columns read top-to-bottom), carefully pair the names with the numbers sequentially in order.
-
-CRITICAL INSTRUCTION: Return a clean, human-readable text list with each recognized nutrient on a new line (e.g. "Energy: 28.8 kcal"). DO NOT output JSON. DO NOT include any conversational text, introductions, or markdown blocks. Output exactly and only the formatted text list of valid nutrients.
+CRITICAL INSTRUCTION: Return a clean, human-readable text list. DO NOT output JSON. DO NOT include any conversational text, introductions, or markdown blocks. Output exactly and only the formatted text.
 
 OCR INPUT:
 ${rawText}`;
