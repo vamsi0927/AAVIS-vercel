@@ -58,6 +58,7 @@ const RISK_DB: RiskEntry[] = [
   ['sodium tripolyphosphate', 'harmful', 'Industrial chemical used as a texturizer.'],
 
   // ── MODERATE (Orange) ────────────────────────────────────────────
+  ['palm kernel',           'moderate', 'Refined oil extremely high in saturated fat. Marker of industrial food processing.'],
   ['palm oil',              'moderate', 'Refined oil high in saturated fat. Linked to deforestation.'],
   ['palmolein',             'moderate', 'Refined palm oil fraction. High in saturated fat.'],
   ['refined oil',           'moderate', 'Chemically processed oil stripped of natural nutrients.'],
@@ -67,10 +68,12 @@ const RISK_DB: RiskEntry[] = [
   ['corn oil',              'moderate', 'Highly refined seed oil. High in omega-6.'],
   ['cottonseed oil',        'moderate', 'Refined oil from cotton seeds. May contain residues.'],
   ['sunflower oil',         'moderate', 'Refined seed oil. Omega-6 heavy when over-consumed.'],
+  ['liquid glucose',        'moderate', 'Refined sugar syrup that rapidly spikes blood sugar and insulin levels.'],
   ['dextrose',              'moderate', 'Processed sugar that rapidly spikes blood sugar.'],
   ['maltodextrin',          'moderate', 'Highly processed starch with a very high glycemic index.'],
   ['corn syrup',            'moderate', 'Processed corn-based sugar. Spikes blood glucose.'],
   ['glucose syrup',         'moderate', 'Concentrated liquid sugar from starch.'],
+  ['glucose',               'moderate', 'Refined sugar component that rapidly spikes blood glucose levels.'],
   ['invert sugar',          'moderate', 'Processed sugar used for smoother texture.'],
   ['modified starch',       'moderate', 'Chemically or physically altered starch.'],
   ['modified food starch',  'moderate', 'Starch treated with chemicals for stability.'],
