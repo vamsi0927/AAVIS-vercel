@@ -206,6 +206,9 @@ export function Result() {
         </button>
         <h1 className="font-display font-black text-lg text-white truncate px-4">Health Report</h1>
         <div className="flex items-center gap-1">
+          <button onClick={handleReAnalyze} disabled={isReanalyzing} className={`p-2 rounded-xl transition-colors border border-transparent ${isReanalyzing ? 'opacity-50 text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5 hover:border-white/10'}`} title="Recalculate Score">
+            {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+          </button>
           <button onClick={() => toggleBookmark(product.id)} className={`p-2 rounded-xl transition-colors ${isBookmarked ? 'text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5'}`}>
             <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>
@@ -242,24 +245,7 @@ export function Result() {
             </div>
           </div>
 
-          {/* ── Action Buttons ── */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleReAnalyze}
-              disabled={isReanalyzing}
-              className={`glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border border-white/5 transition-all text-xs font-bold uppercase tracking-wider ${isReanalyzing ? 'opacity-50' : 'hover:bg-white/5 active:scale-95'}`}
-            >
-              {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin text-brand-primary" /> : <RotateCcw className="w-4 h-4 text-brand-primary" />}
-              {isReanalyzing ? 'Recalculating...' : 'Recalculate Score'}
-            </button>
-            <button
-              onClick={handleViewOriginal}
-              className="glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border border-white/5 transition-all text-xs font-bold uppercase tracking-wider hover:bg-white/5 active:scale-95"
-            >
-              <FileImage className="w-4 h-4 text-content-secondary" />
-              Original Label
-            </button>
-          </div>
+
 
           {/* ── 2. Health Score (SVG Arc Ring) ── */}
           <div className={`rounded-3xl p-6 border text-center relative overflow-hidden shadow-2xl glass-card ${scoreBorderClass} ${scoreBgClass}`}>
