@@ -235,37 +235,43 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     try {
       const cloudScans = await getUserScans(userId, 100);
       if (cloudScans.length > 0) {
-        // Convert DB scans to app ScanResult format and merge with local
-        const cloudConverted: ScanResult[] = cloudScans.map(cs => ({
-          id: cs.id,
-          productId: cs.id,
-          date: cs.created_at,
-          score: cs.health_score,
-          verdict: cs.verdict as any,
-          warnings: [],
-          product: {
-            id: cs.id,
-            name: cs.product_name,
-            brand: cs.brand,
-            imageEmoji: '🤖',
-            imageUrl: cs.image_url || undefined,
-            ingredients: cs.ingredients || [],
-            nutrients: cs.nutrients || {},
-            additives: cs.additives || [],
-            allergens: cs.allergens_detected || [],
-          },
-          aiSummary: cs.ai_summary || undefined,
-          dietAdvice: cs.diet_advice || undefined,
-        }));
-
         setState(prev => {
+          const currentProfile = prev.profile;
+          
+          const cloudConverted: ScanResult[] = cloudScans.map(cs => {
+            const product = {
+              id: cs.id,
+              name: cs.product_name,
+              brand: cs.brand,
+              imageEmoji: '🤖',
+              imageUrl: cs.image_url || undefined,
+              ingredients: cs.ingredients || [],
+              nutrients: cs.nutrients || {},
+              additives: cs.additives || [],
+              allergens: cs.allergens_detected || [],
+            };
+            
+            const dynamicScore = computeHealthScore(product as any, currentProfile as any);
+            
+            return {
+              id: cs.id,
+              productId: cs.id,
+              date: cs.created_at,
+              score: dynamicScore.score,
+              verdict: dynamicScore.verdict,
+              warnings: dynamicScore.warnings,
+              product,
+              aiSummary: cs.ai_summary || undefined,
+              dietAdvice: dynamicScore.dietAdvice || cs.diet_advice || undefined,
+              scoreReasons: dynamicScore.scoreReasons,
+              mainConcerns: dynamicScore.mainConcerns,
+              personalizedWarnings: dynamicScore.personalizedWarnings,
+            };
+          });
+
           const cloudIds = new Set(cloudConverted.map(c => c.id));
           const cloudBookmarkedIds = cloudScans.filter(cs => (cs as any).is_bookmarked).map(cs => cs.id);
-          // Since we are cloud-first now, we do not upload local scans from localStorage anymore.
-          // Any local scans that exist but aren't in the cloud are discarded because we no longer 
-          // support offline guest-to-account scan merging via localStorage.
 
-          // Replace local scans completely with cloud scans (strict cloud-first)
           const seen = new Set();
           const deduped = cloudConverted.filter(scan => {
             const timeKey = scan.date.substring(0, 13);
