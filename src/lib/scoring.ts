@@ -262,28 +262,57 @@ export function computeHealthScore(
   // ── STEP 16: FINAL VERDICT ────────────────────────────────────────────────
   let verdict: HazardLevel = 'safe';
   let dietAdvice = '';
+  let prefix = '';
 
   if (score >= 90) {
-    verdict = 'safe';
-    dietAdvice = 'Excellent. Suitable for regular consumption.';
+    verdict = 'safe'; prefix = 'Excellent.';
   } else if (score >= 80) {
-    verdict = 'safe';
-    dietAdvice = 'Very Good. A solid nutritional choice.';
+    verdict = 'safe'; prefix = 'Very Good.';
   } else if (score >= 70) {
-    verdict = 'safe';
-    dietAdvice = 'Good. Reasonable balance.';
+    verdict = 'safe'; prefix = 'Good.';
   } else if (score >= 55) {
-    verdict = 'caution';
-    dietAdvice = 'Moderate. Consume in moderation.';
+    verdict = 'caution'; prefix = 'Moderate.';
   } else if (score >= 40) {
-    verdict = 'caution';
-    dietAdvice = 'Poor. Avoid frequent consumption.';
+    verdict = 'caution'; prefix = 'Poor.';
   } else if (score >= 20) {
-    verdict = 'hazardous';
-    dietAdvice = 'Bad. High concern due to nutrition or additives.';
+    verdict = 'hazardous'; prefix = 'Bad.';
   } else {
-    verdict = 'hazardous';
-    dietAdvice = 'High Concern. Strongly recommend avoiding.';
+    verdict = 'hazardous'; prefix = 'High Concern.';
+  }
+
+  // Synthesize dynamic reasoning for the verdict
+  const drivingFactors = [];
+  if (sugarPenalty >= 30) drivingFactors.push("excessively high sugar (linked to diabetes and obesity)");
+  else if (sugarPenalty >= 15) drivingFactors.push("high sugar content");
+  
+  if (sodiumPenalty >= 20) drivingFactors.push("dangerous sodium levels (linked to hypertension)");
+  
+  if (detectKeywords(ingredientsL, ['partially hydrogenated', 'hydrogenated oil', 'trans fat'])) {
+    drivingFactors.push("toxic trans fats (linked to cardiovascular disease)");
+  }
+  
+  if (totalAdditivePenalty >= 10) {
+    drivingFactors.push("multiple chemical additives and preservatives (linked to long-term health risks and gut disruption)");
+  }
+  
+  if (upfHeuristic || detectKeywords(ingredientsL, upfMarkers)) {
+    drivingFactors.push("heavy ultra-processing (NOVA 4)");
+  }
+
+  if (flourIdx === 0) {
+    drivingFactors.push("refined flours lacking nutritional value");
+  }
+
+  if (score < 70 && drivingFactors.length > 0) {
+    dietAdvice = `${prefix} This product's low score is primarily driven by ${drivingFactors.join(', and ')}. Frequent consumption is strongly discouraged.`;
+  } else if (score >= 70) {
+    if (drivingFactors.length > 0) {
+      dietAdvice = `${prefix} Generally a reasonable nutritional choice, though it contains some ${drivingFactors[0]}. Suitable for regular consumption.`;
+    } else {
+      dietAdvice = `${prefix} Clean nutritional profile with minimal processing. Excellent choice for regular consumption.`;
+    }
+  } else {
+    dietAdvice = `${prefix} Proceed with caution due to nutritional imbalances.`;
   }
 
   return {
