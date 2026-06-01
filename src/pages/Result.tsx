@@ -250,7 +250,7 @@ export function Result() {
               className={`glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border border-white/5 transition-all text-xs font-bold uppercase tracking-wider ${isReanalyzing ? 'opacity-50' : 'hover:bg-white/5 active:scale-95'}`}
             >
               {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin text-brand-primary" /> : <RotateCcw className="w-4 h-4 text-brand-primary" />}
-              {isReanalyzing ? 'Re-analyzing...' : 'Re-Analyze'}
+              {isReanalyzing ? 'Recalculating...' : 'Recalculate Score'}
             </button>
             <button
               onClick={handleViewOriginal}
