@@ -177,17 +177,17 @@ export function Result() {
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference - (score / 100) * circumference;
-  const ringColor = score <= 40 ? '#ef4444' : score <= 70 ? '#f59e0b' : '#10b981';
-  const scoreBorderClass = score <= 40
+  const ringColor = scan.verdict === 'hazardous' ? '#ef4444' : scan.verdict === 'caution' ? '#f59e0b' : '#10b981';
+  const scoreBorderClass = scan.verdict === 'hazardous'
     ? 'border-brand-hazardous/25'
-    : score <= 70 ? 'border-brand-caution/25'
+    : scan.verdict === 'caution' ? 'border-brand-caution/25'
     : 'border-brand-safe/25';
-  const scoreBgClass = score <= 40
+  const scoreBgClass = scan.verdict === 'hazardous'
     ? 'bg-brand-hazardous/5'
-    : score <= 70 ? 'bg-brand-caution/5'
+    : scan.verdict === 'caution' ? 'bg-brand-caution/5'
     : 'bg-brand-safe/5';
-  const scoreEmoji = score <= 40 ? '🚫' : score <= 70 ? '⚡' : '✅';
-  const scoreLabel = score <= 40 ? 'High Concern' : score <= 70 ? 'Moderate' : 'Good';
+  const scoreEmoji = scan.verdict === 'hazardous' ? '🚫' : scan.verdict === 'caution' ? '⚡' : '✅';
+  const scoreLabel = scan.verdict === 'hazardous' ? 'High Concern' : scan.verdict === 'caution' ? 'Moderate' : 'Good';
 
   return (
     <div className="flex flex-col h-full bg-navy-900 overflow-y-auto no-scrollbar pb-safe relative">

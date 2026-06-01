@@ -189,11 +189,35 @@ export const ADDITIVES_DB: Record<string, Additive> = {
     function: 'Thickens and stabilizes processed foods.',
     healthExplanation: 'Animal studies show CMC can disrupt gut microbiome and promote inflammation. A clear marker of ultra-processed industrial food.'
   },
+  E410: {
+    code: 'E410', name: 'Locust Bean Gum (Carob Gum)', category: 'Thickener / Stabilizer', hazard: 'safe',
+    description: 'Natural vegetable gum extracted from carob seeds.',
+    function: 'Thickener and gelling agent in dairy, sauces, and desserts.',
+    healthExplanation: 'A completely safe natural plant fiber. Functions as a prebiotic supporting gut flora. Highly recommended over synthetic thickeners.'
+  },
   E412: {
     code: 'E412', name: 'Guar Gum', category: 'Thickener', hazard: 'mild',
     description: 'Natural fiber extracted from guar beans.',
     function: 'Thickens sauces, ice cream, and dairy products.',
     healthExplanation: 'Generally safe natural fiber. However, very large amounts can cause mild digestive upset or bloating in sensitive individuals.'
+  },
+  E415: {
+    code: 'E415', name: 'Xanthan Gum', category: 'Thickener', hazard: 'mild',
+    description: 'Polysaccharide produced by bacterial fermentation.',
+    function: 'Thickens and stabilizes dressings, sauces, and gluten-free baking.',
+    healthExplanation: 'A natural-origin thickener. Extremely common and safe for most, though large quantities can cause mild bloating or gas in sensitive individuals.'
+  },
+  E476: {
+    code: 'E476', name: 'Polyglycerol Polyricinoleate (PGPR)', category: 'Emulsifier', hazard: 'caution',
+    description: 'Synthetic emulsifier made from glycerol and castor bean fatty acids.',
+    function: 'Reduces viscosity in chocolate, allowing manufacturers to use less cocoa butter.',
+    healthExplanation: 'Commonly used in cheap chocolates to cut costs. Animal studies show liver enlargement at extremely high doses. Marker of low-grade chocolate processing.'
+  },
+  E477: {
+    code: 'E477', name: 'Propane-1,2-diol esters of fatty acids', category: 'Emulsifier', hazard: 'caution',
+    description: 'Synthetic fat-based emulsifier.',
+    function: 'Stabilizes foams and aerated structures in cakes, whipped toppings, and mixes.',
+    healthExplanation: 'Synthetic emulsifier derived from propylene glycol. Safe at low doses but serves as a clear marker of highly processed, factory-made foods.'
   },
   E451: {
     code: 'E451', name: 'Triphosphates', category: 'Emulsifier / Stabilizer', hazard: 'caution',

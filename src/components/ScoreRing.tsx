@@ -16,11 +16,11 @@ export function ScoreRing({ score, verdict, size = 160 }: ScoreRingProps) {
     switch (v) {
       case 'safe':
         return '#10b981';
+      case 'moderate':
+      case 'caution':
+        return '#f59e0b';
       case 'mild':
         return '#eab308';
-      case 'moderate':
-        return '#f59e0b';
-      case 'caution':
       case 'harmful':
         return '#fb7185';
       case 'hazardous':

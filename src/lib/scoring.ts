@@ -376,18 +376,14 @@ export function computeHealthScore(
   // ── STEP 16: FINAL VERDICT ────────────────────────────────────────────────
   let verdict: HazardLevel = 'safe';
   let dietAdvice = '';
-  let prefix = '';
 
-  if (score >= 90) {
-    verdict = 'safe'; prefix = 'Excellent.';
-  } else if (score >= 80) {
-    verdict = 'safe'; prefix = 'Very Good.';
+  if (score < 40) {
+    verdict = 'hazardous';
+  } else if (score < 70 || processingPenalty >= 15 || totalAdditivePenalty >= 6 || detectKeywords(ingredientsL, ['partially hydrogenated', 'hydrogenated oil', 'trans fat'])) {
+    verdict = 'caution';
+  } else {
+    verdict = 'safe';
   }
-
-  let verdictText = '';
-  if (score >= 70) verdict = 'safe';
-  else if (score >= 40) verdict = 'caution';
-  else verdict = 'hazardous';
 
   // Synthesize dynamic reasoning for the verdict
   const drivingFactors = [];
@@ -422,17 +418,17 @@ export function computeHealthScore(
     factorsText = `${drivingFactors.join(', ')}, and ${last}`;
   }
 
-  if (score < 40) {
+  if (verdict === 'hazardous') {
     if (factorsText) {
       dietAdvice = `This product scored poorly (${score}/100) mostly because it contains ${factorsText}. Because of these factors, we highly recommend avoiding it or consuming it only on rare occasions.`;
     } else {
       dietAdvice = `This product scored poorly (${score}/100). It lacks nutritional value and is highly processed. We recommend looking for healthier alternatives.`;
     }
-  } else if (score < 70) {
+  } else if (verdict === 'caution') {
     if (factorsText) {
-      dietAdvice = `This product has a moderate score (${score}/100). While it's not the worst choice, you should be careful because it contains ${factorsText}. It's fine for occasional consumption, but try not to make it a daily habit.`;
+      dietAdvice = `This product has a moderate rating (${score}/100). While it's not the worst choice, you should be careful because it contains ${factorsText}. It's fine for occasional consumption, but try not to make it a daily habit.`;
     } else {
-      dietAdvice = `This product has a moderate score (${score}/100). It's an okay choice for occasional consumption, but there are cleaner alternatives available.`;
+      dietAdvice = `This product has a moderate rating (${score}/100). It's an okay choice for occasional consumption, but there are cleaner alternatives available.`;
     }
   } else {
     if (factorsText) {
