@@ -15,7 +15,7 @@ Return a concise JSON object with the following structure:
   "productName": "string - common name (Look for largest/topmost text. If unknown, infer e.g. 'Instant Noodles', 'Processed Snack')",
   "brand": "string - brand name (Look for brand logo text)",
   "productType": "food | beverage",
-  "servingSize": "string - e.g. '28g', '1 Cookie (15g)', '200ml' (Look for Serving Size on label. Null if missing.)",
+  "servingSize": "string - e.g. '28g', '1 scoop (30g)', '200ml' (Extract any serving size, portion size, or reference amount. Null if missing.)",
   "nutritionUnit": "string - e.g. 'per 100g', 'per serving', 'per 20g' (Exactly as written above the nutrition column)",
   "ingredients": ["array of ingredients - PRIORITIZE risky/processed items first in the list"],
   "nutrients": {
@@ -50,7 +50,7 @@ CRITICAL INSTRUCTIONS:
 4. Hazard Level: 'hazardous' for controversial chemicals, 'caution' for industrial/processed items (including most emulsifiers/stabilizers), 'safe' only for truly natural extracts.
 5. Personalize for: {PROFILE_CONTEXT}
 6. NUTRITION VALUES: TRANSCRIBE THE EXACT RAW NUMBERS AS PRINTED on the label. DO NOT mathematically calculate, scale, or normalize the values to per 100g. If the label says "160" for calories per serving, return 160. Do NOT estimate, guess, or hallucinate any nutrition numbers.
-7. SERVING SIZE: Look specifically for "Serving Size" at the top of the nutrition facts panel (e.g. "1 oz (28g)"). It is critical to extract this accurately.
+7. SERVING SIZE: Look for "Serving Size", "Portion", or any clear indication of a serving amount (e.g. "1 scoop (30g)", "1 piece", "per 250ml"). Extract this accurately even if the exact words "Serving Size" are missing.
 8. ADDITIVES: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. Never skip this.
 9. RETURN ONLY VALID JSON.`;
 
