@@ -151,6 +151,12 @@ export const ADDITIVES_DB: Record<string, Additive> = {
     function: 'Adds sourness and acts as a natural preservative.',
     healthExplanation: 'Very safe and found naturally in lemons and oranges. Widely consumed and well-tolerated.'
   },
+  E338: {
+    code: 'E338', name: 'Phosphoric Acid', category: 'Acidifier / Flavoring', hazard: 'caution',
+    description: 'Industrial acid used to give colas their tangy flavor.',
+    function: 'Adds tartness and acts as a preservative, primarily in dark colas.',
+    healthExplanation: 'High intake is linked to lower bone density (leaches calcium from bones) and kidney issues. Commonly found in ultra-processed sodas.'
+  },
 
   // ─── Emulsifiers ─────────────────────────────────────────────────────────
   E407: {
