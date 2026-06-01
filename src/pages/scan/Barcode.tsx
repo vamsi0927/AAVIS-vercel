@@ -34,7 +34,14 @@ export function ScanBarcode() {
             brand: product.brand,
             barcode: product.id,
             ingredients: product.ingredients,
-            nutrients: product.nutrients,
+            nutrients: {
+              ...product.nutrients,
+              _productType: product.productType,
+              _servingSize: product.servingSize,
+              _rawNutrients: product.rawNutrients,
+              _dynamicAdditives: product.dynamicAdditives || {},
+              _dynamicIngredients: product.dynamicIngredients || {}
+            },
             additives: product.additives,
             allergens_detected: product.allergens,
             health_score: result.score,

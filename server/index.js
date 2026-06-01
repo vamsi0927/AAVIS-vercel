@@ -100,32 +100,41 @@ app.post('/api/login', async (req, res) => {
 
 const ANALYSIS_PROMPT = `Analyze this food label text. Return a concise JSON object with the following structure:
 {
-  "productName": "string - product name from the label",
-  "brand": "string - brand name, or 'Unknown Brand' if not visible",
-  "ingredients": ["array of individual ingredient strings"],
+  "productName": "string - common name (Look for largest/topmost text. If unknown, infer e.g. 'Instant Noodles', 'Processed Snack')",
+  "brand": "string - brand name (Look for brand logo text)",
+  "productType": "food | beverage",
+  "servingSize": "string - e.g. '28g', '1 scoop (30g)', '200ml' (Extract any serving size, portion size, or reference amount. Null if missing.)",
+  "nutritionUnit": "string - e.g. 'per 100g', 'per serving', 'per 20g' (Exactly as written above the nutrition column)",
+  "ingredients": ["array of ingredients - PRIORITIZE risky/processed items first in the list"],
   "nutrients": {
-    "unit": "string - either '100g', '100ml', or whatever is specified on the label. Default to '100g' if unclear.",
-    "calories": number (kcal, 0 if not found),
-    "sugar": number (g, 0 if not found),
-    "sodium": number (mg, 0 if not found),
-    "fat": number (g, 0 if not found),
-    "satFat": number (g, 0 if not found),
-    "protein": number (g, 0 if not found),
-    "fiber": number (g, 0 if not found),
-    "carbs": number (g, 0 if not found)
+    "calories": number or null,
+    "sugar": number or null,
+    "sodium": number or null,
+    "fat": number or null,
+    "satFat": number or null,
+    "protein": number or null,
+    "fiber": number or null,
+    "carbs": number or null
   },
-  "additives": ["array of E-number codes found, e.g. 'E102', 'E211'"],
-  "dynamicAdditives": {
-    "E-number": {
-      "name": "string",
-      "hazard": "safe|mild|caution|harmful|hazardous",
-      "function": "string - purpose",
-      "healthExplanation": "string - brief health impact"
+  "additives": ["array of E-codes found"],
+  "additiveDetails": {
+    "KEY": {
+      "name": "Common Name",
+      "function": "Purpose (e.g., Emulsifier)",
+      "healthExplanation": "Consumer-friendly health impact",
+      "hazard": "safe | caution | hazardous"
     }
   },
-  "allergens": ["array of allergen categories"],
-  "warnings": ["array of health warning strings"],
-  "aiSummary": "A short funny line about the product (AI roast)"
+  "ingredientDetails": {
+    "INGREDIENT_NAME": {
+      "hazard": "safe | mild | caution | harmful | hazardous",
+      "explanation": "short human-readable explanation of why this ingredient is at this hazard level"
+    }
+  },
+  "allergens": ["array of detected allergens"],
+  "mainConcerns": ["array of 2-3 short human-readable health risks"],
+  "dietAdvice": "A strict, brutally honest, conversational 2-line verdict acting as a human nutrition expert explaining exactly why it is safe or hazardous",
+  "aiSummary": "short funny AI roast line (Indian context)"
 }
 
 Return ONLY a valid JSON object. No markdown. No backticks. No explanation. Just raw JSON.`;
@@ -163,7 +172,11 @@ async function analyzeWithGemini(text, apiKey) {
   const GEMINI_API_URL =
     'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
 
-  const prompt = `${ANALYSIS_PROMPT}\n\nExtracted Text from Label:\n${text}`;
+  // If text already contains the analysis instructions, use it directly.
+  // Otherwise, fallback to prepending the server-side ANALYSIS_PROMPT.
+  const prompt = text.includes('Return a concise JSON object') || text.includes('ingredientDetails')
+    ? text
+    : `${ANALYSIS_PROMPT}\n\nExtracted Text from Label:\n${text}`;
 
   const requestBody = {
     contents: [{ parts: [{ text: prompt }] }],

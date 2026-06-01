@@ -410,25 +410,48 @@ export function Result() {
                   {(() => {
                     const riskOrder: Record<string, number> = { hazardous: 0, harmful: 1, caution: 2, moderate: 2, mild: 3, safe: 4 };
                     
-                    const getLevel = (ingr: string) => {
-                      const dynamicInfo = product.dynamicIngredients
+                    const getDynamicInfo = (ingrName: string) => {
+                      const fromIngr = product.dynamicIngredients
                         ? Object.entries(product.dynamicIngredients).find(([k]) =>
-                            ingr.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingr.toLowerCase())
+                            ingrName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingrName.toLowerCase())
                           )?.[1]
                         : undefined;
-                      return dynamicInfo?.hazard || classifyIngredient(ingr).level;
+                      if (fromIngr) return fromIngr;
+
+                      const fromAdd = product.dynamicAdditives
+                        ? Object.entries(product.dynamicAdditives).find(([k]) =>
+                            ingrName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingrName.toLowerCase())
+                          )?.[1]
+                        : undefined;
+                      
+                      if (fromAdd) {
+                        return { hazard: fromAdd.hazard, explanation: fromAdd.healthExplanation };
+                      }
+
+                      // Fallback to local ADDITIVES_DB if it matches an E-number or E-number name
+                      const localAdd = Object.values(ADDITIVES_DB).find(
+                        (a) =>
+                          ingrName.toLowerCase() === a.code.toLowerCase() ||
+                          ingrName.toLowerCase() === a.name.toLowerCase() ||
+                          (a.name && ingrName.toLowerCase().includes(a.name.toLowerCase()))
+                      );
+                      if (localAdd) {
+                        return { hazard: localAdd.hazard, explanation: localAdd.healthExplanation };
+                      }
+                      return undefined;
+                    };
+
+                    const getLevel = (ingr: string) => {
+                      return getDynamicInfo(ingr)?.hazard || classifyIngredient(ingr).level;
                     };
 
                     const sorted = [...product.ingredients].sort((a, b) => riskOrder[getLevel(a)] - riskOrder[getLevel(b)]);
                     const visible = showAllIngredients ? sorted : sorted.slice(0, 12);
+                    
                     return visible.map((ingr, idx) => {
-                      const dynamicInfo = product.dynamicIngredients
-                        ? Object.entries(product.dynamicIngredients).find(([k]) =>
-                            ingr.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingr.toLowerCase())
-                          )?.[1]
-                        : undefined;
+                      const dynamicInfo = getDynamicInfo(ingr);
                         
-                      // Fallback to local DB if AI missed it
+                      // Fallback to local DB if AI missed it completely
                       const localRisk = classifyIngredient(ingr);
                       const level = dynamicInfo?.hazard || localRisk.level;
                       const explanation = dynamicInfo?.explanation || localRisk.explanation;
@@ -463,13 +486,14 @@ export function Result() {
                   const allCodes = [...new Set([...product.additives, ...dynamicKeys])];
                   return allCodes.map(code => {
                     const aiAdditive = product.dynamicAdditives?.[code];
+                    const localDbAdditive = ADDITIVES_DB[code];
                     
-                    // If AI didn't return info for this additive, we just render a generic fallback
+                    // Prefer AI explanations, then local database, then generic fallback
                     const additive = {
-                      name: aiAdditive?.name || code,
-                      hazard: aiAdditive?.hazard || 'caution',
-                      function: aiAdditive?.function || 'Food Additive',
-                      healthExplanation: aiAdditive?.healthExplanation || 'Industrial food additive.'
+                      name: aiAdditive?.name || localDbAdditive?.name || code,
+                      hazard: aiAdditive?.hazard || localDbAdditive?.hazard || 'caution',
+                      function: aiAdditive?.function || localDbAdditive?.function || 'Food Additive',
+                      healthExplanation: aiAdditive?.healthExplanation || localDbAdditive?.healthExplanation || 'Industrial food additive.'
                     };
                     const leftBorder = getAdditiveCardBorder(additive.hazard);
                     return (
