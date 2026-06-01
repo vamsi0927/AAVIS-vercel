@@ -126,7 +126,23 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
     }
   }
 
-  // Fallback to Render if no API key is available in the client env
+  // Try Vercel Serverless Function first if we are on Vercel
+  const isVercel = window.location.hostname.includes('vercel.app');
+  if (isVercel && endpoint === '/api/analyze') {
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) return await response.json();
+      console.warn('[Vercel API] Failed, falling back to Render', await response.text());
+    } catch (e) {
+      console.warn('[Vercel API] Network error, falling back to Render', e);
+    }
+  }
+
+  // Fallback to Render if Vercel serverless fails or we are not on Vercel
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
