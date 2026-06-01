@@ -153,6 +153,7 @@ export function Result() {
         scoreReasons: updatedScoreData.scoreReasons,
         mainConcerns: updatedScoreData.mainConcerns || scan.mainConcerns,
         personalizedWarnings: updatedScoreData.personalizedWarnings,
+        scoreBreakdown: updatedScoreData.scoreBreakdown,
       };
       
       updateScanInState(scan.id, updatedScan);
@@ -307,7 +308,7 @@ export function Result() {
             </p>
 
             {/* Score reason breakdown */}
-            {scan.scoreBreakdown && (
+            {scan.scoreBreakdown && scan.scoreBreakdown.finalScore !== undefined && (
               <div className="text-left mt-5 pt-5 border-t border-white/5 space-y-2.5">
                 <p className="text-[10px] font-black text-content-secondary uppercase tracking-[0.15em] mb-3">Score Breakdown</p>
                 {scan.scoreReasons?.map((reason, idx) => (
@@ -322,7 +323,7 @@ export function Result() {
                 
                 <div className="flex items-center justify-between border-t border-white/10 mt-3 pt-3 px-1">
                   <span className="text-xs font-black text-white">Final Score:</span>
-                  <span className="text-sm font-black" style={{ color: ringColor }}>{scan.scoreBreakdown.finalScore}</span>
+                  <span className="text-sm font-black" style={{ color: ringColor }}>{scan.scoreBreakdown?.finalScore}</span>
                 </div>
               </div>
             )}

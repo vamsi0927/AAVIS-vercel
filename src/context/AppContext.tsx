@@ -270,6 +270,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
               scoreReasons: dynamicScore.scoreReasons,
               mainConcerns: dynamicScore.mainConcerns,
               personalizedWarnings: dynamicScore.personalizedWarnings,
+              scoreBreakdown: dynamicScore.scoreBreakdown,
             };
           });
 
