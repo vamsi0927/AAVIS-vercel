@@ -307,7 +307,7 @@ export function Result() {
             </p>
 
             {/* Score reason breakdown */}
-            {scan.scoreBreakdown && (
+            {scan.scoreReasons && scan.scoreReasons.length > 0 && (
               <div className="text-left mt-5 pt-5 border-t border-white/5 space-y-2.5">
                 <p className="text-[10px] font-black text-content-secondary uppercase tracking-[0.15em] mb-3">Score Breakdown</p>
                 {scan.scoreReasons?.map((reason, idx) => (
