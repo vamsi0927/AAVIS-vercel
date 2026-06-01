@@ -53,12 +53,13 @@ CRITICAL INSTRUCTIONS:
 1. Product Detection: Carefully identify the product name and brand. If OCR is messy, use context to infer a reasonable product type rather than 'Unknown'.
 2. Ingredient Prioritization: List harmful additives, refined oils, and processed sugars AT THE BEGINNING of the 'ingredients' array.
 3. NEVER skip difficult or long ingredient names.
-4. Hazard Level: 'hazardous' for controversial chemicals, 'caution' for industrial/processed items (including most emulsifiers/stabilizers), 'safe' only for truly natural extracts.
-5. Personalize for: {PROFILE_CONTEXT}
-6. NUTRITION VALUES: TRANSCRIBE THE EXACT RAW NUMBERS AS PRINTED on the label. DO NOT mathematically calculate, scale, or normalize the values to per 100g. If the label says "160" for calories per serving, return 160. Do NOT estimate, guess, or hallucinate any nutrition numbers.
-7. SERVING SIZE: Look for "Serving Size", "Portion", or any clear indication of a serving amount (e.g. "1 scoop (30g)", "1 piece", "per 250ml"). Extract this accurately even if the exact words "Serving Size" are missing.
-8. ADDITIVES & INGREDIENTS: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. It is also MANDATORY to generate a hazard classification and explanation in "ingredientDetails" for EVERY SINGLE INGREDIENT. Never skip this.
-9. RETURN ONLY VALID JSON.`;
+4. Normalize INS: Convert any "INS XXX" codes found on the label directly into European "E XXX" codes (e.g. INS 471 -> E471) in both the ingredients list and additives list to maintain global consistency.
+5. Hazard Level: 'hazardous' for controversial chemicals, 'caution' for industrial/processed items (including most emulsifiers/stabilizers), 'safe' only for truly natural extracts.
+6. Personalize for: {PROFILE_CONTEXT}
+7. NUTRITION VALUES: TRANSCRIBE THE EXACT RAW NUMBERS AS PRINTED on the label. DO NOT mathematically calculate, scale, or normalize the values to per 100g. If the label says "160" for calories per serving, return 160. Do NOT estimate, guess, or hallucinate any nutrition numbers.
+8. SERVING SIZE: Look for "Serving Size", "Portion", or any clear indication of a serving amount (e.g. "1 scoop (30g)", "1 piece", "per 250ml"). Extract this accurately even if the exact words "Serving Size" are missing.
+9. ADDITIVES & INGREDIENTS: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. It is also MANDATORY to generate a hazard classification and explanation in "ingredientDetails" for EVERY SINGLE INGREDIENT. Never skip this.
+10. RETURN ONLY VALID JSON.`;
 
 // ─── Types ────────────────────────────────────────────────────────
 export interface GeminiAnalysisResult {
@@ -117,6 +118,27 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     carbs: getNutrient('carbs'),
   };
 
+  const normalizeECode = (str: string) => str.replace(/\bINS\s*-?\s*(\d+[a-zA-Z]?)\b/gi, 'E$1');
+
+  const rawIngredients = Array.isArray(parsed.ingredients) && parsed.ingredients.length > 0
+      ? parsed.ingredients
+      : (typeof parsed.ingredients === 'string' && parsed.ingredients.trim()
+          ? parsed.ingredients.split(',').map((i: string) => i.trim()).filter(Boolean)
+          : ['(AI could not extract ingredients)']);
+          
+  const cleanIngredients = rawIngredients.map((i: string) => normalizeECode(i));
+  const cleanAdditives = (Array.isArray(parsed.additives) ? parsed.additives : []).map((a: string) => normalizeECode(a));
+
+  const cleanDynamicAdditives = Object.entries(parsed.additiveDetails || {}).reduce((acc, [k, v]) => {
+    acc[normalizeECode(k)] = v as any;
+    return acc;
+  }, {} as any);
+
+  const cleanDynamicIngredients = Object.entries(parsed.ingredientDetails || {}).reduce((acc, [k, v]) => {
+    acc[normalizeECode(k)] = v as any;
+    return acc;
+  }, {} as any);
+
   return {
     id: `ai_${Date.now()}`,
     name: parsed.productName || fallbackName,
@@ -124,16 +146,12 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     imageEmoji: emoji,
     productType: parsed.productType || 'food',
     servingSize: parsed.servingSize || undefined,
-    ingredients: Array.isArray(parsed.ingredients) && parsed.ingredients.length > 0
-      ? parsed.ingredients
-      : (typeof parsed.ingredients === 'string' && parsed.ingredients.trim()
-          ? parsed.ingredients.split(',').map((i: string) => i.trim()).filter(Boolean)
-          : ['(AI could not extract ingredients)']),
+    ingredients: cleanIngredients,
     nutrients: { ...rawNutrients }, // Will be overwritten by normalizeProduct
     rawNutrients: { ...rawNutrients }, // Persisted for UI / Impact calculation
-    additives: Array.isArray(parsed.additives) ? parsed.additives : [],
-    dynamicAdditives: parsed.additiveDetails || {},
-    dynamicIngredients: parsed.ingredientDetails || {},
+    additives: cleanAdditives,
+    dynamicAdditives: cleanDynamicAdditives,
+    dynamicIngredients: cleanDynamicIngredients,
     allergens: Array.isArray(parsed.allergens) ? parsed.allergens : [],
   };
 }

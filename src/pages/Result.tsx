@@ -409,7 +409,17 @@ export function Result() {
                 <div className="flex flex-wrap gap-2">
                   {(() => {
                     const riskOrder: Record<string, number> = { hazardous: 0, harmful: 1, caution: 2, moderate: 2, mild: 3, safe: 4 };
-                    const sorted = [...product.ingredients];
+                    
+                    const getLevel = (ingr: string) => {
+                      const dynamicInfo = product.dynamicIngredients
+                        ? Object.entries(product.dynamicIngredients).find(([k]) =>
+                            ingr.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingr.toLowerCase())
+                          )?.[1]
+                        : undefined;
+                      return dynamicInfo?.hazard || classifyIngredient(ingr).level;
+                    };
+
+                    const sorted = [...product.ingredients].sort((a, b) => riskOrder[getLevel(a)] - riskOrder[getLevel(b)]);
                     const visible = showAllIngredients ? sorted : sorted.slice(0, 12);
                     return visible.map((ingr, idx) => {
                       const dynamicInfo = product.dynamicIngredients

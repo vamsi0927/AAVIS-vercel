@@ -272,11 +272,16 @@ export function computeHealthScore(
   // ── STEP 11.5: GENERAL INGREDIENT HAZARD PENALTY ──────────────────────────
   let ingredientHazardPenalty = 0;
   product.ingredients.forEach(ing => {
-    const risk = classifyIngredient(ing);
+    // Skip E-codes because they are penalized in the Additives section
+    if (/^E\d+[a-zA-Z]?$/i.test(ing)) return;
+
+    const dynamicInfo = product.dynamicIngredients?.[ing];
+    const riskLevel = dynamicInfo?.hazard || classifyIngredient(ing).level;
+    
     let pen = 0;
-    if (risk.level === 'hazardous') pen = 12;
-    else if (risk.level === 'harmful') pen = 6;
-    else if (risk.level === 'moderate' || risk.level === 'caution') pen = 2;
+    if (riskLevel === 'hazardous') pen = 12;
+    else if (riskLevel === 'harmful') pen = 6;
+    else if (riskLevel === 'moderate' || riskLevel === 'caution') pen = 2;
     
     if (pen > 0) {
       ingredientHazardPenalty += pen;
