@@ -8,7 +8,7 @@ import { computeHealthScore } from '../lib/scoring';
 import { analyzeMultiStepScan, performOCR, getGeminiErrorMessage } from '../lib/geminiAnalysis';
 import { intelligentOcrCorrection } from '../lib/ocrCorrection';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { saveScan } from '../lib/supabaseService';
+import { saveScan, uploadScanImage } from '../lib/supabaseService';
 import Webcam from 'react-webcam';
 import { toast } from 'sonner';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
@@ -301,6 +301,15 @@ export function Scan() {
         const { data: { session } } = await supabase.auth.getSession();
         const userId = session?.user?.id;
         if (userId) {
+          let storageUrl = ingredientsImage || undefined;
+          
+          if (ingredientsImage && ingredientsImage.startsWith('data:image')) {
+            const uploadedUrl = await uploadScanImage(ingredientsImage, finalScanId);
+            if (uploadedUrl) {
+              storageUrl = uploadedUrl;
+            }
+          }
+
           const savedRow = await saveScan(userId, {
             product_name: result.product.name,
             brand: result.product.brand,
@@ -317,7 +326,7 @@ export function Scan() {
             verdict: scoreResult.verdict,
             diet_advice: scanRecord.dietAdvice,
             ai_summary: result.aiSummary,
-            image_url: ingredientsImage || undefined,
+            image_url: storageUrl,
           });
           if (savedRow) {
             finalScanId = savedRow.id;

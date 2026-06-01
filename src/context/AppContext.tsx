@@ -17,6 +17,7 @@ interface AppContextType extends AppState {
   logout: () => void;
   updateProfile: (profile: UserProfile) => void;
   addScan: (scan: ScanResult) => void;
+  updateScanInState: (scanId: string, updatedScan: ScanResult) => void;
   completeOnboarding: () => void;
   incrementScanCount: () => void;
   setHasRated: () => void;
@@ -374,10 +375,17 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
   };
 
   const addScan = (scan: ScanResult) => {
-    setState((prev) => ({
+    setState(prev => ({
       ...prev,
       scans: [scan, ...prev.scans],
       scanCount: prev.scanCount + 1
+    }));
+  };
+
+  const updateScanInState = (scanId: string, updatedScan: ScanResult) => {
+    setState(prev => ({
+      ...prev,
+      scans: prev.scans.map(s => s.id === scanId ? updatedScan : s),
     }));
   };
 
@@ -502,6 +510,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         logout,
         updateProfile,
         addScan,
+        updateScanInState,
         completeOnboarding,
         incrementScanCount,
         setHasRated,

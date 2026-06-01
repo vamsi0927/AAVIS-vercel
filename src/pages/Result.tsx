@@ -9,9 +9,13 @@ import {
   Sparkles,
   AlertTriangle,
   Bookmark,
-  Info
+  Info,
+  RotateCcw,
+  FileImage,
+  Loader2
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { updateScanScore } from '../lib/supabaseService';
 import { ADDITIVES_DB } from '../data/additives';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { toast } from 'sonner';
@@ -69,7 +73,7 @@ function IngredientChip({ name, level, explanation, dynamicInfo }: { name: strin
 export function Result() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { scans, bookmarkedProductIds, toggleBookmark, theme } = useAppContext();
+  const { scans, bookmarkedProductIds, toggleBookmark, theme, profile, updateScanInState } = useAppContext();
   
   const scan = scans.find((s) => s.id === id || s.productId === id || s.product?.id === id);
   const product = scan?.product || (scan ? SAMPLE_PRODUCTS.find((p) => p.id === scan.productId) : null);
@@ -108,6 +112,69 @@ export function Result() {
   const isBookmarked = bookmarkedProductIds.includes(product.id);
 
   const score = scan.score ?? 0;
+
+  const [isReanalyzing, setIsReanalyzing] = useState(false);
+  const [reanalyzeStatus, setReanalyzeStatus] = useState('');
+
+  const handleReAnalyze = async () => {
+    if (!scan || !product) return;
+    setIsReanalyzing(true);
+    
+    try {
+      setReanalyzeStatus('[REANALYZE] Running Scoring Engine...');
+      // Small artificial delay to show the status (gives a good UX feel that it's doing work)
+      await new Promise(r => setTimeout(r, 600));
+      
+      const updatedScoreData = computeHealthScore(product, profile);
+      
+      setReanalyzeStatus('[REANALYZE] Updating Database...');
+      
+      const success = await updateScanScore(scan.id, {
+        health_score: updatedScoreData.score,
+        verdict: updatedScoreData.verdict,
+        nutrients: product.nutrients,
+        diet_advice: updatedScoreData.dietAdvice || '',
+      });
+      
+      if (!success) {
+        toast.error('Failed to update database');
+        setIsReanalyzing(false);
+        return;
+      }
+      
+      setReanalyzeStatus('[SCORE_RECALCULATED]');
+      
+      const updatedScan = {
+        ...scan,
+        score: updatedScoreData.score,
+        verdict: updatedScoreData.verdict,
+        warnings: updatedScoreData.warnings,
+        dietAdvice: updatedScoreData.dietAdvice || scan.dietAdvice,
+        scoreReasons: updatedScoreData.scoreReasons,
+        mainConcerns: updatedScoreData.mainConcerns || scan.mainConcerns,
+        personalizedWarnings: updatedScoreData.personalizedWarnings,
+      };
+      
+      updateScanInState(scan.id, updatedScan);
+      
+      await new Promise(r => setTimeout(r, 500));
+      toast.success('Score Successfully Recalculated!');
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to re-analyze scan');
+    } finally {
+      setIsReanalyzing(false);
+    }
+  };
+
+  const handleViewOriginal = () => {
+    if (!scan.image_url && !product.imageUrl) {
+      toast.error('No original label image found for this scan');
+      return;
+    }
+    const url = scan.image_url || product.imageUrl;
+    window.open(url, '_blank');
+  };
 
   // ── Score ring config (SVG arc)
   const radius = 54;
@@ -172,6 +239,25 @@ export function Result() {
                 </span>
               )}
             </div>
+          </div>
+
+          {/* ── Action Buttons ── */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={handleReAnalyze}
+              disabled={isReanalyzing}
+              className={`glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border border-white/5 transition-all text-xs font-bold uppercase tracking-wider ${isReanalyzing ? 'opacity-50' : 'hover:bg-white/5 active:scale-95'}`}
+            >
+              {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin text-brand-primary" /> : <RotateCcw className="w-4 h-4 text-brand-primary" />}
+              {isReanalyzing ? 'Re-analyzing...' : 'Re-Analyze'}
+            </button>
+            <button
+              onClick={handleViewOriginal}
+              className="glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border border-white/5 transition-all text-xs font-bold uppercase tracking-wider hover:bg-white/5 active:scale-95"
+            >
+              <FileImage className="w-4 h-4 text-content-secondary" />
+              Original Label
+            </button>
           </div>
 
           {/* ── 2. Health Score (SVG Arc Ring) ── */}

@@ -195,6 +195,84 @@ export function getVerdict(score: number): 'safe' | 'caution' | 'hazardous' {
 
 
 /**
+ * Helper to convert a base64 data URL to a Blob
+ */
+function dataURLtoBlob(dataurl: string): Blob {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+
+/**
+ * Upload a base64 image to Supabase Storage
+ */
+export async function uploadScanImage(base64Image: string, scanId: string): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const blob = dataURLtoBlob(base64Image);
+    const fileName = `${scanId}_${Date.now()}.jpg`;
+    
+    const { data, error } = await supabase.storage
+      .from('scan-images')
+      .upload(fileName, blob, {
+        contentType: blob.type,
+        upsert: true
+      });
+
+    if (error) {
+      console.error('[Aavis] Failed to upload scan image to storage:', error);
+      return null;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('scan-images')
+      .getPublicUrl(fileName);
+
+    return publicUrlData.publicUrl;
+  } catch (error) {
+    console.error('[Aavis] Error during uploadScanImage:', error);
+    return null;
+  }
+}
+
+/**
+ * Update the score and breakdown of an existing scan without re-uploading
+ */
+export async function updateScanScore(
+  scanId: string,
+  updates: {
+    health_score: number;
+    verdict: string;
+    nutrients: any;
+    diet_advice: string;
+  }
+): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false;
+  
+  const { error } = await supabase
+    .from('scans')
+    .update({
+      health_score: updates.health_score,
+      verdict: updates.verdict,
+      nutrients: updates.nutrients,
+      diet_advice: updates.diet_advice
+    })
+    .eq('id', scanId);
+
+  if (error) {
+    console.error('[Aavis] Failed to update scan score:', error);
+    return false;
+  }
+  return true;
+}
+
+/**
  * Save a scan to the database and update user streak.
  */
 export async function saveScan(
