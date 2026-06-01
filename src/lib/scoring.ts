@@ -436,6 +436,29 @@ export function computeHealthScore(
     scoreReasons.push(`Refined Flour: -10`);
   }
 
+  // Additives Penalty
+  let totalAdditivePenalty = 0;
+  const allAdditives = [...new Set([...product.additives, ...Object.keys(product.dynamicAdditives || {})])];
+  for (const code of allAdditives) {
+    const additive = product.dynamicAdditives?.[code] || ADDITIVES_DB[code];
+    let penalty = 0;
+    
+    if (additive) {
+      if (additive.hazard === 'hazardous' || additive.hazard === 'harmful') penalty = 7;
+      else if (additive.hazard === 'caution') penalty = 3;
+      else if (additive.hazard === 'mild') penalty = 1;
+    } else {
+      penalty = 3; // default
+    }
+
+    if (penalty > 0) {
+      totalAdditivePenalty += penalty;
+      scoreReasons.push(`${code} (${additive?.hazard || 'unknown'}): -${penalty}`);
+    }
+  }
+  if (totalAdditivePenalty > 25) totalAdditivePenalty = 25; // Capped at -25
+  score -= totalAdditivePenalty;
+
   // Rewards/Bonuses
   if (detectKeywords(ingredientsL, ['olive oil', 'avocado oil', 'mustard oil'])) {
     score += 5;
