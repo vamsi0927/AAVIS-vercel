@@ -36,6 +36,13 @@ export function ScanManual() {
         ...scoredResult,
         mainConcerns: scoredResult.mainConcerns || aiResult.mainConcerns,
         dietAdvice: scoredResult.dietAdvice || aiResult.dietAdvice,
+        score: aiResult.finalScore !== undefined ? aiResult.finalScore : scoredResult.score,
+        verdict: (aiResult.finalScore !== undefined)
+          ? (aiResult.finalScore < 40 ? 'hazardous' : aiResult.finalScore < 70 ? 'caution' : 'safe')
+          : scoredResult.verdict,
+        aiDimensions: aiResult.aiDimensions,
+        overallAssessment: aiResult.overallAssessment,
+        majorBenefits: aiResult.majorBenefits,
       };
       
       let finalScanId = scan.id;
@@ -60,8 +67,10 @@ export function ScanManual() {
             },
             additives: aiResult.product.additives,
             allergens_detected: aiResult.product.allergens,
-            health_score: scoredResult.score,
-            verdict: scoredResult.verdict,
+            health_score: aiResult.finalScore !== undefined ? aiResult.finalScore : scoredResult.score,
+            verdict: (aiResult.finalScore !== undefined)
+              ? (aiResult.finalScore < 40 ? 'hazardous' : aiResult.finalScore < 70 ? 'caution' : 'safe')
+              : scoredResult.verdict,
             diet_advice: scan.dietAdvice,
             ai_summary: aiResult.aiSummary,
             image_url: aiResult.product.imageUrl,

@@ -285,8 +285,10 @@ export function Scan() {
         id: `scan_${Date.now()}`,
         date: new Date().toISOString(),
         productId: result.product.id,
-        score: scoreResult.score,
-        verdict: scoreResult.verdict,
+        score: result.finalScore !== undefined ? result.finalScore : scoreResult.score,
+        verdict: (result.finalScore !== undefined) 
+          ? (result.finalScore < 40 ? 'hazardous' : result.finalScore < 70 ? 'caution' : 'safe')
+          : scoreResult.verdict,
         warnings: scoreResult.warnings,
         product: result.product,
         aiSummary: result.aiSummary,
@@ -295,6 +297,9 @@ export function Scan() {
         mainConcerns: scoreResult.mainConcerns || result.mainConcerns,
         personalizedWarnings: scoreResult.personalizedWarnings,
         scoreBreakdown: scoreResult.scoreBreakdown,
+        aiDimensions: result.aiDimensions,
+        overallAssessment: result.overallAssessment,
+        majorBenefits: result.majorBenefits,
       };
 
       let finalScanId = scanRecord.id;

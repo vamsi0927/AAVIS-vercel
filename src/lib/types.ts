@@ -1,5 +1,35 @@
 export type HazardLevel = 'safe' | 'mild' | 'moderate' | 'caution' | 'harmful' | 'hazardous';
 
+export type ProductCategory = 
+  | 'Whole Food'
+  | 'Beverage'
+  | 'Snack'
+  | 'Dairy'
+  | 'Bakery'
+  | 'Breakfast Food'
+  | 'Protein Supplement'
+  | 'Confectionery'
+  | 'Sauce & Condiment'
+  | 'Cooking Oil & Fat'
+  | 'Ready Meal'
+  | 'Plant-Based Alternative'
+  | 'General Food';
+
+export interface DimensionScore {
+  score: number;
+  justification: string;
+}
+
+export interface AIScoringDimensions {
+  ingredientSafety: DimensionScore;
+  nutritionalQuality: DimensionScore;
+  processingLevel: DimensionScore;
+  nutrientDensity: DimensionScore;
+  energyDensity: DimensionScore;
+  wholeFoodContent: DimensionScore;
+  functionalHealthImpact: DimensionScore;
+}
+
 export interface Additive {
   code: string; // e.g., E102
   name: string;
@@ -31,7 +61,7 @@ export interface Product {
   ingredients: string[];
   
   // New Normalization Fields
-  productType?: 'food' | 'beverage';
+  productType?: ProductCategory | 'food' | 'beverage';
   servingSize?: string; // e.g. "28g"
   normalizationBasis?: '100g' | '100ml';
   
@@ -93,6 +123,8 @@ export interface ScanResult {
   servingWarning?: string;
   nutritionConfidence?: number;
   scoreBreakdown?: ScoreBreakdown;
+  aiDimensions?: AIScoringDimensions;
+  overallAssessment?: string;
 }
 
 export interface NotificationPrefs {

@@ -14,7 +14,7 @@ Return a concise JSON object with the following structure:
 {
   "productName": "string - common name (Look for largest/topmost text. If unknown, infer e.g. 'Instant Noodles', 'Processed Snack')",
   "brand": "string - brand name (Look for brand logo text)",
-  "productType": "food | beverage",
+  "productType": "Whole Food | Beverage | Snack | Dairy | Bakery | Breakfast Food | Protein Supplement | Confectionery | Sauce & Condiment | Cooking Oil & Fat | Ready Meal | Plant-Based Alternative | General Food",
   "servingSize": "string - e.g. '28g', '1 scoop (30g)', '200ml' (Extract any serving size, portion size, or reference amount. Null if missing.)",
   "nutritionUnit": "string - e.g. 'per 100g', 'per serving', 'per 20g' (Exactly as written above the nutrition column)",
   "ingredients": ["array of ingredients - PRIORITIZE risky/processed items first in the list"],
@@ -33,18 +33,30 @@ Return a concise JSON object with the following structure:
     "KEY": {
       "name": "Common Name",
       "function": "Purpose (e.g., Emulsifier)",
-      "healthExplanation": "Consumer-friendly health impact",
+      "healthExplanation": "Consumer-friendly health impact (MUST explain every single additive found)",
       "hazard": "safe | caution | hazardous"
     }
   },
   "ingredientDetails": {
     "INGREDIENT_NAME": {
       "hazard": "safe | mild | caution | harmful | hazardous",
-      "explanation": "short human-readable explanation of why this ingredient is at this hazard level"
+      "explanation": "short human-readable explanation (MUST explain every single ingredient found in the list)"
     }
   },
+  "dimensions": {
+    "ingredientSafety": { "score": 0, "justification": "string" },
+    "nutritionalQuality": { "score": 0, "justification": "string" },
+    "processingLevel": { "score": 0, "justification": "string" },
+    "nutrientDensity": { "score": 0, "justification": "string" },
+    "energyDensity": { "score": 0, "justification": "string" },
+    "wholeFoodContent": { "score": 0, "justification": "string" },
+    "functionalHealthImpact": { "score": 0, "justification": "string" }
+  },
+  "finalScore": 0,
+  "overallAssessment": "string",
   "allergens": ["array of detected allergens"],
   "mainConcerns": ["array of 2-3 short human-readable health risks"],
+  "majorBenefits": ["array of 2-3 short human-readable health benefits"],
   "dietAdvice": "A strict, brutally honest, conversational 2-line verdict acting as a human nutrition expert explaining exactly why it is safe or hazardous",
   "aiSummary": "short funny AI roast line (Indian context)"
 }
@@ -54,12 +66,14 @@ CRITICAL INSTRUCTIONS:
 2. Ingredient Prioritization: List harmful additives, refined oils, and processed sugars AT THE BEGINNING of the 'ingredients' array.
 3. NEVER skip difficult or long ingredient names.
 4. Normalize INS: Convert any "INS XXX" codes found on the label directly into European "E XXX" codes (e.g. INS 471 -> E471) in both the ingredients list and additives list to maintain global consistency.
-5. Hazard Level: 'hazardous' for controversial chemicals, 'caution' for industrial/processed items (including most emulsifiers/stabilizers), 'safe' only for truly natural extracts.
-6. Personalize for: {PROFILE_CONTEXT}
-7. NUTRITION VALUES: TRANSCRIBE THE EXACT RAW NUMBERS AS PRINTED on the label. DO NOT mathematically calculate, scale, or normalize the values to per 100g. If the label says "160" for calories per serving, return 160. Do NOT estimate, guess, or hallucinate any nutrition numbers.
-8. SERVING SIZE: Look for "Serving Size", "Portion", or any clear indication of a serving amount (e.g. "1 scoop (30g)", "1 piece", "per 250ml"). Extract this accurately even if the exact words "Serving Size" are missing.
-9. ADDITIVES & INGREDIENTS: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. It is also MANDATORY to generate a hazard classification and explanation in "ingredientDetails" for EVERY SINGLE INGREDIENT. Never skip this.
-10. RETURN ONLY VALID JSON.`;
+5. Identify hidden names for sugar (maltodextrin, dextrose, syrups) and flag them as "caution" or "harmful".
+6. E-codes or INS codes must be parsed accurately into additiveDetails (EVERY additive must have details).
+7. Treat "Vegetable Oil (Edible Vegetable Oil, Palm Oil, Palmolein)" as "harmful" due to saturated fats and processing.
+8. Identify UPF (Ultra Processed Food) markers.
+9. Match against profile: {PROFILE_CONTEXT}. Warn strongly if allergens or conditions are triggered!
+10. AI SCORING (CRITICAL): Analyze the product across the 7 dimensions. Return a score (0-100) for each dimension and a justification.
+11. COMPLETENESS (CRITICAL): You MUST provide an entry in \`ingredientDetails\` for EVERY SINGLE item in the \`ingredients\` array. You MUST provide an entry in \`additiveDetails\` for EVERY SINGLE additive found. If you extract an E-code, you MUST explain it! Do not leave any item unexplained.
+12. RETURN ONLY VALID JSON.`;
 
 // ─── Types ────────────────────────────────────────────────────────
 export interface GeminiAnalysisResult {
@@ -67,6 +81,10 @@ export interface GeminiAnalysisResult {
   aiSummary: string;
   dietAdvice: string;
   mainConcerns: string[];
+  majorBenefits?: string[];
+  aiDimensions?: any; // The 7 dimensions parsed from JSON
+  overallAssessment?: string;
+  finalScore?: number;
   rawResponse: any;
 }
 
@@ -75,6 +93,40 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
   console.log('[Analyze Request Payload]', body);
   console.log('[Analyze Request JSON]', JSON.stringify(body));
 
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+  if (apiKey && endpoint === '/api/analyze' && (body as any).text) {
+    // Bypass Render backend completely for Vercel previews
+    const text = (body as any).text;
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
+    const requestBody = {
+      contents: [{ parts: [{ text }] }],
+      generationConfig: { temperature: 0.1, topP: 0.8, maxOutputTokens: 4096 },
+    };
+
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'Gemini API error');
+
+    const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!textResponse) throw new Error('Empty response from Gemini');
+
+    let cleaned = textResponse.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      const match = cleaned.match(/\{[\s\S]*\}/);
+      if (match) return JSON.parse(match[0]);
+      throw new Error('Failed to parse JSON from AI response');
+    }
+  }
+
+  // Fallback to Render if no API key is available in the client env
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -197,6 +249,10 @@ export async function analyzeImageWithGemini(
     aiSummary: parsed.aiSummary || 'AI analysis complete.',
     dietAdvice: parsed.dietAdvice || 'Check details for more info.',
     mainConcerns: Array.isArray(parsed.mainConcerns) ? parsed.mainConcerns : [],
+    majorBenefits: Array.isArray(parsed.majorBenefits) ? parsed.majorBenefits : [],
+    aiDimensions: parsed.dimensions,
+    overallAssessment: parsed.overallAssessment,
+    finalScore: parsed.finalScore,
     rawResponse: parsed,
   };
 }
@@ -232,6 +288,10 @@ export async function analyzeMultiStepScan(
     aiSummary: parsed.aiSummary || 'AI analysis complete.',
     dietAdvice: parsed.dietAdvice || 'Check details for more info.',
     mainConcerns: Array.isArray(parsed.mainConcerns) ? parsed.mainConcerns : [],
+    majorBenefits: Array.isArray(parsed.majorBenefits) ? parsed.majorBenefits : [],
+    aiDimensions: parsed.dimensions,
+    overallAssessment: parsed.overallAssessment,
+    finalScore: parsed.finalScore,
     rawResponse: parsed,
   };
 }
@@ -263,6 +323,10 @@ export async function analyzeTextWithGemini(
     aiSummary: parsed.aiSummary || 'AI analysis complete.',
     dietAdvice: parsed.dietAdvice || 'Check details for more info.',
     mainConcerns: Array.isArray(parsed.mainConcerns) ? parsed.mainConcerns : [],
+    majorBenefits: Array.isArray(parsed.majorBenefits) ? parsed.majorBenefits : [],
+    aiDimensions: parsed.dimensions,
+    overallAssessment: parsed.overallAssessment,
+    finalScore: parsed.finalScore,
     rawResponse: parsed,
   };
 }

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { updateScanScore } from '../lib/supabaseService';
+import { analyzeTextWithGemini } from '../lib/geminiAnalysis';
 import { ADDITIVES_DB } from '../data/additives';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { toast } from 'sonner';
@@ -117,19 +118,29 @@ export function Result() {
     setIsReanalyzing(true);
     
     try {
-      setReanalyzeStatus('[REANALYZE] Running Scoring Engine...');
-      // Small artificial delay to show the status (gives a good UX feel that it's doing work)
-      await new Promise(r => setTimeout(r, 600));
+      setReanalyzeStatus('[REANALYZE] Running AI Scoring Engine...');
       
-      const updatedScoreData = computeHealthScore(product, profile);
+      const ingredientsText = product.ingredients.join(', ');
+      const aiResult = await analyzeTextWithGemini(product.name, ingredientsText, profile, (msg) => {
+        setReanalyzeStatus(`[REANALYZE] ${msg}`);
+      });
+      
+      // Still run local scoring for personalized warnings/structural checks
+      const updatedScoreData = computeHealthScore(aiResult.product, profile);
       
       setReanalyzeStatus('[REANALYZE] Updating Database...');
       
+      // Override with AI score if available
+      const finalScore = aiResult.finalScore !== undefined ? aiResult.finalScore : updatedScoreData.score;
+      const finalVerdict = aiResult.finalScore !== undefined 
+          ? (aiResult.finalScore < 40 ? 'hazardous' : aiResult.finalScore < 70 ? 'caution' : 'safe')
+          : updatedScoreData.verdict;
+
       const success = await updateScanScore(scan.id, {
-        health_score: updatedScoreData.score,
-        verdict: updatedScoreData.verdict,
-        nutrients: product.nutrients,
-        diet_advice: updatedScoreData.dietAdvice || '',
+        health_score: finalScore,
+        verdict: finalVerdict,
+        nutrients: aiResult.product.nutrients,
+        diet_advice: updatedScoreData.dietAdvice || aiResult.dietAdvice || '',
       });
       
       if (!success) {
@@ -142,14 +153,17 @@ export function Result() {
       
       const updatedScan = {
         ...scan,
-        score: updatedScoreData.score,
-        verdict: updatedScoreData.verdict,
+        score: finalScore,
+        verdict: finalVerdict,
         warnings: updatedScoreData.warnings,
-        dietAdvice: updatedScoreData.dietAdvice || scan.dietAdvice,
+        dietAdvice: updatedScoreData.dietAdvice || aiResult.dietAdvice || scan.dietAdvice,
         scoreReasons: updatedScoreData.scoreReasons,
-        mainConcerns: updatedScoreData.mainConcerns || scan.mainConcerns,
+        mainConcerns: updatedScoreData.mainConcerns || aiResult.mainConcerns || scan.mainConcerns,
         personalizedWarnings: updatedScoreData.personalizedWarnings,
         scoreBreakdown: updatedScoreData.scoreBreakdown,
+        aiDimensions: aiResult.aiDimensions,
+        overallAssessment: aiResult.overallAssessment,
+        majorBenefits: aiResult.majorBenefits,
       };
       
       updateScanInState(scan.id, updatedScan);
@@ -282,15 +296,52 @@ export function Result() {
               {scoreEmoji}&nbsp;{scoreLabel}
             </div>
             <p className="text-xs text-content-secondary max-w-sm mx-auto leading-relaxed">
-              {scan.dietAdvice || (score <= 40
+              {scan.overallAssessment || scan.dietAdvice || (score <= 40
                 ? 'High concern. This product has notable health risks. See the analysis below.'
                 : score <= 70
                 ? 'Moderate. Occasional consumption is okay, but limit frequency.'
                 : 'Good. This product has a relatively clean nutritional profile.')}
             </p>
 
-            {/* Score reason breakdown */}
-            {scan.scoreBreakdown && scan.scoreBreakdown.finalScore !== undefined && (
+            {/* AI Dimensions Breakdown */}
+            {scan.aiDimensions && (
+              <div className="text-left mt-5 pt-5 border-t border-white/5 space-y-4">
+                <p className="text-[10px] font-black text-content-secondary uppercase tracking-[0.15em] mb-3">Health Dimensions Breakdown</p>
+                
+                {Object.entries(scan.aiDimensions).map(([dim, data]: [string, any], idx) => {
+                  const dimLabels: Record<string, string> = {
+                    ingredientSafety: 'Ingredient Safety',
+                    nutritionalQuality: 'Nutritional Quality',
+                    processingLevel: 'Processing Level',
+                    nutrientDensity: 'Nutrient Density',
+                    energyDensity: 'Energy Density',
+                    wholeFoodContent: 'Whole Food Content',
+                    functionalHealthImpact: 'Functional Health Impact'
+                  };
+                  const label = dimLabels[dim] || dim;
+                  const dimScore = data.score;
+                  const dimColor = dimScore < 40 ? '#ef4444' : dimScore < 70 ? '#f59e0b' : '#10b981';
+                  
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between items-center text-xs font-bold text-white">
+                        <span>{label}</span>
+                        <span style={{ color: dimColor }}>{dimScore}/100</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${dimScore}%`, backgroundColor: dimColor }} />
+                      </div>
+                      <p className="text-[10px] text-content-secondary pt-1 leading-relaxed">
+                        {data.justification}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Score reason breakdown (Fallback for old scans) */}
+            {!scan.aiDimensions && scan.scoreBreakdown && scan.scoreBreakdown.finalScore !== undefined && (
               <div className="text-left mt-5 pt-5 border-t border-white/5 space-y-2.5">
                 <p className="text-[10px] font-black text-content-secondary uppercase tracking-[0.15em] mb-3">Score Breakdown</p>
                 {scan.scoreReasons?.map((reason, idx) => (
@@ -368,6 +419,22 @@ export function Result() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {scan.majorBenefits && scan.majorBenefits.length > 0 && scan.majorBenefits[0] !== "None" && (
+            <div className="bg-brand-safe/5 border border-brand-safe/20 rounded-3xl p-5 shadow-lg">
+              <h3 className="text-brand-safe font-black text-sm mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> Notable Benefits
+              </h3>
+              <ul className="space-y-2.5">
+                {scan.majorBenefits.map((benefit: string, idx: number) => (
+                  <li key={idx} className="text-xs text-content-primary/90 flex gap-2 leading-relaxed">
+                    <span className="text-brand-safe font-black mt-0.5 shrink-0">✓</span>
+                    <span className="flex-1 min-w-0 break-words">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
@@ -574,7 +641,7 @@ export function Result() {
               const allKeys = Array.from(new Set([
                 ...Object.keys(product.nutrients || {}),
                 ...Object.keys(product.rawNutrients || {})
-              ])).filter(k => k !== 'unit');
+              ])).filter(k => k !== 'unit' && !k.startsWith('_'));
 
               return allKeys.map((key, idx) => {
                 const normVal = (product.normalizedNutrients || product.nutrients)[key as keyof typeof product.nutrients] as number | null;

@@ -102,7 +102,7 @@ const ANALYSIS_PROMPT = `Analyze this food label text. Return a concise JSON obj
 {
   "productName": "string - common name (Look for largest/topmost text. If unknown, infer e.g. 'Instant Noodles', 'Processed Snack')",
   "brand": "string - brand name (Look for brand logo text)",
-  "productType": "food | beverage",
+  "productType": "Whole Food | Beverage | Snack | Dairy | Bakery | Breakfast Food | Protein Supplement | Confectionery | Sauce & Condiment | Cooking Oil & Fat | Ready Meal | Plant-Based Alternative | General Food",
   "servingSize": "string - e.g. '28g', '1 scoop (30g)', '200ml' (Extract any serving size, portion size, or reference amount. Null if missing.)",
   "nutritionUnit": "string - e.g. 'per 100g', 'per serving', 'per 20g' (Exactly as written above the nutrition column)",
   "ingredients": ["array of ingredients - PRIORITIZE risky/processed items first in the list"],
@@ -131,8 +131,20 @@ const ANALYSIS_PROMPT = `Analyze this food label text. Return a concise JSON obj
       "explanation": "short human-readable explanation of why this ingredient is at this hazard level"
     }
   },
+  "dimensions": {
+    "ingredientSafety": { "score": 0, "justification": "string" },
+    "nutritionalQuality": { "score": 0, "justification": "string" },
+    "processingLevel": { "score": 0, "justification": "string" },
+    "nutrientDensity": { "score": 0, "justification": "string" },
+    "energyDensity": { "score": 0, "justification": "string" },
+    "wholeFoodContent": { "score": 0, "justification": "string" },
+    "functionalHealthImpact": { "score": 0, "justification": "string" }
+  },
+  "finalScore": 0,
+  "overallAssessment": "string",
   "allergens": ["array of detected allergens"],
   "mainConcerns": ["array of 2-3 short human-readable health risks"],
+  "majorBenefits": ["array of 2-3 short human-readable health benefits"],
   "dietAdvice": "A strict, brutally honest, conversational 2-line verdict acting as a human nutrition expert explaining exactly why it is safe or hazardous",
   "aiSummary": "short funny AI roast line (Indian context)"
 }
@@ -183,7 +195,7 @@ async function analyzeWithGemini(text, apiKey) {
     generationConfig: {
       temperature: 0.1,
       topP: 0.8,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 4096,
     },
   };
 
