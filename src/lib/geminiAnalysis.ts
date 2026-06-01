@@ -47,7 +47,8 @@ CRITICAL INSTRUCTIONS:
 4. Hazard Level: 'hazardous' for controversial chemicals, 'caution' for industrial/processed items (including most emulsifiers/stabilizers), 'safe' only for truly natural extracts.
 5. Personalize for: {PROFILE_CONTEXT}
 6. NUTRITION VALUES: ONLY use values explicitly found in the OCR text. If a nutrient value is NOT clearly present in the scanned text, set it to null. Do NOT estimate, guess, or hallucinate any nutrition numbers. Look for keywords like 'Energy', 'Calories', 'Sugar', 'Sodium', 'Fat', 'Saturated', 'Protein', 'Fibre/Fiber', 'Carbohydrate' and extract the numeric value next to them.
-7. RETURN ONLY VALID JSON.`;
+7. ADDITIVES: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. Never skip this.
+8. RETURN ONLY VALID JSON.`;
 
 // ─── Types ────────────────────────────────────────────────────────
 export interface GeminiAnalysisResult {
