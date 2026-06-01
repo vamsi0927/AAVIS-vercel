@@ -411,29 +411,53 @@ export function Result() {
                     const riskOrder: Record<string, number> = { hazardous: 0, harmful: 1, caution: 2, moderate: 2, mild: 3, safe: 4 };
                     
                     const getDynamicInfo = (ingrName: string) => {
-                      const fromIngr = product.dynamicIngredients
-                        ? Object.entries(product.dynamicIngredients).find(([k]) =>
-                            ingrName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingrName.toLowerCase())
-                          )?.[1]
-                        : undefined;
-                      if (fromIngr) return fromIngr;
+                      const nameLower = ingrName.toLowerCase().trim();
 
-                      const fromAdd = product.dynamicAdditives
-                        ? Object.entries(product.dynamicAdditives).find(([k]) =>
-                            ingrName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingrName.toLowerCase())
-                          )?.[1]
-                        : undefined;
-                      
-                      if (fromAdd) {
-                        return { hazard: fromAdd.hazard, explanation: fromAdd.healthExplanation };
+                      // 1. Look in dynamicIngredients (AI-generated)
+                      if (product.dynamicIngredients) {
+                        // A. Exact or substring match (highly reliable)
+                        const directMatch = Object.entries(product.dynamicIngredients).find(([k]) => {
+                          const keyLower = k.toLowerCase().trim();
+                          return nameLower.includes(keyLower) || keyLower.includes(nameLower);
+                        });
+                        if (directMatch) return directMatch[1];
+
+                        // B. Word/Token overlap match
+                        const stopWords = new Set(['and', 'of', 'with', 'for', 'in', 'or', 'the', 'contains', 'added', 'powder', 'extract', 'liquid', 'natural', 'artificial', 'processed', 'refined', 'oil', 'flour']);
+                        const getTokens = (str: string) =>
+                          str.toLowerCase()
+                             .split(/[^a-z0-9]/)
+                             .map(t => t.trim())
+                             .filter(t => t.length > 2 && !stopWords.has(t));
+
+                        const nameTokens = getTokens(nameLower);
+                        if (nameTokens.length > 0) {
+                          const tokenMatch = Object.entries(product.dynamicIngredients).find(([k]) => {
+                            const keyTokens = getTokens(k);
+                            return nameTokens.some(t => keyTokens.includes(t));
+                          });
+                          if (tokenMatch) return tokenMatch[1];
+                        }
                       }
 
-                      // Fallback to local ADDITIVES_DB if it matches an E-number or E-number name
+                      // 2. Look in dynamicAdditives (AI-generated)
+                      if (product.dynamicAdditives) {
+                        const fromAdd = Object.entries(product.dynamicAdditives).find(([k]) => {
+                          const keyLower = k.toLowerCase().trim();
+                          return nameLower.includes(keyLower) || keyLower.includes(nameLower);
+                        })?.[1];
+
+                        if (fromAdd) {
+                          return { hazard: fromAdd.hazard, explanation: fromAdd.healthExplanation };
+                        }
+                      }
+
+                      // 3. Fallback to local ADDITIVES_DB if it matches an E-number or E-number name
                       const localAdd = Object.values(ADDITIVES_DB).find(
                         (a) =>
-                          ingrName.toLowerCase() === a.code.toLowerCase() ||
-                          ingrName.toLowerCase() === a.name.toLowerCase() ||
-                          (a.name && ingrName.toLowerCase().includes(a.name.toLowerCase()))
+                          nameLower === a.code.toLowerCase() ||
+                          nameLower === a.name.toLowerCase() ||
+                          (a.name && nameLower.includes(a.name.toLowerCase()))
                       );
                       if (localAdd) {
                         return { hazard: localAdd.hazard, explanation: localAdd.healthExplanation };
