@@ -517,58 +517,77 @@ export function Result() {
               </div>
             </div>
 
-            {[
-              { key: 'calories', label: 'Calories', icon: '🔥', unit: 'kcal' },
-              { key: 'sugar', label: 'Sugars', icon: '🍬', unit: 'g' },
-              { key: 'sodium', label: 'Sodium', icon: '🧂', unit: 'mg' },
-              { key: 'satFat', label: 'Sat Fat', icon: '🧈', unit: 'g' },
-              { key: 'protein', label: 'Protein', icon: '💪', unit: 'g' },
-              { key: 'fiber', label: 'Fiber', icon: '🌿', unit: 'g' },
-              { key: 'carbs', label: 'Carbs', icon: '🌾', unit: 'g' },
-            ].map((item, idx) => {
-              const normVal = (product.normalizedNutrients || product.nutrients)[item.key as keyof typeof product.nutrients] as number | null;
-              const rawVal = (product.rawNutrients || product.nutrients)[item.key as keyof typeof product.nutrients] as number | null;
-              
-              const isDanger = (item.key === 'sugar' && normVal! > 10) || (item.key === 'sodium' && normVal! > 400) || (item.key === 'satFat' && normVal! > 5);
-              const isGood = (item.key === 'protein' && normVal! > 10) || (item.key === 'fiber' && normVal! > 5);
+            {(() => {
+              const NUTRIENT_META: Record<string, {label: string, icon: string, defaultUnit: string}> = {
+                calories: { label: 'Calories', icon: '🔥', defaultUnit: 'kcal' },
+                sugar: { label: 'Sugars', icon: '🍬', defaultUnit: 'g' },
+                sodium: { label: 'Sodium', icon: '🧂', defaultUnit: 'mg' },
+                fat: { label: 'Total Fat', icon: '🥑', defaultUnit: 'g' },
+                satFat: { label: 'Sat Fat', icon: '🧈', defaultUnit: 'g' },
+                protein: { label: 'Protein', icon: '💪', defaultUnit: 'g' },
+                fiber: { label: 'Fiber', icon: '🌿', defaultUnit: 'g' },
+                carbs: { label: 'Carbs', icon: '🌾', defaultUnit: 'g' },
+              };
 
-              return (
-                <div key={idx} className="grid grid-cols-[1fr_80px_80px] gap-2 items-center py-2.5 border-b border-white/5 last:border-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">{item.icon}</span>
-                    <span className="text-xs text-content-secondary font-medium truncate">{item.label}</span>
+              const allKeys = Array.from(new Set([
+                ...Object.keys(product.nutrients || {}),
+                ...Object.keys(product.rawNutrients || {})
+              ])).filter(k => k !== 'unit');
+
+              return allKeys.map((key, idx) => {
+                const normVal = (product.normalizedNutrients || product.nutrients)[key as keyof typeof product.nutrients] as number | null;
+                const rawVal = (product.rawNutrients || product.nutrients)[key as keyof typeof product.nutrients] as number | null;
+                
+                // Only show if we have either a raw or normalized value
+                if (normVal === null && rawVal === null && normVal === undefined && rawVal === undefined) return null;
+
+                const meta = NUTRIENT_META[key] || { 
+                  label: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim(), 
+                  icon: '✨', 
+                  defaultUnit: 'g' 
+                };
+
+                const isDanger = (key === 'sugar' && normVal! > 10) || (key === 'sodium' && normVal! > 400) || (key === 'satFat' && normVal! > 5);
+                const isGood = (key === 'protein' && normVal! > 10) || (key === 'fiber' && normVal! > 5);
+
+                return (
+                  <div key={key} className="grid grid-cols-[1fr_80px_80px] gap-2 items-center py-2.5 border-b border-white/5 last:border-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{meta.icon}</span>
+                      <span className="text-xs text-content-secondary font-medium truncate">{meta.label}</span>
+                    </div>
+                    
+                    {/* Normalized Column */}
+                    <div className="flex items-center justify-end gap-1">
+                      {normVal !== null && normVal !== undefined && !isNaN(normVal as number) ? (
+                        <>
+                          <span className={`text-[13px] font-black ${isDanger ? 'text-brand-hazardous' : isGood ? 'text-brand-safe' : 'text-white'}`}>
+                            {Number(normVal).toFixed(1).replace(/\.0$/, '')}
+                          </span>
+                          <span className="text-[9px] text-content-secondary">{meta.defaultUnit}</span>
+                        </>
+                      ) : (
+                        <span className="text-[10px] text-content-secondary opacity-50">-</span>
+                      )}
+                    </div>
+                    
+                    {/* Raw/Serving Column */}
+                    <div className="flex items-center justify-end gap-1 opacity-75">
+                      {rawVal !== null && rawVal !== undefined && !isNaN(rawVal as number) ? (
+                        <>
+                          <span className="text-[11px] font-bold text-white">
+                            {Number(rawVal).toFixed(1).replace(/\.0$/, '')}
+                          </span>
+                          <span className="text-[9px] text-content-secondary">{meta.defaultUnit}</span>
+                        </>
+                      ) : (
+                        <span className="text-[10px] text-content-secondary opacity-50">-</span>
+                      )}
+                    </div>
                   </div>
-                  
-                  {/* Normalized Column */}
-                  <div className="flex items-center justify-end gap-1">
-                    {normVal !== null ? (
-                      <>
-                        <span className={`text-[13px] font-black ${isDanger ? 'text-brand-hazardous' : isGood ? 'text-brand-safe' : 'text-white'}`}>
-                          {normVal}
-                        </span>
-                        <span className="text-[9px] text-content-secondary">{item.unit}</span>
-                      </>
-                    ) : (
-                      <span className="text-[10px] text-content-secondary opacity-50">-</span>
-                    )}
-                  </div>
-                  
-                  {/* Raw/Serving Column */}
-                  <div className="flex items-center justify-end gap-1 opacity-75">
-                    {rawVal !== null ? (
-                      <>
-                        <span className="text-[11px] font-bold text-white">
-                          {rawVal}
-                        </span>
-                        <span className="text-[9px] text-content-secondary">{item.unit}</span>
-                      </>
-                    ) : (
-                      <span className="text-[10px] text-content-secondary opacity-50">-</span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
             
             {(scan.nutritionConfidence && scan.nutritionConfidence < 100) && (
               <p className="text-[9px] text-brand-caution mt-4 bg-brand-caution/10 p-2 rounded-lg text-center font-medium border border-brand-caution/20">
