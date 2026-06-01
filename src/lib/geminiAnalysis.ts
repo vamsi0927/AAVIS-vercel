@@ -299,7 +299,8 @@ PHASE 1 — OCR RECONSTRUCTION
 
 PHASE 2 — STRUCTURED EXTRACTION
 * Reconstruct the nutrition table correctly.
-* ONLY extract standard recognized nutrition facts (e.g., Calories/Energy, Fat, Carbohydrates, Sugar, Sodium, Protein, Fiber, Potassium, Cholesterol, etc.).
+* CRITICAL: ALWAYS extract and preserve "Serving Size", "Portion Size", or "Servings Per Container" if present in the text. Put it at the very top of your output.
+* ONLY extract standard recognized nutrition facts (e.g., Calories/Energy, Fat, Carbohydrates, Sugar, Sodium, Protein, Fiber, Potassium, Cholesterol, etc.) and serving sizes.
 * COMPLETELY IGNORE all unrecognized words, acronyms, gibberish (e.g., "SHR", "Laas"), and OCR errors. Do not include them in your output.
 * COLUMN ALIGNMENT: If the OCR text presents a list of nutrient names followed by a separate list of numeric values (like two columns read top-to-bottom), carefully pair the names with the numbers sequentially in order.
 
