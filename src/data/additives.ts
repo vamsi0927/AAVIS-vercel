@@ -51,6 +51,12 @@ export const ADDITIVES_DB: Record<string, Additive> = {
     function: 'Blue colorant in confectionery and beverages.',
     healthExplanation: 'Generally considered lower risk among synthetic dyes but still an unnecessary industrial colorant. Banned in several countries.'
   },
+  E150: {
+    code: 'E150', name: 'Caramel Color', category: 'Color', hazard: 'caution',
+    description: 'Generic brown food coloring.',
+    function: 'Adds brown color to colas, sauces, and baked goods.',
+    healthExplanation: 'Depending on the exact processing method (Classes I-IV), it may contain 4-MEI, a compound linked to cancer in animal studies. Highly processed.'
+  },
   E150d: {
     code: 'E150d', name: 'Sulphite Ammonia Caramel', category: 'Color', hazard: 'caution',
     description: 'Brown colorant processed with ammonia and sulphites.',
@@ -183,6 +189,18 @@ export const ADDITIVES_DB: Record<string, Additive> = {
     function: 'Thickens and stabilizes processed foods.',
     healthExplanation: 'Animal studies show CMC can disrupt gut microbiome and promote inflammation. A clear marker of ultra-processed industrial food.'
   },
+  E412: {
+    code: 'E412', name: 'Guar Gum', category: 'Thickener', hazard: 'mild',
+    description: 'Natural fiber extracted from guar beans.',
+    function: 'Thickens sauces, ice cream, and dairy products.',
+    healthExplanation: 'Generally safe natural fiber. However, very large amounts can cause mild digestive upset or bloating in sensitive individuals.'
+  },
+  E451: {
+    code: 'E451', name: 'Triphosphates', category: 'Emulsifier / Stabilizer', hazard: 'caution',
+    description: 'Synthetic phosphate salts.',
+    function: 'Retains moisture in processed meats and seafood.',
+    healthExplanation: 'High dietary intake of added inorganic phosphates is linked to kidney damage, accelerated aging, and cardiovascular issues. Best avoided.'
+  },
   E471: {
     code: 'E471', name: 'Mono- and Diglycerides', category: 'Emulsifier', hazard: 'mild',
     description: 'Fats derived from plant or animal sources.',
@@ -194,6 +212,12 @@ export const ADDITIVES_DB: Record<string, Additive> = {
     description: 'Traditional baking soda used for centuries.',
     function: 'Helps dough rise; regulates acidity.',
     healthExplanation: 'Very safe mineral. A traditional ingredient used in home and commercial baking with no meaningful health concerns at food-grade levels.'
+  },
+  E501: {
+    code: 'E501', name: 'Potassium Carbonates', category: 'Acidity Regulator', hazard: 'safe',
+    description: 'Potassium salt of carbonic acid.',
+    function: 'Used in baking and cocoa processing (Dutch cocoa).',
+    healthExplanation: 'Generally recognized as safe. Commonly used to reduce acidity in cocoa powder with no significant health concerns.'
   },
 
   // ─── Flavor enhancers ────────────────────────────────────────────────────
@@ -240,5 +264,11 @@ export const ADDITIVES_DB: Record<string, Additive> = {
     description: 'Chlorinated derivative of sucrose — 600× sweeter than sugar.',
     function: 'Sweetens diet foods and beverages.',
     healthExplanation: 'May disrupt gut microbiome with regular use. Recent studies raise concerns about metabolism of its breakdown products. Not recommended for people with compromised gut health.'
+  },
+  E917: {
+    code: 'E917', name: 'Potassium Iodate', category: 'Flour Treatment / Supplement', hazard: 'safe',
+    description: 'Iodine supplement.',
+    function: 'Used to fortify salt with iodine and condition flour.',
+    healthExplanation: 'Safe and beneficial for preventing iodine deficiency (goiter). Used widely in iodized salt.'
   },
 };
