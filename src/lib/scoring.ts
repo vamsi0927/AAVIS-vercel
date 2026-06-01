@@ -377,6 +377,8 @@ export function computeHealthScore(
     verdict = 'safe'; prefix = 'Excellent.';
   } else if (score >= 80) {
     verdict = 'safe'; prefix = 'Very Good.';
+  }
+
   let verdictText = '';
   if (score >= 70) verdict = 'safe';
   else if (score >= 40) verdict = 'caution';
