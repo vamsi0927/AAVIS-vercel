@@ -438,7 +438,10 @@ export function Result() {
             <div className="grid grid-cols-[1fr_80px_80px] gap-2 border-b border-white/10 pb-2 mb-3">
               <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase">Nutrient</div>
               <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">Per 100{product.normalizedNutrients?.unit === '100ml' ? 'ml' : 'g'}<br/><span className="text-[8px] text-brand-primary">(Scored)</span></div>
-              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">Per Serving<br/><span className="text-[8px] opacity-60">({product.servingSize || 'Unknown'})</span></div>
+              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">
+                {product.servingSize ? 'Per Serving' : 'Original Label'}<br/>
+                <span className="text-[8px] opacity-60">({product.servingSize || product.rawNutrients?.unit || product.nutrients.unit || '-'})</span>
+              </div>
             </div>
 
             {[

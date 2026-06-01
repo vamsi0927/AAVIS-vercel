@@ -50,7 +50,14 @@ function normalizeProduct(product: Product, warnings: string[]): { normalized: P
   }
 
   if (match) {
-    const amount = parseFloat(match[1]);
+    let amount = parseFloat(match[1]);
+    const unit = match[2];
+    
+    // Convert ounces to grams (1 oz = 28.3495g)
+    if (unit === 'oz') {
+      amount = amount * 28.3495;
+    }
+
     if (amount > 0 && amount !== 100) {
       factor = 100 / amount;
     }
