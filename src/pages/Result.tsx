@@ -285,12 +285,12 @@ export function Result() {
             <div className="text-xl font-display font-black mb-1" style={{ color: ringColor }}>
               {scoreEmoji}&nbsp;{scoreLabel}
             </div>
-            <p className="text-xs text-content-secondary max-w-[240px] mx-auto leading-relaxed">
-              {score <= 40
+            <p className="text-xs text-content-secondary max-w-sm mx-auto leading-relaxed">
+              {scan.dietAdvice || (score <= 40
                 ? 'High concern. This product has notable health risks. See the analysis below.'
                 : score <= 70
                 ? 'Moderate. Occasional consumption is okay, but limit frequency.'
-                : 'Good. This product has a relatively clean nutritional profile.'}
+                : 'Good. This product has a relatively clean nutritional profile.')}
             </p>
 
             {/* Score reason breakdown */}
@@ -340,23 +340,7 @@ export function Result() {
             </div>
           )}
 
-          {/* ── 8. Smart Verdict ── */}
-          {scan.dietAdvice && (
-            <div className={`rounded-3xl p-5 shadow-lg border ${
-              scan.verdict === 'hazardous' ? 'bg-brand-hazardous/5 border-brand-hazardous/20'
-              : scan.verdict === 'caution' ? 'bg-brand-caution/5 border-brand-caution/20'
-              : 'bg-brand-safe/5 border-brand-safe/20'
-            }`}>
-              <h3 className={`font-black text-sm mb-2 flex items-center gap-2 ${
-                scan.verdict === 'hazardous' ? 'text-brand-hazardous'
-                : scan.verdict === 'caution' ? 'text-brand-caution'
-                : 'text-brand-safe'
-              }`}>
-                <Sparkles className="w-4 h-4" /> Aavis Verdict
-              </h3>
-              <p className="text-xs text-content-primary leading-relaxed break-words">{scan.dietAdvice}</p>
-            </div>
-          )}
+
 
           {/* ── 3. Main Health Concerns ── */}
           {scan.mainConcerns && scan.mainConcerns.length > 0 && (
