@@ -37,6 +37,12 @@ Return a concise JSON object with the following structure:
       "hazard": "safe | caution | hazardous"
     }
   },
+  "ingredientDetails": {
+    "INGREDIENT_NAME": {
+      "hazard": "safe | mild | caution | harmful | hazardous",
+      "explanation": "short human-readable explanation of why this ingredient is at this hazard level"
+    }
+  },
   "allergens": ["array of detected allergens"],
   "mainConcerns": ["array of 2-3 short human-readable health risks"],
   "dietAdvice": "A strict, brutally honest, conversational 2-line verdict acting as a human nutrition expert explaining exactly why it is safe or hazardous",
@@ -51,7 +57,7 @@ CRITICAL INSTRUCTIONS:
 5. Personalize for: {PROFILE_CONTEXT}
 6. NUTRITION VALUES: TRANSCRIBE THE EXACT RAW NUMBERS AS PRINTED on the label. DO NOT mathematically calculate, scale, or normalize the values to per 100g. If the label says "160" for calories per serving, return 160. Do NOT estimate, guess, or hallucinate any nutrition numbers.
 7. SERVING SIZE: Look for "Serving Size", "Portion", or any clear indication of a serving amount (e.g. "1 scoop (30g)", "1 piece", "per 250ml"). Extract this accurately even if the exact words "Serving Size" are missing.
-8. ADDITIVES: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. Never skip this.
+8. ADDITIVES & INGREDIENTS: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. It is also MANDATORY to generate a hazard classification and explanation in "ingredientDetails" for EVERY SINGLE INGREDIENT. Never skip this.
 9. RETURN ONLY VALID JSON.`;
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -127,6 +133,7 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     rawNutrients: { ...rawNutrients }, // Persisted for UI / Impact calculation
     additives: Array.isArray(parsed.additives) ? parsed.additives : [],
     dynamicAdditives: parsed.additiveDetails || {},
+    dynamicIngredients: parsed.ingredientDetails || {},
     allergens: Array.isArray(parsed.allergens) ? parsed.allergens : [],
   };
 }

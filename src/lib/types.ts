@@ -42,6 +42,7 @@ export interface Product {
   
   additives: string[]; // array of E-codes
   dynamicAdditives?: Record<string, Additive>; // AI-generated additive explanations
+  dynamicIngredients?: Record<string, { hazard: HazardLevel; explanation: string; }>; // AI-generated ingredient explanations
   allergens: string[];
 }
 

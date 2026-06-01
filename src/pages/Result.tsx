@@ -30,16 +30,12 @@ import {
 import { computeHealthScore, isBeverage } from '../lib/scoring';
 import type { Additive } from '../lib/types';
 
-function IngredientChip({ name, level, explanation, dynamicInfo }: { name: string; level: IngredientRiskLevel; explanation: string; dynamicInfo?: Additive }) {
+function IngredientChip({ name, level, explanation }: { name: string; level: IngredientRiskLevel; explanation: string; }) {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // Use AI-provided dynamic info if available, otherwise fallback to local classification
-  const finalLevel = (dynamicInfo?.hazard as IngredientRiskLevel) || level;
-  const finalExplanation = dynamicInfo?.healthExplanation || explanation || dynamicInfo?.function;
-
   return (
     <div 
-      onClick={() => finalExplanation && setIsExpanded(!isExpanded)}
+      onClick={() => explanation && setIsExpanded(!isExpanded)}
       className={`
         relative flex flex-col transition-all duration-200 cursor-pointer max-w-full
         ${isExpanded ? 'w-full mb-1' : 'shrink'}
@@ -47,23 +43,23 @@ function IngredientChip({ name, level, explanation, dynamicInfo }: { name: strin
     >
       <div className={`
         flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-medium transition-colors min-w-0
-        ${getRiskChipClasses(finalLevel)}
+        ${getRiskChipClasses(level)}
         ${isExpanded ? 'rounded-b-none border-b-0 shadow-lg bg-opacity-30' : 'hover:bg-opacity-20'}
       `}>
-        <div className={`w-1.5 h-1.5 rounded-full ${getRiskDotColor(finalLevel)} shrink-0 shadow-sm`} />
+        <div className={`w-1.5 h-1.5 rounded-full ${getRiskDotColor(level)} shrink-0 shadow-sm`} />
         <span className="capitalize break-words flex-1 min-w-0">{name}</span>
-        {finalExplanation && (
+        {explanation && (
           <Info className={`w-3.5 h-3.5 shrink-0 ml-2 opacity-40 transition-transform ${isExpanded ? 'rotate-180 opacity-100' : ''}`} />
         )}
       </div>
       
-      {isExpanded && finalExplanation && (
+      {isExpanded && explanation && (
         <div className={`
           p-3 text-[10px] leading-relaxed border border-t-0 rounded-b-lg animate-in slide-in-from-top-1 break-words
-          ${getRiskChipClasses(finalLevel)} bg-opacity-20 backdrop-blur-sm
+          ${getRiskChipClasses(level)} bg-opacity-20 backdrop-blur-sm
         `}>
-          {finalLevel !== 'safe' && <span className="font-bold uppercase mr-1">[{finalLevel}]</span>}
-          {finalExplanation}
+          {level !== 'safe' && <span className="font-bold uppercase mr-1">[{level}]</span>}
+          {explanation}
         </div>
       )}
     </div>
@@ -413,19 +409,22 @@ export function Result() {
                 <div className="flex flex-wrap gap-2">
                   {(() => {
                     const riskOrder: Record<string, number> = { hazardous: 0, harmful: 1, caution: 2, moderate: 2, mild: 3, safe: 4 };
-                    const sorted = [...product.ingredients].sort((a, b) => {
-                      return riskOrder[classifyIngredient(a).level] - riskOrder[classifyIngredient(b).level];
-                    });
+                    const sorted = [...product.ingredients];
                     const visible = showAllIngredients ? sorted : sorted.slice(0, 12);
                     return visible.map((ingr, idx) => {
-                      const risk = classifyIngredient(ingr);
-                      const dynamicInfo = product.dynamicAdditives
-                        ? Object.entries(product.dynamicAdditives).find(([k]) =>
+                      const dynamicInfo = product.dynamicIngredients
+                        ? Object.entries(product.dynamicIngredients).find(([k]) =>
                             ingr.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(ingr.toLowerCase())
                           )?.[1]
                         : undefined;
+                        
+                      // Fallback to local DB if AI missed it
+                      const localRisk = classifyIngredient(ingr);
+                      const level = dynamicInfo?.hazard || localRisk.level;
+                      const explanation = dynamicInfo?.explanation || localRisk.explanation;
+
                       return (
-                        <IngredientChip key={idx} name={ingr} level={risk.level} explanation={risk.explanation} dynamicInfo={dynamicInfo} />
+                        <IngredientChip key={idx} name={ingr} level={level} explanation={explanation} />
                       );
                     });
                   })()}
@@ -454,12 +453,13 @@ export function Result() {
                   const allCodes = [...new Set([...product.additives, ...dynamicKeys])];
                   return allCodes.map(code => {
                     const aiAdditive = product.dynamicAdditives?.[code];
-                    const localAdditive = ADDITIVES_DB[code];
+                    
+                    // If AI didn't return info for this additive, we just render a generic fallback
                     const additive = {
-                      name: aiAdditive?.name || localAdditive?.name || code,
-                      hazard: aiAdditive?.hazard || localAdditive?.hazard || 'caution',
-                      function: aiAdditive?.function || localAdditive?.function || 'Food Additive',
-                      healthExplanation: aiAdditive?.healthExplanation || localAdditive?.healthExplanation || 'Industrial food additive.'
+                      name: aiAdditive?.name || code,
+                      hazard: aiAdditive?.hazard || 'caution',
+                      function: aiAdditive?.function || 'Food Additive',
+                      healthExplanation: aiAdditive?.healthExplanation || 'Industrial food additive.'
                     };
                     const leftBorder = getAdditiveCardBorder(additive.hazard);
                     return (
