@@ -8,8 +8,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'No text provided for analysis' });
   }
 
-  // Hardcoded key for seamless Vercel deployment without user config
-  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || 'AIzaSyDxyO5uX-fLWV1jtWiRXfmA6gZq-PG5MkI';
+  // Read key from environment variable
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+
+  if (!apiKey) {
+    return res.status(500).json({ error: 'API key not configured in Vercel Environment Variables.' });
+  }
 
   const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
 
