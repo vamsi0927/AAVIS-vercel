@@ -305,7 +305,12 @@ export function Scan() {
             product_name: result.product.name,
             brand: result.product.brand,
             ingredients: result.product.ingredients,
-            nutrients: result.product.nutrients,
+            nutrients: {
+              ...result.product.nutrients,
+              _productType: result.product.productType,
+              _servingSize: result.product.servingSize,
+              _rawNutrients: result.product.rawNutrients
+            },
             additives: result.product.additives,
             allergens_detected: result.product.allergens,
             health_score: scoreResult.score,
