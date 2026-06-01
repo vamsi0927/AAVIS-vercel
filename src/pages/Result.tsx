@@ -221,10 +221,10 @@ export function Result() {
             </p>
 
             {/* Score reason breakdown */}
-            {scan.scoreReasons && scan.scoreReasons.length > 0 && (
+            {scan.scoreBreakdown && (
               <div className="text-left mt-5 pt-5 border-t border-white/5 space-y-2.5">
-                <p className="text-[10px] font-black text-content-secondary uppercase tracking-[0.15em] mb-3">Why this score?</p>
-                {scan.scoreReasons.map((reason, idx) => (
+                <p className="text-[10px] font-black text-content-secondary uppercase tracking-[0.15em] mb-3">Score Breakdown</p>
+                {scan.scoreReasons?.map((reason, idx) => (
                   <div key={idx} className="flex items-start gap-2.5">
                     <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
                       style={{ background: `${ringColor}22`, border: `1px solid ${ringColor}44` }}>
@@ -233,9 +233,39 @@ export function Result() {
                     <p className="text-xs text-content-primary/80 leading-relaxed flex-1 min-w-0 break-words">{reason}</p>
                   </div>
                 ))}
+                
+                <div className="flex items-center justify-between border-t border-white/10 mt-3 pt-3 px-1">
+                  <span className="text-xs font-black text-white">Final Score:</span>
+                  <span className="text-sm font-black" style={{ color: ringColor }}>{scan.scoreBreakdown.finalScore}</span>
+                </div>
               </div>
             )}
           </div>
+          
+          {/* ── Consumption Impact ── */}
+          {scan.consumptionImpact && (
+            <div className={`rounded-3xl p-5 shadow-lg border ${
+              scan.consumptionImpact === 'High' ? 'bg-brand-hazardous/5 border-brand-hazardous/20'
+              : scan.consumptionImpact === 'Moderate' ? 'bg-brand-caution/5 border-brand-caution/20'
+              : 'bg-brand-safe/5 border-brand-safe/20'
+            }`}>
+              <h3 className={`font-black text-sm mb-2 flex items-center gap-2 ${
+                scan.consumptionImpact === 'High' ? 'text-brand-hazardous'
+                : scan.consumptionImpact === 'Moderate' ? 'text-brand-caution'
+                : 'text-brand-safe'
+              }`}>
+                <Sparkles className="w-4 h-4" /> Consumption Impact: {scan.consumptionImpact}
+              </h3>
+              <p className="text-xs text-content-primary leading-relaxed break-words">
+                Based on the real-world serving size ({scan.product?.servingSize || 'Unknown'}), eating this product has a <strong>{scan.consumptionImpact.toLowerCase()} impact</strong> on your daily nutritional limits.
+              </p>
+              {scan.servingWarning && (
+                <p className="text-[10px] text-content-secondary mt-2 italic border-t border-white/5 pt-2">
+                  {scan.servingWarning}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* ── 8. Smart Verdict ── */}
           {scan.dietAdvice && (
@@ -399,43 +429,79 @@ export function Result() {
 
           {/* ── 6. Nutritional Facts ── */}
           <div className="glass-card rounded-3xl p-5 border border-white/5 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2">
               <h3 className="font-bold text-sm flex items-center gap-2 text-white">
                 <FileText className="w-4 h-4 text-brand-primary" /> Nutritional Facts
               </h3>
-              <span className="text-[9px] text-content-secondary font-bold uppercase tracking-wider bg-white/5 px-2 py-1 rounded-lg">per {product.nutrients.unit || (isBeverage(product) ? '100ml' : '100g')}</span>
             </div>
+            
+            <div className="grid grid-cols-[1fr_80px_80px] gap-2 border-b border-white/10 pb-2 mb-3">
+              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase">Nutrient</div>
+              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">Per 100{product.normalizedNutrients?.unit === '100ml' ? 'ml' : 'g'}<br/><span className="text-[8px] text-brand-primary">(Scored)</span></div>
+              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">Per Serving<br/><span className="text-[8px] opacity-60">({product.servingSize || 'Unknown'})</span></div>
+            </div>
+
             {[
-              { label: 'Calories', icon: '🔥', val: product.nutrients.calories, unit: 'kcal', warn: false, good: false },
-              { label: 'Sugars', icon: '🍬', val: product.nutrients.sugar, unit: 'g', warn: (product.nutrients.sugar ?? 0) > 10, good: false },
-              { label: 'Sodium', icon: '🧂', val: product.nutrients.sodium, unit: 'mg', warn: (product.nutrients.sodium ?? 0) > 400, good: false },
-              { label: 'Saturated Fat', icon: '🧈', val: product.nutrients.satFat, unit: 'g', warn: (product.nutrients.satFat ?? 0) > 5, good: false },
-              { label: 'Protein', icon: '💪', val: product.nutrients.protein, unit: 'g', warn: false, good: (product.nutrients.protein ?? 0) > 10 },
-              { label: 'Fiber', icon: '🌿', val: product.nutrients.fiber, unit: 'g', warn: false, good: (product.nutrients.fiber ?? 0) > 5 },
-              { label: 'Carbs', icon: '🌾', val: product.nutrients.carbs, unit: 'g', warn: false, good: false },
-            ].map((item, idx) => (
-              <div key={idx} className="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-base">{item.icon}</span>
-                  <span className="text-xs text-content-secondary font-medium">{item.label}</span>
+              { key: 'calories', label: 'Calories', icon: '🔥', unit: 'kcal' },
+              { key: 'sugar', label: 'Sugars', icon: '🍬', unit: 'g' },
+              { key: 'sodium', label: 'Sodium', icon: '🧂', unit: 'mg' },
+              { key: 'satFat', label: 'Sat Fat', icon: '🧈', unit: 'g' },
+              { key: 'protein', label: 'Protein', icon: '💪', unit: 'g' },
+              { key: 'fiber', label: 'Fiber', icon: '🌿', unit: 'g' },
+              { key: 'carbs', label: 'Carbs', icon: '🌾', unit: 'g' },
+            ].map((item, idx) => {
+              const normVal = (product.normalizedNutrients || product.nutrients)[item.key as keyof typeof product.nutrients] as number | null;
+              const rawVal = (product.rawNutrients || product.nutrients)[item.key as keyof typeof product.nutrients] as number | null;
+              
+              const isDanger = (item.key === 'sugar' && normVal! > 10) || (item.key === 'sodium' && normVal! > 400) || (item.key === 'satFat' && normVal! > 5);
+              const isGood = (item.key === 'protein' && normVal! > 10) || (item.key === 'fiber' && normVal! > 5);
+
+              return (
+                <div key={idx} className="grid grid-cols-[1fr_80px_80px] gap-2 items-center py-2.5 border-b border-white/5 last:border-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{item.icon}</span>
+                    <span className="text-xs text-content-secondary font-medium truncate">{item.label}</span>
+                  </div>
+                  
+                  {/* Normalized Column */}
+                  <div className="flex items-center justify-end gap-1">
+                    {normVal !== null ? (
+                      <>
+                        <span className={`text-[13px] font-black ${isDanger ? 'text-brand-hazardous' : isGood ? 'text-brand-safe' : 'text-white'}`}>
+                          {normVal}
+                        </span>
+                        <span className="text-[9px] text-content-secondary">{item.unit}</span>
+                      </>
+                    ) : (
+                      <span className="text-[10px] text-content-secondary opacity-50">-</span>
+                    )}
+                  </div>
+                  
+                  {/* Raw/Serving Column */}
+                  <div className="flex items-center justify-end gap-1 opacity-75">
+                    {rawVal !== null ? (
+                      <>
+                        <span className="text-[11px] font-bold text-white">
+                          {rawVal}
+                        </span>
+                        <span className="text-[9px] text-content-secondary">{item.unit}</span>
+                      </>
+                    ) : (
+                      <span className="text-[10px] text-content-secondary opacity-50">-</span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  {item.val !== null ? (
-                    <>
-                      <span className={`text-sm font-black ${item.warn ? 'text-brand-hazardous' : item.good ? 'text-brand-safe' : 'text-white'}`}>
-                        {item.val}
-                      </span>
-                      <span className="text-[10px] text-content-secondary">{item.unit}</span>
-                      {item.warn && <AlertTriangle className="w-3.5 h-3.5 text-brand-hazardous" />}
-                    </>
-                  ) : (
-                    <span className="text-[10px] text-content-secondary italic">Not detected</span>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
+            
+            {(scan.nutritionConfidence && scan.nutritionConfidence < 100) && (
+              <p className="text-[9px] text-brand-caution mt-4 bg-brand-caution/10 p-2 rounded-lg text-center font-medium border border-brand-caution/20">
+                ⚠️ Nutrition data may contain OCR errors (Confidence: {scan.nutritionConfidence}%).
+              </p>
+            )}
+            
             <p className="text-[9px] text-content-secondary mt-3 text-center italic opacity-60">
-              Values extracted via OCR. May vary slightly from label.
+              Health score calculated exclusively using normalized values for fair comparison.
             </p>
           </div>
         </div>

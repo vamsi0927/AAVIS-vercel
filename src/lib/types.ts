@@ -29,7 +29,17 @@ export interface Product {
   imageEmoji: string;
   imageUrl?: string; // Base64 thumbnail or external URL
   ingredients: string[];
-  nutrients: Nutrients;
+  
+  // New Normalization Fields
+  productType?: 'food' | 'beverage';
+  servingSize?: string; // e.g. "28g"
+  normalizationBasis?: '100g' | '100ml';
+  
+  // Nutrients
+  nutrients: Nutrients; // (Keep for backwards compatibility / local overrides)
+  rawNutrients?: Nutrients;
+  normalizedNutrients?: Nutrients;
+  
   additives: string[]; // array of E-codes
   dynamicAdditives?: Record<string, Additive>; // AI-generated additive explanations
   allergens: string[];
@@ -49,6 +59,18 @@ export interface UserProfile {
   fitnessGoals?: string[]; // e.g. 'Weight Loss', 'Muscle Gain', 'Maintenance'
 }
 
+export interface ScoreBreakdown {
+  sugarPenalty: number;
+  sodiumPenalty: number;
+  satFatPenalty: number;
+  additivePenalty: number;
+  processingPenalty: number;
+  proteinBonus: number;
+  fiberBonus: number;
+  wholeFoodBonus: number;
+  finalScore: number;
+}
+
 export interface ScanResult {
   id: string;
   productId: string;
@@ -62,6 +84,12 @@ export interface ScanResult {
   scoreReasons?: string[];
   mainConcerns?: string[];
   personalizedWarnings?: string[];
+  
+  // New Normalization Engine Fields
+  consumptionImpact?: 'Low' | 'Moderate' | 'High';
+  servingWarning?: string;
+  nutritionConfidence?: number;
+  scoreBreakdown?: ScoreBreakdown;
 }
 
 export interface NotificationPrefs {

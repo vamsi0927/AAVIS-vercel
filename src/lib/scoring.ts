@@ -2,6 +2,9 @@ import { Product, UserProfile, HazardLevel, ScanResult } from './types';
 import { ADDITIVES_DB } from '../data/additives';
 
 export function isBeverage(product: Product): boolean {
+  if (product.productType === 'beverage') return true;
+  if (product.productType === 'food') return false;
+
   const nameL = product.name.toLowerCase();
   const ingrL = product.ingredients.join(' ').toLowerCase();
   const beverageKeywords = ['drink', 'soda', 'juice', 'water', 'cola', 'beverage', 'tea', 'coffee', 'liquid', 'syrup', 'squash', 'nectar'];
@@ -11,34 +14,76 @@ export function isBeverage(product: Product): boolean {
   return false;
 }
 
-function normalizeProduct(product: Product): Product {
-  const n = { ...product.nutrients };
-  const unitStr = (n.unit || '').toLowerCase();
+export function validateNutritionData(n: any): { valid: boolean; confidenceDrop: number } {
+  let drop = 0;
+  if (n.sugar !== null && n.carbs !== null && n.sugar > n.carbs) drop += 30;
+  if (n.fat !== null && n.fat > 100) drop += 30;
+  if (n.protein !== null && n.protein > 100) drop += 30;
+  if (n.calories !== null && n.calories > 1000) drop += 30; // Suspiciously high per 100g
+  
+  const hasNegative = Object.values(n).some((v) => typeof v === 'number' && v < 0);
+  if (hasNegative) drop += 30;
+
+  return { valid: drop === 0, confidenceDrop: drop };
+}
+
+function normalizeProduct(product: Product, warnings: string[]): { normalized: Product, confidence: number } {
+  const n = product.rawNutrients ? { ...product.rawNutrients } : { ...product.nutrients };
+  let confidence = 100;
+
+  const validation = validateNutritionData(n);
+  if (!validation.valid) {
+    confidence -= validation.confidenceDrop;
+    warnings.push("Nutrition data may contain OCR extraction errors (impossible values detected).");
+  }
+
+  const isDrink = isBeverage(product);
+  const targetUnit = isDrink ? '100ml' : '100g';
   let factor = 1;
 
-  const match = unitStr.match(/(\d+(?:\.\d+)?)\s*(g|ml|oz)/);
+  const unitStr = (n.unit || '').toLowerCase();
+  let match = unitStr.match(/(\d+(?:\.\d+)?)\s*(g|ml|oz)/);
+  
+  // If unit wasn't in OCR but we have a servingSize string
+  if (!match && product.servingSize) {
+    match = product.servingSize.toLowerCase().match(/(\d+(?:\.\d+)?)\s*(g|ml|oz)/);
+  }
+
   if (match) {
     const amount = parseFloat(match[1]);
     if (amount > 0 && amount !== 100) {
       factor = 100 / amount;
     }
+  } else {
+    // Unknown Unit Fallback
+    confidence -= 20;
+    warnings.push("Unable to detect serving size or unit. Scoring raw values as a fallback.");
   }
 
   const scale = (val: number | null) => val !== null ? Number((val * factor).toFixed(2)) : null;
 
+  const normalizedNutrients = {
+    unit: targetUnit,
+    calories: scale(n.calories),
+    sugar: scale(n.sugar),
+    sodium: scale(n.sodium),
+    fat: scale(n.fat),
+    satFat: scale(n.satFat),
+    protein: scale(n.protein),
+    fiber: scale(n.fiber),
+    carbs: scale(n.carbs)
+  };
+
+  console.log(`\n[NORMALIZATION]\nRaw Values: ${JSON.stringify(n)}\nServing Size: ${product.servingSize || 'Unknown'}\nNormalized Values: ${JSON.stringify(normalizedNutrients)}\n`);
+
   return {
-    ...product,
-    nutrients: {
-      unit: isBeverage(product) ? '100ml' : '100g',
-      calories: scale(n.calories),
-      sugar: scale(n.sugar),
-      sodium: scale(n.sodium),
-      fat: scale(n.fat),
-      satFat: scale(n.satFat),
-      protein: scale(n.protein),
-      fiber: scale(n.fiber),
-      carbs: scale(n.carbs)
-    }
+    normalized: {
+      ...product,
+      normalizedNutrients,
+      // For legacy reasons in this file, we map it over the main nutrients object as well
+      nutrients: normalizedNutrients
+    },
+    confidence: Math.max(0, confidence)
   };
 }
 
@@ -60,15 +105,48 @@ export function computeHealthScore(
   rawProduct: Product,
   profile: UserProfile
 ): Omit<ScanResult, 'id' | 'date'> {
-  const product = normalizeProduct(rawProduct);
-  const n = product.nutrients;
-  const isDrink = isBeverage(product);
-  
-  let score = 100;
   const warnings: string[] = [];
   const scoreReasons: string[] = [];
   const mainConcerns: string[] = [];
   const personalizedWarnings: string[] = [];
+
+  const { normalized: product, confidence } = normalizeProduct(rawProduct, warnings);
+  const n = product.normalizedNutrients || product.nutrients;
+  const rawN = product.rawNutrients || product.nutrients;
+  const isDrink = isBeverage(product);
+  
+  let score = 100;
+  
+  let consumptionImpact: 'Low' | 'Moderate' | 'High' = 'Moderate';
+  if (rawN) {
+    if (
+      (rawN.calories && rawN.calories > 300) ||
+      (rawN.sugar && rawN.sugar > 15) ||
+      (rawN.sodium && rawN.sodium > 400) ||
+      (rawN.satFat && rawN.satFat > 5)
+    ) {
+      consumptionImpact = 'High';
+    } else if (
+      (rawN.calories && rawN.calories < 100) &&
+      (rawN.sugar && rawN.sugar < 5) &&
+      (rawN.sodium && rawN.sodium < 100)
+    ) {
+      consumptionImpact = 'Low';
+    }
+  }
+
+  let servingWarning = '';
+  if (product.servingSize) {
+    const match = product.servingSize.match(/(\d+(?:\.\d+)?)\s*(g|ml|oz)/);
+    if (match) {
+      const amt = parseFloat(match[1]);
+      if (amt <= 25) {
+        servingWarning = "Manufacturer serving size is very small and may underestimate real-world consumption.";
+      } else if (amt > 300) {
+        servingWarning = "Large serving size may exaggerate nutritional impact if you don't consume the entire portion.";
+      }
+    }
+  }
 
   const conditionsLower = (profile.conditions || []).map(c => c.toLowerCase());
   const ingredientsL = product.ingredients.map(i => i.toLowerCase());
@@ -88,6 +166,10 @@ export function computeHealthScore(
 
   let sugarPenalty = 0;
   let sodiumPenalty = 0;
+  let satFatPenalty = 0;
+  let processingPenalty = 0;
+  let proteinBonus = 0;
+  let fiberBonus = 0;
 
   // ── STEP 2: SUGAR PENALTY ─────────────────────────────────────────────────
   if (n.sugar !== null) {
@@ -131,14 +213,13 @@ export function computeHealthScore(
 
   // ── STEP 4: SATURATED FAT PENALTY ─────────────────────────────────────────
   if (n.satFat !== null) {
-    let p = 0;
-    if (n.satFat >= 10) p = 25;
-    else if (n.satFat >= 5) p = 15;
-    else if (n.satFat >= 3) p = 8;
-    else if (n.satFat >= 1) p = 3;
-    if (p > 0) {
-      score -= p;
-      scoreReasons.push(`Saturated Fat (${n.satFat}g): -${p}`);
+    if (n.satFat >= 10) satFatPenalty = 25;
+    else if (n.satFat >= 5) satFatPenalty = 15;
+    else if (n.satFat >= 3) satFatPenalty = 8;
+    else if (n.satFat >= 1) satFatPenalty = 3;
+    if (satFatPenalty > 0) {
+      score -= satFatPenalty;
+      scoreReasons.push(`Saturated Fat (${n.satFat}g): -${satFatPenalty}`);
     }
   }
 
@@ -174,8 +255,9 @@ export function computeHealthScore(
   const upfHeuristic = combinedText.includes('instant noodle') || combinedText.includes('cola') || combinedText.includes('energy drink') || combinedText.includes('chips') || combinedText.includes('candy') || combinedText.includes('processed meat');
   
   if (upfHeuristic || detectKeywords(ingredientsL, upfMarkers)) {
-    score -= 15; // v3.1 adjustment
-    scoreReasons.push(`Ultra-Processed (NOVA 4): -15`);
+    processingPenalty = 15;
+    score -= processingPenalty; // v3.1 adjustment
+    scoreReasons.push(`Ultra-Processed (NOVA 4): -${processingPenalty}`);
     mainConcerns.push('Ultra-Processed: Associated with poorer long-term health outcomes.');
   }
 
@@ -213,29 +295,27 @@ export function computeHealthScore(
 
   // ── STEP 8: FIBER BONUS ───────────────────────────────────────────────────
   if (n.fiber !== null) {
-    let bonus = 0;
-    if (n.fiber >= 8) bonus = 15;
-    else if (n.fiber >= 5) bonus = 10;
-    else if (n.fiber >= 2) bonus = 5;
+    if (n.fiber >= 8) fiberBonus = 15;
+    else if (n.fiber >= 5) fiberBonus = 10;
+    else if (n.fiber >= 2) fiberBonus = 5;
 
-    bonus = Math.round(bonus * bonusMultiplier);
-    if (bonus > 0) {
-      score += bonus;
-      scoreReasons.push(`Fiber (${n.fiber}g): +${bonus}`);
+    fiberBonus = Math.round(fiberBonus * bonusMultiplier);
+    if (fiberBonus > 0) {
+      score += fiberBonus;
+      scoreReasons.push(`Fiber (${n.fiber}g): +${fiberBonus}`);
     }
   }
 
   // ── STEP 9: PROTEIN BONUS ─────────────────────────────────────────────────
   if (n.protein !== null) {
-    let bonus = 0;
-    if (n.protein >= 20) bonus = 15;
-    else if (n.protein >= 10) bonus = 10;
-    else if (n.protein >= 5) bonus = 5;
+    if (n.protein >= 20) proteinBonus = 15;
+    else if (n.protein >= 10) proteinBonus = 10;
+    else if (n.protein >= 5) proteinBonus = 5;
 
-    bonus = Math.round(bonus * bonusMultiplier);
-    if (bonus > 0) {
-      score += bonus;
-      scoreReasons.push(`Protein (${n.protein}g): +${bonus}`);
+    proteinBonus = Math.round(proteinBonus * bonusMultiplier);
+    if (proteinBonus > 0) {
+      score += proteinBonus;
+      scoreReasons.push(`Protein (${n.protein}g): +${proteinBonus}`);
     }
   }
 
@@ -324,5 +404,19 @@ export function computeHealthScore(
     mainConcerns,
     personalizedWarnings,
     dietAdvice,
+    consumptionImpact,
+    servingWarning,
+    nutritionConfidence: confidence,
+    scoreBreakdown: {
+      sugarPenalty,
+      sodiumPenalty,
+      satFatPenalty,
+      additivePenalty: totalAdditivePenalty,
+      processingPenalty,
+      proteinBonus,
+      fiberBonus,
+      wholeFoodBonus: wfBonus,
+      finalScore: score
+    }
   };
 }

@@ -14,6 +14,9 @@ Return a concise JSON object with the following structure:
 {
   "productName": "string - common name (Look for largest/topmost text. If unknown, infer e.g. 'Instant Noodles', 'Processed Snack')",
   "brand": "string - brand name (Look for brand logo text)",
+  "productType": "food | beverage",
+  "servingSize": "string - e.g. '28g', '1 Cookie (15g)', '200ml' (Look for Serving Size on label. Null if missing.)",
+  "nutritionUnit": "string - e.g. 'per 100g', 'per serving', 'per 20g' (Exactly as written above the nutrition column)",
   "ingredients": ["array of ingredients - PRIORITIZE risky/processed items first in the list"],
   "nutrients": {
     "calories": number or null,
@@ -99,26 +102,32 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     return null;
   };
 
+  const rawNutrients = {
+    unit: parsed.nutritionUnit || null,
+    calories: getNutrient('calories'),
+    sugar: getNutrient('sugar'),
+    sodium: getNutrient('sodium'),
+    fat: getNutrient('fat'),
+    satFat: getNutrient('satFat'),
+    protein: getNutrient('protein'),
+    fiber: getNutrient('fiber'),
+    carbs: getNutrient('carbs'),
+  };
+
   return {
     id: `ai_${Date.now()}`,
     name: parsed.productName || fallbackName,
     brand: parsed.brand || 'Unknown Brand',
     imageEmoji: emoji,
+    productType: parsed.productType || 'food',
+    servingSize: parsed.servingSize || undefined,
     ingredients: Array.isArray(parsed.ingredients) && parsed.ingredients.length > 0
       ? parsed.ingredients
       : (typeof parsed.ingredients === 'string' && parsed.ingredients.trim()
           ? parsed.ingredients.split(',').map((i: string) => i.trim()).filter(Boolean)
           : ['(AI could not extract ingredients)']),
-    nutrients: {
-      calories: getNutrient('calories'),
-      sugar: getNutrient('sugar'),
-      sodium: getNutrient('sodium'),
-      fat: getNutrient('fat'),
-      satFat: getNutrient('satFat'),
-      protein: getNutrient('protein'),
-      fiber: getNutrient('fiber'),
-      carbs: getNutrient('carbs'),
-    },
+    nutrients: { ...rawNutrients }, // Will be overwritten by normalizeProduct
+    rawNutrients: { ...rawNutrients }, // Persisted for UI / Impact calculation
     additives: Array.isArray(parsed.additives) ? parsed.additives : [],
     dynamicAdditives: parsed.additiveDetails || {},
     allergens: Array.isArray(parsed.allergens) ? parsed.allergens : [],
