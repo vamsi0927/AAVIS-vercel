@@ -32,9 +32,6 @@ export interface Product {
   
   // New Normalization Fields
   productType?: 'food' | 'beverage';
-  productGenre?: string; // Exact category name (Whole Fruits, Potato Chips, Cola, etc.)
-  novaGroup?: number;    // 1 | 2 | 3 | 4
-  allNutrientsExpanded?: { name: string; value: string; isStandard: boolean }[];
   servingSize?: string; // e.g. "28g"
   normalizationBasis?: '100g' | '100ml';
   
@@ -66,14 +63,8 @@ export interface ScoreBreakdown {
   sugarPenalty: number;
   sodiumPenalty: number;
   satFatPenalty: number;
-  transFatPenalty?: number;
-  energyDensityPenalty?: number;
-  flourPenalty?: number;
-  oilPenalty?: number;
   additivePenalty: number;
   processingPenalty: number;
-  ingredientHazardPenalty?: number;
-  allergenPenalty?: number;
   proteinBonus: number;
   fiberBonus: number;
   wholeFoodBonus: number;
@@ -93,6 +84,8 @@ export interface ScanResult {
   scoreReasons?: string[];
   mainConcerns?: string[];
   personalizedWarnings?: string[];
+  image_url?: string;
+  imageUrl?: string;
   
   // New Normalization Engine Fields
   consumptionImpact?: 'Low' | 'Moderate' | 'High';

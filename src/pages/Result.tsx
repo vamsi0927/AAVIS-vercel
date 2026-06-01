@@ -79,7 +79,6 @@ export function Result() {
   const product = scan?.product || (scan ? SAMPLE_PRODUCTS.find((p) => p.id === scan.productId) : null);
   
   const [showAllIngredients, setShowAllIngredients] = useState(false);
-  const [showAllNutrients, setShowAllNutrients] = useState(false);
 
   if (!scan || !product) {
     return (
@@ -123,29 +122,17 @@ export function Result() {
     
     try {
       setReanalyzeStatus('[REANALYZE] Running Scoring Engine...');
+      // Small artificial delay to show the status (gives a good UX feel that it's doing work)
       await new Promise(r => setTimeout(r, 600));
       
       const updatedScoreData = computeHealthScore(product, profile);
       
       setReanalyzeStatus('[REANALYZE] Updating Database...');
       
-      const { detectProductCategory } = await import('../lib/scoring');
-      const category = detectProductCategory(product);
-      
-      const updatedNutrients = {
-        ...product.nutrients,
-        _productType: product.productType,
-        _productGenre: category,
-        _novaGroup: (product as any).novaGroup,
-        _allNutrientsExpanded: (product as any).allNutrientsExpanded,
-        _servingSize: product.servingSize,
-        _rawNutrients: product.rawNutrients
-      };
-
       const success = await updateScanScore(scan.id, {
         health_score: updatedScoreData.score,
         verdict: updatedScoreData.verdict,
-        nutrients: updatedNutrients,
+        nutrients: product.nutrients,
         diet_advice: updatedScoreData.dietAdvice || '',
       });
       
@@ -166,12 +153,6 @@ export function Result() {
         scoreReasons: updatedScoreData.scoreReasons,
         mainConcerns: updatedScoreData.mainConcerns || scan.mainConcerns,
         personalizedWarnings: updatedScoreData.personalizedWarnings,
-        scoreBreakdown: updatedScoreData.scoreBreakdown,
-        product: {
-          ...product,
-          productGenre: category,
-          nutrients: updatedNutrients
-        }
       };
       
       updateScanInState(scan.id, updatedScan);
@@ -326,7 +307,7 @@ export function Result() {
             </p>
 
             {/* Score reason breakdown */}
-            {scan.scoreReasons && scan.scoreReasons.length > 0 && (
+            {scan.scoreBreakdown && (
               <div className="text-left mt-5 pt-5 border-t border-white/5 space-y-2.5">
                 <p className="text-[10px] font-black text-content-secondary uppercase tracking-[0.15em] mb-3">Score Breakdown</p>
                 {scan.scoreReasons?.map((reason, idx) => (
@@ -341,7 +322,7 @@ export function Result() {
                 
                 <div className="flex items-center justify-between border-t border-white/10 mt-3 pt-3 px-1">
                   <span className="text-xs font-black text-white">Final Score:</span>
-                  <span className="text-sm font-black" style={{ color: ringColor }}>{scan.scoreBreakdown?.finalScore ?? score}</span>
+                  <span className="text-sm font-black" style={{ color: ringColor }}>{scan.scoreBreakdown.finalScore}</span>
                 </div>
               </div>
             )}
@@ -602,33 +583,6 @@ export function Result() {
               );
             })}
             
-            {/* Expanded Nutrients Section */}
-            {product.allNutrientsExpanded && product.allNutrientsExpanded.some(n => !n.isStandard) && (
-              <div className="mt-4 border-t border-white/5 pt-4">
-                <button
-                  onClick={() => setShowAllNutrients(!showAllNutrients)}
-                  className="w-full flex items-center justify-between text-xs text-content-secondary hover:text-white font-bold transition-colors"
-                >
-                  <span>Show Other Extracted Nutrients (Vitamins/Minerals)</span>
-                  <span className="text-brand-primary">{showAllNutrients ? 'Hide ↑' : 'Show ↓'}</span>
-                </button>
-                
-                {showAllNutrients && (
-                  <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] bg-white/3 p-3 rounded-2xl border border-white/5">
-                    {product.allNutrientsExpanded
-                      .filter(item => !item.isStandard)
-                      .map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center py-1 border-b border-white/3 last:border-0">
-                          <span className="text-content-secondary font-medium truncate pr-2">{item.name}</span>
-                          <span className="font-bold text-white shrink-0">{item.value}</span>
-                        </div>
-                      ))
-                    }
-                  </div>
-                )}
-              </div>
-            )}
-            
             {(scan.nutritionConfidence && scan.nutritionConfidence < 100) && (
               <p className="text-[9px] text-brand-caution mt-4 bg-brand-caution/10 p-2 rounded-lg text-center font-medium border border-brand-caution/20">
                 ⚠️ Nutrition data may contain OCR errors (Confidence: {scan.nutritionConfidence}%).
@@ -639,168 +593,6 @@ export function Result() {
               Health score calculated exclusively using normalized values for fair comparison.
             </p>
           </div>
-
-          {/* ── 7. Detailed Score Breakdown Card ── */}
-          {scan.scoreBreakdown && (
-            <div className="glass-card rounded-3xl p-5 border border-white/5 shadow-xl">
-              <h3 className="font-bold text-sm mb-4 flex items-center gap-2 text-white">
-                <Sparkles className="w-4 h-4 text-brand-primary" /> Detailed Score Breakdown
-              </h3>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs py-1 border-b border-white/5">
-                  <span className="text-content-secondary font-medium">Base Starting Score</span>
-                  <span className="font-bold text-white">100 pts</span>
-                </div>
-
-                {/* Penalties */}
-                {scan.scoreBreakdown.sugarPenalty > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-hazardous" /> Sugar Penalty
-                    </span>
-                    <span className="font-bold text-brand-hazardous">-{scan.scoreBreakdown.sugarPenalty} pts</span>
-                  </div>
-                )}
-
-                {scan.scoreBreakdown.sodiumPenalty > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-hazardous" /> Sodium Penalty
-                    </span>
-                    <span className="font-bold text-brand-hazardous">-{scan.scoreBreakdown.sodiumPenalty} pts</span>
-                  </div>
-                )}
-
-                {scan.scoreBreakdown.satFatPenalty > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-hazardous" /> Saturated Fat Penalty
-                    </span>
-                    <span className="font-bold text-brand-hazardous">-{scan.scoreBreakdown.satFatPenalty} pts</span>
-                  </div>
-                )}
-
-                {scan.scoreBreakdown.transFatPenalty && scan.scoreBreakdown.transFatPenalty > 0 ? (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-hazardous" /> Trans Fat Penalty
-                    </span>
-                    <span className="font-bold text-brand-hazardous">-{scan.scoreBreakdown.transFatPenalty} pts</span>
-                  </div>
-                ) : null}
-
-                {scan.scoreBreakdown.energyDensityPenalty && scan.scoreBreakdown.energyDensityPenalty > 0 ? (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-caution" /> Energy Density Penalty
-                    </span>
-                    <span className="font-bold text-brand-caution">-{scan.scoreBreakdown.energyDensityPenalty} pts</span>
-                  </div>
-                ) : null}
-
-                {scan.scoreBreakdown.flourPenalty && scan.scoreBreakdown.flourPenalty > 0 ? (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-caution" /> Refined Flour Penalty
-                    </span>
-                    <span className="font-bold text-brand-caution">-{scan.scoreBreakdown.flourPenalty} pts</span>
-                  </div>
-                ) : null}
-
-                {scan.scoreBreakdown.oilPenalty && scan.scoreBreakdown.oilPenalty > 0 ? (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-hazardous" /> Palm/Bad Oil Penalty
-                    </span>
-                    <span className="font-bold text-brand-hazardous">-{scan.scoreBreakdown.oilPenalty} pts</span>
-                  </div>
-                ) : null}
-
-                {scan.scoreBreakdown.processingPenalty > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-caution" /> Ultra-Processing (NOVA 4)
-                    </span>
-                    <span className="font-bold text-brand-caution">-{scan.scoreBreakdown.processingPenalty} pts</span>
-                  </div>
-                )}
-
-                {scan.scoreBreakdown.additivePenalty > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-caution" /> Additives Penalty
-                    </span>
-                    <span className="font-bold text-brand-caution">-{scan.scoreBreakdown.additivePenalty} pts</span>
-                  </div>
-                )}
-
-                {scan.scoreBreakdown.ingredientHazardPenalty && scan.scoreBreakdown.ingredientHazardPenalty > 0 ? (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-caution" /> Ingredient Risk Penalty
-                    </span>
-                    <span className="font-bold text-brand-caution">-{scan.scoreBreakdown.ingredientHazardPenalty} pts</span>
-                  </div>
-                ) : null}
-
-                {scan.scoreBreakdown.allergenPenalty && scan.scoreBreakdown.allergenPenalty > 0 ? (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-hazardous" /> Personal Allergen Penalty
-                    </span>
-                    <span className="font-bold text-brand-hazardous">-{scan.scoreBreakdown.allergenPenalty} pts</span>
-                  </div>
-                ) : null}
-
-                {/* Bonuses */}
-                {scan.scoreBreakdown.fiberBonus > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-safe" /> Dietary Fiber Bonus
-                    </span>
-                    <span className="font-bold text-brand-safe">+{scan.scoreBreakdown.fiberBonus} pts</span>
-                  </div>
-                )}
-
-                {scan.scoreBreakdown.proteinBonus > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-safe" /> Protein Bonus
-                    </span>
-                    <span className="font-bold text-brand-safe">+{scan.scoreBreakdown.proteinBonus} pts</span>
-                  </div>
-                )}
-
-                {scan.scoreBreakdown.wholeFoodBonus > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-content-secondary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-safe" /> Whole Food & Probiotic Bonus
-                    </span>
-                    <span className="font-bold text-brand-safe">+{scan.scoreBreakdown.wholeFoodBonus} pts</span>
-                  </div>
-                )}
-
-                {/* Final Score visual bar */}
-                <div className="border-t border-white/10 mt-4 pt-4 flex flex-col gap-2">
-                  <div className="flex justify-between text-sm font-black text-white">
-                    <span>Aavis Health Score:</span>
-                    <span style={{ color: ringColor }}>{scan.scoreBreakdown.finalScore} / 100</span>
-                  </div>
-                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-1000"
-                      style={{ 
-                        width: `${scan.scoreBreakdown.finalScore}%`,
-                        backgroundColor: ringColor,
-                        boxShadow: `0 0 8px ${ringColor}80`
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

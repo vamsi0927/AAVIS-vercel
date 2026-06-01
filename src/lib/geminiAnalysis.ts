@@ -15,8 +15,6 @@ Return a concise JSON object with the following structure:
   "productName": "string - common name (Look for largest/topmost text. If unknown, infer e.g. 'Instant Noodles', 'Processed Snack')",
   "brand": "string - brand name (Look for brand logo text)",
   "productType": "food | beverage",
-  "productGenre": "Whole Fruits | Vegetables | Nuts & Seeds | Legumes | Dairy | Yogurt | Cheese | Beverages | Soft Drinks / Cola | Energy Drinks | Fruit Juices | Chips & Fried Snacks | Instant Noodles | Biscuits & Cookies | Chocolates & Candy | Breakfast Cereals | Sauces & Condiments | Processed Meats | Frozen Meals | Fast Food | Bakery Products | General Foods - Classify strictly into one of these exact categories based on name and ingredients.",
-  "novaGroup": 1 | 2 | 3 | 4,
   "servingSize": "string - e.g. '28g', '1 Cookie (15g)', '200ml' (Look for Serving Size on label. Null if missing.)",
   "nutritionUnit": "string - e.g. 'per 100g', 'per serving', 'per 20g' (Exactly as written above the nutrition column)",
   "ingredients": ["array of ingredients - PRIORITIZE risky/processed items first in the list"],
@@ -30,13 +28,6 @@ Return a concise JSON object with the following structure:
     "fiber": number or null,
     "carbs": number or null
   },
-  "allNutrientsExpanded": [
-    {
-      "name": "string (e.g. 'Vitamin C', 'Cholesterol', 'Iron')",
-      "value": "string (e.g. '10mg', '2g', '0g')",
-      "isStandard": boolean (true for carbs, sugar, sodium, fat, satFat, protein, fiber, calories; false for others)
-    }
-  ],
   "additives": ["array of E-codes found"],
   "additiveDetails": {
     "KEY": {
@@ -61,8 +52,7 @@ CRITICAL INSTRUCTIONS:
 6. NUTRITION VALUES: TRANSCRIBE THE EXACT RAW NUMBERS AS PRINTED on the label. DO NOT mathematically calculate, scale, or normalize the values to per 100g. If the label says "160" for calories per serving, return 160. Do NOT estimate, guess, or hallucinate any nutrition numbers.
 7. SERVING SIZE: Look specifically for "Serving Size" at the top of the nutrition facts panel (e.g. "1 oz (28g)"). It is critical to extract this accurately.
 8. ADDITIVES: It is MANDATORY to generate a detailed explanation in "additiveDetails" for EVERY SINGLE E-code you find. Never skip this.
-9. EXTRACTION COMPLETENESS: Under "allNutrientsExpanded", transcribe EVERY SINGLE printed nutrient or mineral on the label. Organize them so we do not miss any details from the original label.
-10. RETURN ONLY VALID JSON.`;
+9. RETURN ONLY VALID JSON.`;
 
 // ─── Types ────────────────────────────────────────────────────────
 export interface GeminiAnalysisResult {
@@ -131,9 +121,6 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     brand: parsed.brand || 'Unknown Brand',
     imageEmoji: emoji,
     productType: parsed.productType || 'food',
-    productGenre: parsed.productGenre || undefined,
-    novaGroup: typeof parsed.novaGroup === 'number' ? parsed.novaGroup : undefined,
-    allNutrientsExpanded: Array.isArray(parsed.allNutrientsExpanded) ? parsed.allNutrientsExpanded : [],
     servingSize: parsed.servingSize || undefined,
     ingredients: Array.isArray(parsed.ingredients) && parsed.ingredients.length > 0
       ? parsed.ingredients

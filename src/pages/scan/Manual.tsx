@@ -30,7 +30,6 @@ export function ScanManual() {
       
       const scan: any = {
         id: `scan_${Date.now()}`,
-        productId: aiResult.product.id,
         date: new Date().toISOString(),
         product: aiResult.product,
         aiSummary: aiResult.aiSummary,
@@ -51,15 +50,7 @@ export function ScanManual() {
             brand: aiResult.product.brand,
             barcode: aiResult.product.id,
             ingredients: aiResult.product.ingredients,
-            nutrients: {
-              ...aiResult.product.nutrients,
-              _productType: aiResult.product.productType,
-              _productGenre: (aiResult.product as any).productGenre,
-              _novaGroup: (aiResult.product as any).novaGroup,
-              _allNutrientsExpanded: (aiResult.product as any).allNutrientsExpanded,
-              _servingSize: aiResult.product.servingSize,
-              _rawNutrients: aiResult.product.rawNutrients
-            },
+            nutrients: aiResult.product.nutrients,
             additives: aiResult.product.additives,
             allergens_detected: aiResult.product.allergens,
             health_score: scoredResult.score,
