@@ -247,7 +247,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
               imageEmoji: '🤖',
               imageUrl: cs.image_url || undefined,
               ingredients: cs.ingredients || [],
-              productType: cs.nutrients?._productType || 'food',
+              productType: cs.nutrients?._productType || undefined,
               servingSize: cs.nutrients?._servingSize || undefined,
               rawNutrients: cs.nutrients?._rawNutrients || undefined,
               nutrients: cs.nutrients || {},
