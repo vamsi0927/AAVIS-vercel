@@ -252,6 +252,8 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
               rawNutrients: cs.nutrients?._rawNutrients || undefined,
               nutrients: cs.nutrients || {},
               additives: cs.additives || [],
+              dynamicAdditives: cs.nutrients?._dynamicAdditives || {},
+              dynamicIngredients: cs.nutrients?._dynamicIngredients || {},
               allergens: cs.allergens_detected || [],
             };
             

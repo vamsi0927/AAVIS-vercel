@@ -319,7 +319,9 @@ export function Scan() {
               ...result.product.nutrients,
               _productType: result.product.productType,
               _servingSize: result.product.servingSize,
-              _rawNutrients: result.product.rawNutrients
+              _rawNutrients: result.product.rawNutrients,
+              _dynamicAdditives: result.product.dynamicAdditives,
+              _dynamicIngredients: result.product.dynamicIngredients
             },
             additives: result.product.additives,
             allergens_detected: result.product.allergens,
