@@ -30,7 +30,7 @@ Return a concise JSON object with the following structure:
   },
   "additives": ["array of E-codes found"],
   "additiveDetails": {
-    "KEY": {
+    "E_CODE": {
       "name": "Common Name",
       "function": "Purpose (e.g., Emulsifier)",
       "healthExplanation": "Consumer-friendly health impact (MUST explain every single additive found)",
@@ -72,7 +72,7 @@ CRITICAL INSTRUCTIONS:
 8. Identify UPF (Ultra Processed Food) markers.
 9. Match against profile: {PROFILE_CONTEXT}. Warn strongly if allergens or conditions are triggered!
 10. AI SCORING (CRITICAL): Analyze the product across the 7 dimensions. Return a score (0-100) for each dimension and a justification.
-11. COMPLETENESS (CRITICAL): You MUST provide an entry in \`ingredientDetails\` for EVERY SINGLE item in the \`ingredients\` array. You MUST provide an entry in \`additiveDetails\` for EVERY SINGLE additive found. If you extract an E-code, you MUST explain it! Do not leave any item unexplained.
+11. COMPLETENESS (CRITICAL): You MUST provide an entry in \`ingredientDetails\` for EVERY SINGLE item in the \`ingredients\` array. You MUST provide an entry in \`additiveDetails\` for EVERY SINGLE additive found. For \`additiveDetails\`, the JSON key MUST be the exact E-code (e.g. "E440") that is present in the \`additives\` array. Do not leave any item unexplained.
 12. RETURN ONLY VALID JSON.`;
 
 // ─── Types ────────────────────────────────────────────────────────
