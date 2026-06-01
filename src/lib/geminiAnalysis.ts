@@ -88,17 +88,13 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
   const regexNutrients = extractNutrientsFromText(rawText || '');
 
   const getNutrient = (key: keyof typeof regexNutrients) => {
-    // 1. Try Gemini's parsed value
-    if (typeof parsed.nutrients?.[key] === 'number' && parsed.nutrients[key] !== 0) {
+    // 1. Try Gemini's parsed value (both zero and non-zero)
+    if (typeof parsed.nutrients?.[key] === 'number' && !isNaN(parsed.nutrients[key])) {
       return parsed.nutrients[key];
     }
     // 2. Fallback to Regex extracted value
     if (regexNutrients[key] !== null) {
       return regexNutrients[key];
-    }
-    // 3. Fallback to 0 if Gemini explicitly said 0 (though Regex would have caught it if it existed)
-    if (parsed.nutrients?.[key] === 0) {
-      return 0;
     }
     return null;
   };

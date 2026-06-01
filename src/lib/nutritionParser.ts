@@ -56,7 +56,7 @@ export function extractNutrientsFromText(rawText: string): ParsedNutrients {
   const sodium = extractValue(text, /(?:sodium|salt)[^\d]*([\d\.,]+)/i);
   
   // Protein
-  const protein = extractValue(text, /(?:proteins?)[^\d]*([\d\.,]+)/i);
+  const protein = extractValue(text, /(?:proteins?|protiens?)[^\d]*([\d\.,]+)/i);
   
   // Dietary Fiber / Fiber
   const fiber = extractValue(text, /(?:dietary\s*)?fib(?:er|re)[^\d]*([\d\.,]+)/i);
