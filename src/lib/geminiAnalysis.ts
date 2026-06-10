@@ -127,18 +127,18 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
   }
 
   // Try Vercel Serverless Function first if we are on Vercel
-  const isVercel = window.location.hostname.includes('vercel.app');
-  if (isVercel && endpoint === '/api/analyze') {
+  const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname === 'localhost';
+  if (endpoint === '/api/analyze' || endpoint === '/api/chat') {
     try {
-      const response = await fetch('/api/analyze', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       if (response.ok) return await response.json();
-      console.warn('[Vercel API] Failed, falling back to Render', await response.text());
+      console.warn(`[Vercel API] ${endpoint} Failed, falling back to Render`, await response.text());
     } catch (e) {
-      console.warn('[Vercel API] Network error, falling back to Render', e);
+      console.warn(`[Vercel API] ${endpoint} Network error, falling back to Render`, e);
     }
   }
 
