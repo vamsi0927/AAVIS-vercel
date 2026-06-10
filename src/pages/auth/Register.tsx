@@ -1,68 +1,60 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mail, Lock, User, ArrowRight, Loader2, KeyRound } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { getOrCreateUser } from '../../lib/supabaseService';
-import { useAppContext } from '../../context/AppContext';
 import logoImg from '../../assets/logo.png';
 
 export function Register() {
   const navigate = useNavigate();
-  const { hasCompletedOnboarding } = useAppContext();
+  const [step, setStep] = useState<'register' | 'verify'>('register');
+  
+  // Form State
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password) return;
+    if (!name || !email || !password || !confirmPassword) return;
     
     if (password.length < 6) {
       toast.error('Password must be at least 6 characters long');
       return;
     }
 
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
     setIsLoading(true);
     
     try {
-      // 1. Create Supabase Auth user
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
-          data: { name }, // Store name in user_metadata
+          data: { name },
         },
       });
 
       if (error) {
-        // Simplify Supabase password policy errors
         let msg = error.message || 'Failed to sign up';
         if (msg.toLowerCase().includes('password')) {
           msg = 'Password must be at least 6 characters.';
         }
         toast.error(msg);
-        setIsLoading(false);
         return;
       }
 
-      // 2. Create profile in users table
-      if (data.user) {
-        await getOrCreateUser(data.user.email || email.trim(), name);
-      }
-
-      toast.success('Account created successfully! 🎉');
-      
-      // If email confirmation is disabled, user can login immediately
-      if (data.session) {
-        navigate('/onboarding', { replace: true });
-      } else {
-        // Email confirmation might be required
-        toast.info('Please check your email to confirm your account, or log in directly.');
-        navigate('/login', { replace: true });
-      }
+      toast.success('Registration successful! Check your email for the verification code.');
+      setStep('verify');
     } catch (err: any) {
       toast.error('Registration failed. Please try again.');
     } finally {
@@ -70,9 +62,43 @@ export function Register() {
     }
   };
 
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp || otp.length < 6) {
+      toast.error('Please enter the 6-digit code');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: otp,
+        type: 'signup'
+      });
+
+      if (error) {
+        toast.error(error.message || 'Invalid or expired verification code');
+        return;
+      }
+
+      // Create profile in users table
+      if (data.user) {
+        await getOrCreateUser(data.user.email || email.trim(), name);
+      }
+
+      toast.success('Account verified successfully! 🎉');
+      navigate('/onboarding', { replace: true });
+    } catch (err: any) {
+      toast.error('Verification failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-navy-900 px-6 py-8 overflow-y-auto no-scrollbar relative">
-      {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-brand-primary/10 rounded-full blur-[80px]" />
       <div className="absolute bottom-1/4 left-1/4 w-60 h-60 bg-brand-secondary/5 rounded-full blur-[80px]" />
 
@@ -88,72 +114,138 @@ export function Register() {
               <div className="absolute inset-0 bg-brand-primary/20 rounded-full blur-md animate-pulse" />
               <img src={logoImg} alt="Aavis Logo" className="w-16 h-16 object-contain relative z-10" />
             </div>
-            <h1 className="text-2xl font-display font-black tracking-tight text-white mb-1">Create Account</h1>
+            <h1 className="text-2xl font-display font-black tracking-tight text-white mb-1">
+              {step === 'register' ? 'Create Account' : 'Verify Email'}
+            </h1>
             <p className="text-content-secondary text-sm">
-              Join Aavis to eat healthier
+              {step === 'register' ? 'Join Aavis to eat healthier' : `We sent a 6-digit code to ${email}`}
             </p>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
-                type="text"
-                required
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
-              />
-            </div>
+          <AnimatePresence mode="wait">
+            {step === 'register' ? (
+              <motion.form 
+                key="register"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                onSubmit={handleRegister} 
+                className="space-y-4"
+              >
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Full Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                  />
+                </div>
 
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
-                type="email"
-                required
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
-              />
-            </div>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                  />
+                </div>
 
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
-                type="password"
-                required
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
-              />
-            </div>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
+                  <input
+                    type="password"
+                    required
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                  />
+                </div>
 
-            <button
-              type="submit"
-              disabled={!name || !email || !password || isLoading}
-              className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" /> Creating Account...
-                </>
-              ) : (
-                <>
-                  Sign Up <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
+                  <input
+                    type="password"
+                    required
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                  />
+                </div>
 
-          <p className="text-center text-xs text-content-secondary mt-6">
-            Already have an account?{' '}
-            <Link to="/login" className="text-brand-primary font-bold hover:underline">
-              Sign in
-            </Link>
-          </p>
+                <button
+                  type="submit"
+                  disabled={!name || !email || !password || !confirmPassword || isLoading}
+                  className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
+                >
+                  {isLoading ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Creating Account...</>
+                  ) : (
+                    <>Sign Up <ArrowRight className="w-4 h-4" /></>
+                  )}
+                </button>
+              </motion.form>
+            ) : (
+              <motion.form 
+                key="verify"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                onSubmit={handleVerify} 
+                className="space-y-4"
+              >
+                <div className="relative">
+                  <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    placeholder="Enter 6-digit code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-center text-lg tracking-widest font-bold placeholder:font-normal placeholder:tracking-normal placeholder:text-sm placeholder:text-content-secondary"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={otp.length < 6 || isLoading}
+                  className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
+                >
+                  {isLoading ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</>
+                  ) : (
+                    <>Verify Account <ArrowRight className="w-4 h-4" /></>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setStep('register')}
+                  disabled={isLoading}
+                  className="w-full bg-transparent hover:bg-white/5 text-content-secondary hover:text-white rounded-2xl py-3.5 font-medium text-sm transition-all"
+                >
+                  Back to Registration
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+
+          {step === 'register' && (
+            <p className="text-center text-xs text-content-secondary mt-6">
+              Already have an account?{' '}
+              <Link to="/login" className="text-brand-primary font-bold hover:underline">
+                Sign in
+              </Link>
+            </p>
+          )}
         </motion.div>
       </div>
     </div>
