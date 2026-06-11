@@ -120,10 +120,10 @@ export function Register() {
               <img src={logoImg} alt="Aavis Logo" className="w-16 h-16 object-contain relative z-10" />
             </div>
             <h1 className="text-2xl font-display font-black tracking-tight text-white mb-1">
-              {step === 'register' ? 'Create Account' : 'Verify Email'}
+              {step === 'register' ? 'Create Account' : ''}
             </h1>
             <p className="text-content-secondary text-sm">
-              {step === 'register' ? 'Join Aavis to eat healthier' : `We sent a 6-digit code to ${email}`}
+              {step === 'register' ? 'Join Aavis to eat healthier' : ''}
             </p>
           </div>
 
