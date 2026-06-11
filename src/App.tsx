@@ -362,6 +362,7 @@ function AppContent() {
         
               {/* New Missing Routes */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
         <Route path="/result/:id/additives" element={<ProtectedRoute><ResultAdditives /></ProtectedRoute>} />
         <Route path="/result/:id/allergens" element={<ProtectedRoute><ResultAllergens /></ProtectedRoute>} />

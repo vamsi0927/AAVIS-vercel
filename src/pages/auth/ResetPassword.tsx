@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Lock, Loader2, ArrowRight, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
@@ -8,9 +8,13 @@ import logoImg from '../../assets/logo.png';
 
 export function ResetPassword() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  const token = searchParams.get('token');
+  const uid = searchParams.get('uid');
 
   const validations = {
     minLength: password.length >= 8,
@@ -35,15 +39,36 @@ export function ResetPassword() {
       return;
     }
 
-    setIsUpdating(true);
-    const { error } = await supabase.auth.updateUser({ password });
-    setIsUpdating(false);
+    if (!token || !uid) {
+      toast.error('Invalid or missing reset token. Please request a new password reset link.');
+      return;
+    }
 
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Password updated successfully! Please sign in.');
+    setIsUpdating(true);
+    
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          uid,
+          newPassword: password
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to reset password');
+      }
+      
+      toast.success(data.message || 'Password updated successfully! Please sign in.');
       navigate('/login', { replace: true });
+    } catch (err: any) {
+      toast.error(err.message || 'An error occurred during password reset');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
