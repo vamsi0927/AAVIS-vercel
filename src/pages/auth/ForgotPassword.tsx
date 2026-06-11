@@ -20,15 +20,24 @@ export function ForgotPassword() {
     }
 
     setIsSending(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    setIsSending(false);
-
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Password reset link sent to your email!');
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send reset link');
+      }
+      
+      toast.success(data.message || 'Password reset link sent to your email!');
+    } catch (err: any) {
+      toast.error(err.message || 'An error occurred');
+    } finally {
+      setIsSending(false);
     }
   };
 

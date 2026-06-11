@@ -36,31 +36,36 @@ export function Register() {
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: { name },
+      // Hit our custom backend endpoint which bypasses Supabase free-tier email limits
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          name
+        })
       });
 
-      if (error) {
-        let msg = error.message || 'Failed to sign up';
-        if (msg.toLowerCase().includes('password')) {
-          msg = 'Password must be at least 6 characters.';
-        }
-        toast.error(msg);
-        return;
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to sign up');
       }
 
-      toast.success('Registration successful! Check your email for the verification code.');
+      toast.success('Registration successful! Check your email for the verification link.');
       setStep('verify');
     } catch (err: any) {
-      toast.error('Registration failed. Please try again.');
+      toast.error(err.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // handleVerify is no longer needed since verification happens via email link clicking.
+  // We can just keep the 'verify' UI as a message telling them to check their email.
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,48 +198,29 @@ export function Register() {
                 </button>
               </motion.form>
             ) : (
-              <motion.form 
+              <motion.div 
                 key="verify"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                onSubmit={handleVerify} 
-                className="space-y-4"
+                className="space-y-6 text-center py-4"
               >
-                <div className="relative">
-                  <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    placeholder="Enter 6-digit code"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-center text-lg tracking-widest font-bold placeholder:font-normal placeholder:tracking-normal placeholder:text-sm placeholder:text-content-secondary"
-                  />
+                <div className="w-16 h-16 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-4">
+                  <Mail className="w-8 h-8 text-brand-primary" />
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={otp.length < 6 || isLoading}
-                  className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
-                >
-                  {isLoading ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</>
-                  ) : (
-                    <>Verify Account <ArrowRight className="w-4 h-4" /></>
-                  )}
-                </button>
+                <h3 className="text-xl font-bold text-white">Check your email</h3>
+                <p className="text-content-secondary text-sm">
+                  We've sent a verification link to <span className="text-white font-medium">{email}</span>. Please click the link to activate your account.
+                </p>
 
                 <button
                   type="button"
                   onClick={() => setStep('register')}
-                  disabled={isLoading}
-                  className="w-full bg-transparent hover:bg-white/5 text-content-secondary hover:text-white rounded-2xl py-3.5 font-medium text-sm transition-all"
+                  className="w-full bg-transparent border border-white/10 hover:bg-white/5 text-white rounded-2xl py-3.5 font-medium text-sm transition-all mt-6"
                 >
-                  Back to Registration
+                  Edit email address
                 </button>
-              </motion.form>
+              </motion.div>
             )}
           </AnimatePresence>
 

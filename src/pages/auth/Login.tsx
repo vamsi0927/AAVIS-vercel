@@ -37,6 +37,13 @@ export function Login() {
       }
 
       if (data.user) {
+        if (!data.user.email_confirmed_at) {
+          await supabase.auth.signOut();
+          toast.error('Please verify your email before logging in.');
+          setIsLoading(false);
+          return;
+        }
+
         toast.success('Login successful! 🎉');
         login({ 
           username: data.user.email || email, 
