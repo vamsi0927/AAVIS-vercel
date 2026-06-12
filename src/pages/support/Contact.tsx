@@ -1,17 +1,47 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Mail, MessageSquare, Send } from 'lucide-react';
+import { ChevronLeft, Mail, Send } from 'lucide-react';
 import { toast } from 'sonner';
+
 export function Contact() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
+  const [category, setCategory] = useState('General Inquiry');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const categories = [
+    'General Inquiry',
+    'Account Issues',
+    'Email Verification',
+    'Password Reset',
+    'Bug Report',
+    'Feature Request',
+    'Other'
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!name.trim() || !email.trim() || !subject.trim() || !message.trim()) {
+      toast.error('All fields are required.');
+      return;
+    }
+
+    if (message.trim().length > 2000) {
+      toast.error('Message cannot exceed 2000 characters.');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -20,40 +50,41 @@ export function Contact() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name, email, subject, category, message }),
       });
       
       const data = await res.json();
       
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to send message');
+        throw new Error(data.error || 'Failed to send message. Please try again later.');
       }
       
-      toast.success("Message sent. We'll get back to you within 24 hours.");
+      toast.success("Message sent successfully. We'll get back to you within 24 hours.");
       setName('');
       setEmail('');
       setSubject('');
+      setCategory('General Inquiry');
       setMessage('');
     } catch (error: any) {
-      const errorMsg = error.message || 'Failed to send message. Please try again.';
+      const errorMsg = error.message || 'Failed to send message. Please try again later.';
       toast.error(errorMsg);
       
       // Fallback: If backend fails (e.g. Resend free tier restrictions), open local mail client
       setTimeout(() => {
-        window.location.href = `mailto:aavis.support@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("From: " + name + "\nEmail: " + email + "\n\n" + message)}`;
+        window.location.href = `mailto:aavis.support@gmail.com?subject=${encodeURIComponent(`[AAVIS Support] ${category} - ${subject}`)}&body=${encodeURIComponent("Category: " + category + "\nName: " + name + "\nEmail: " + email + "\n\nMessage:\n" + message)}`;
       }, 1500);
       
     } finally {
       setIsSubmitting(false);
     }
   };
+
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
-          
           <ChevronLeft className="w-6 h-6" />
         </button>
         <h1 className="font-display font-bold text-lg ml-2">Contact Us</h1>
@@ -65,8 +96,8 @@ export function Contact() {
             <Mail className="w-5 h-5 text-brand-primary" />
           </div>
           <div>
-            <h3 className="text-sm text-content-secondary uppercase tracking-wider font-bold mb-1">Email Us</h3>
-            <a href="mailto:aavis.support@gmail.com" className="font-medium hover:text-brand-primary transition-colors hover:underline">aavis.support@gmail.com</a>
+            <h3 className="text-sm text-content-secondary uppercase tracking-wider font-bold mb-1">Need Help?</h3>
+            <a href="mailto:aavis.support@gmail.com" className="font-medium hover:text-brand-primary transition-colors hover:underline">📧 aavis.support@gmail.com</a>
           </div>
         </div>
 
@@ -87,6 +118,18 @@ export function Contact() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary" />
           
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-primary appearance-none"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat} className="bg-navy-800 text-white">
+                {cat}
+              </option>
+            ))}
+          </select>
+
           <input
             type="text"
             required
@@ -98,6 +141,7 @@ export function Contact() {
           <textarea
             required
             rows={6}
+            maxLength={2000}
             placeholder="Your message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -117,5 +161,6 @@ export function Contact() {
           </button>
         </form>
       </div>
-    </div>);
+    </div>
+  );
 }
