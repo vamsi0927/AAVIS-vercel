@@ -37,12 +37,12 @@ export default async function handler(req, res) {
 
     if (resendError) {
       console.error('Resend Error:', resendError);
-      return res.status(500).json({ error: 'Failed to send message.' });
+      return res.status(500).json({ error: resendError.message || 'Failed to send message via Resend.' });
     }
 
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error('Contact API Error:', err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: err.message || 'Internal Server Error' });
   }
 }

@@ -35,7 +35,14 @@ export function Contact() {
       setSubject('');
       setMessage('');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to send message. Please try again.');
+      const errorMsg = error.message || 'Failed to send message. Please try again.';
+      toast.error(errorMsg);
+      
+      // Fallback: If backend fails (e.g. Resend free tier restrictions), open local mail client
+      setTimeout(() => {
+        window.location.href = `mailto:aavis.support@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("From: " + name + "\nEmail: " + email + "\n\n" + message)}`;
+      }, 1500);
+      
     } finally {
       setIsSubmitting(false);
     }
