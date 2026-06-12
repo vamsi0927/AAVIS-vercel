@@ -6,6 +6,7 @@
 import { Product } from './types';
 import { optimizedOCR } from './imagePreprocess';
 import { extractNutrientsFromText } from './nutritionParser';
+import { supabase } from './supabase';
 
 const BACKEND_URL = 'https://aavis-backend.onrender.com';
 
@@ -126,13 +127,22 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
     }
   }
 
+  // Get Supabase Session Token
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+  
+  if (token) {
+    authHeaders['Authorization'] = `Bearer ${token}`;
+  }
+
   // Try Vercel Serverless Function first if we are on Vercel
   const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname === 'localhost';
   if (endpoint === '/api/analyze' || endpoint === '/api/chat') {
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify(body),
       });
       if (response.ok) return await response.json();
@@ -145,7 +155,7 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
   // Fallback to Render if Vercel serverless fails or we are not on Vercel
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders,
     body: JSON.stringify(body),
   });
 
