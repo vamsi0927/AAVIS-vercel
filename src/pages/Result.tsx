@@ -12,7 +12,9 @@ import {
   Info,
   RotateCcw,
   FileImage,
-  Loader2
+  Loader2,
+  X,
+  ImageIcon
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { updateScanScore } from '../lib/supabaseService';
@@ -112,6 +114,7 @@ export function Result() {
 
   const [isReanalyzing, setIsReanalyzing] = useState(false);
   const [reanalyzeStatus, setReanalyzeStatus] = useState('');
+  const [showImageModal, setShowImageModal] = useState<string | null>(null);
 
   const handleReAnalyze = async () => {
     if (!scan || !product) return;
@@ -184,7 +187,7 @@ export function Result() {
       return;
     }
     const url = scan.image_url || product.imageUrl;
-    window.open(url, '_blank');
+    setShowImageModal(url);
   };
 
   // ── Score ring config (SVG arc)
@@ -805,6 +808,67 @@ export function Result() {
           </div>
         </div>
       </div>
+
+      {/* Image Viewer Modal */}
+      {showImageModal && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+          onClick={() => setShowImageModal(null)}
+        >
+          <button 
+            className="absolute top-4 right-4 md:top-6 md:right-6 p-2 bg-black/50 hover:bg-black text-white rounded-full transition-colors z-10"
+            onClick={() => setShowImageModal(null)}
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div 
+            className="w-full max-w-2xl bg-navy-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full bg-black/80 relative flex items-center justify-center border-b border-white/10" style={{ maxHeight: '60vh' }}>
+              <img 
+                src={showImageModal} 
+                alt="Original Label"
+                className="w-full h-auto max-h-[60vh] object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement?.classList.add('fallback-icon-container-modal');
+                }}
+              />
+              <div className="absolute inset-0 items-center justify-center hidden [.fallback-icon-container-modal_&]:flex">
+                <ImageIcon className="w-16 h-16 text-content-secondary/30" />
+              </div>
+            </div>
+            
+            <div className="p-6 bg-navy-800/50 flex-shrink-0 overflow-y-auto">
+              <h2 className="text-xl font-bold text-white mb-1">
+                {product.name}
+              </h2>
+              <div className="flex items-center gap-2 mb-4 text-sm text-content-secondary">
+                <span>{product.brand}</span>
+                <span>•</span>
+                <span>{new Date(scan.date).toLocaleDateString(undefined, {
+                  month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                })}</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="px-4 py-2 bg-navy-900 rounded-xl border border-white/5 flex items-center gap-2">
+                  <span className="text-sm text-content-secondary font-medium">Health Score:</span>
+                  <span className="text-lg font-bold text-white">
+                    {score}/100 
+                    {scan.verdict === 'safe' ? ' 🟢' : scan.verdict === 'caution' ? ' 🟡' : ' 🔴'}
+                  </span>
+                </div>
+                <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-2 rounded-xl ${scan.verdict === 'safe' ? 'bg-brand-safe/20 text-brand-safe' : scan.verdict === 'caution' ? 'bg-brand-caution/20 text-brand-caution' : 'bg-brand-hazardous/20 text-brand-hazardous'}`}>
+                  {scan.verdict}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
