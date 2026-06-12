@@ -425,6 +425,25 @@ export async function getUserScans(userId: string, limit = 50): Promise<DBScan[]
   return (data || []) as DBScan[];
 }
 
+/**
+ * Delete a specific scan for a user.
+ */
+export async function deleteUserScan(scanId: string, userId: string): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false;
+
+  const { error } = await supabase
+    .from('scans')
+    .delete()
+    .eq('id', scanId)
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('[Aavis] Failed to delete scan:', error);
+    return false;
+  }
+  return true;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // SEARCH OPERATIONS
 // ═══════════════════════════════════════════════════════════════

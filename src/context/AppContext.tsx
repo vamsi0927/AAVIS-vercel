@@ -22,6 +22,8 @@ interface AppContextType extends AppState {
   incrementScanCount: () => void;
   setHasRated: () => void;
   clearHistory: () => void;
+  removeScan: (scanId: string) => void;
+  restoreScans: (scans: ScanResult[]) => void;
   toggleBookmark: (productId: string) => void;
   setLanguage: (lang: 'en' | 'hi') => void;
   updateNotificationPrefs: (prefs: NotificationPrefs) => void;
@@ -416,6 +418,20 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       scans: []
     }));
   };
+  const removeScan = (scanId: string) => {
+    setState((prev) => ({
+      ...prev,
+      scans: prev.scans.filter(s => s.id !== scanId),
+      scanCount: Math.max(0, prev.scanCount - 1)
+    }));
+  };
+  const restoreScans = (scans: ScanResult[]) => {
+    setState((prev) => ({
+      ...prev,
+      scans,
+      scanCount: scans.length
+    }));
+  };
   const toggleBookmark = (scanId: string) => {
     setState((prev) => {
       const isBookmarked = prev.bookmarkedProductIds.includes(scanId);
@@ -518,6 +534,8 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         incrementScanCount,
         setHasRated,
         clearHistory,
+        removeScan,
+        restoreScans,
         toggleBookmark,
         setLanguage,
         updateNotificationPrefs,
