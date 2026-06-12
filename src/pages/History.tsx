@@ -167,10 +167,10 @@ export function History() {
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer"
                 >
-                  <option value="newest">Newest</option>
-                  <option value="oldest">Oldest</option>
-                  <option value="highest">Highest Score</option>
-                  <option value="lowest">Lowest Score</option>
+                  <option value="newest" className="bg-navy-900 text-white">Newest</option>
+                  <option value="oldest" className="bg-navy-900 text-white">Oldest</option>
+                  <option value="highest" className="bg-navy-900 text-white">Highest Score</option>
+                  <option value="lowest" className="bg-navy-900 text-white">Lowest Score</option>
                 </select>
               </div>
             </div>

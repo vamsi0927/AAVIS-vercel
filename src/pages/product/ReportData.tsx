@@ -52,10 +52,10 @@ export function ReportData() {
               onChange={(e) => setIssueType(e.target.value)}
               className="w-full bg-navy-800 border border-navy-700 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-brand-primary"
             >
-              <option value="ingredients">Incorrect Ingredients</option>
-              <option value="nutrition">Wrong Nutritional Values</option>
-              <option value="allergens">Missing Allergens</option>
-              <option value="other">Other</option>
+              <option value="ingredients" className="bg-navy-900 text-white">Incorrect Ingredients</option>
+              <option value="nutrition" className="bg-navy-900 text-white">Wrong Nutritional Values</option>
+              <option value="allergens" className="bg-navy-900 text-white">Missing Allergens</option>
+              <option value="other" className="bg-navy-900 text-white">Other</option>
             </select>
           </div>
 

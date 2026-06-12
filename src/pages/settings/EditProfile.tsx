@@ -92,10 +92,10 @@ export function EditProfile() {
                   onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                   className="w-full bg-navy-800 border border-navy-700 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
                 >
-                  <option value="Prefer not to say">Prefer not to say</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value="Prefer not to say" className="bg-navy-900 text-white">Prefer not to say</option>
+                  <option value="Male" className="bg-navy-900 text-white">Male</option>
+                  <option value="Female" className="bg-navy-900 text-white">Female</option>
+                  <option value="Other" className="bg-navy-900 text-white">Other</option>
                 </select>
               </div>
             </div>
@@ -130,11 +130,11 @@ export function EditProfile() {
                 onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value })}
                 className="w-full bg-navy-800 border border-navy-700 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
               >
-                <option value="Sedentary">Sedentary</option>
-                <option value="Lightly Active">Lightly Active</option>
-                <option value="Moderately Active">Moderately Active</option>
-                <option value="Very Active">Very Active</option>
-                <option value="Super Active">Super Active</option>
+                <option value="Sedentary" className="bg-navy-900 text-white">Sedentary</option>
+                <option value="Lightly Active" className="bg-navy-900 text-white">Lightly Active</option>
+                <option value="Moderately Active" className="bg-navy-900 text-white">Moderately Active</option>
+                <option value="Very Active" className="bg-navy-900 text-white">Very Active</option>
+                <option value="Super Active" className="bg-navy-900 text-white">Super Active</option>
               </select>
             </div>
           </div>
