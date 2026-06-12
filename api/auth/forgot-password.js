@@ -1,6 +1,17 @@
 import { supabaseAdmin } from '../_lib/supabaseAdmin.js';
 import { resend, SENDER_EMAIL } from '../_lib/resendClient.js';
+import { checkRateLimit } from '../_lib/rateLimiter.js';
 import crypto from 'crypto';
+
+// Basic HTML sanitizer
+function escapeHtml(unsafe) {
+  return String(unsafe)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -11,6 +22,16 @@ export default async function handler(req, res) {
 
   if (!email) {
     return res.status(400).json({ error: 'Missing email' });
+  }
+
+  if (email.length > 255) {
+    return res.status(400).json({ error: 'Payload size limit exceeded' });
+  }
+
+  // Rate Limiting Check
+  const rateLimit = await checkRateLimit(req, 'auth');
+  if (!rateLimit.success) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   try {
@@ -65,7 +86,7 @@ export default async function handler(req, res) {
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2>Password Reset Request</h2>
-          <p>We received a request to reset your password. Click the button below to choose a new one.</p>
+          <p>We received a request to reset the password for the AAVIS account associated with ${escapeHtml(email)}.</p>
           <a href="${resetLink}" style="display: inline-block; background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px;">Reset Password</a>
           <p style="margin-top: 20px; color: #dc2626; font-weight: bold;">This link will expire in 10 minutes.</p>
           <p style="margin-top: 30px; font-size: 12px; color: #666;">If you didn't request a password reset, you can safely ignore this email.</p>

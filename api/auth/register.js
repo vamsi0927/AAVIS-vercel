@@ -1,6 +1,17 @@
 import { supabaseAdmin } from '../_lib/supabaseAdmin.js';
 import { resend, SENDER_EMAIL } from '../_lib/resendClient.js';
+import { checkRateLimit } from '../_lib/rateLimiter.js';
 import crypto from 'crypto';
+
+// Basic HTML sanitizer to prevent injection in emails
+function escapeHtml(unsafe) {
+  return String(unsafe)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -11,6 +22,16 @@ export default async function handler(req, res) {
 
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (email.length > 255 || password.length > 255 || name.length > 255) {
+    return res.status(400).json({ error: 'Payload size limit exceeded' });
+  }
+
+  // Rate Limiting Check
+  const rateLimit = await checkRateLimit(req, 'auth');
+  if (!rateLimit.success) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   try {
@@ -63,7 +84,7 @@ export default async function handler(req, res) {
       subject: 'Verify your AAVIS Account',
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2>Welcome to AAVIS, ${name}!</h2>
+          <h2>Welcome to AAVIS, ${escapeHtml(name)}!</h2>
           <p>Please click the button below to verify your email address and activate your account.</p>
           <a href="${verifyLink}" style="display: inline-block; background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px;">Verify Email</a>
           <p style="margin-top: 30px; font-size: 12px; color: #666;">If you didn't create this account, you can safely ignore this email.</p>

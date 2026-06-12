@@ -617,85 +617,169 @@ export function Result() {
               </h3>
             </div>
             
-            <div className="grid grid-cols-[1fr_80px_80px] gap-2 border-b border-white/10 pb-2 mb-3">
-              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase">Nutrient</div>
-              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">Per 100{product.normalizedNutrients?.unit === '100ml' ? 'ml' : 'g'}<br/><span className="text-[8px] text-brand-primary">(Scored)</span></div>
-              <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">
-                {product.servingSize ? 'Per Serving' : 'Original Label'}<br/>
-                <span className="text-[8px] opacity-60">({product.servingSize || product.rawNutrients?.unit || product.nutrients.unit || '-'})</span>
-              </div>
-            </div>
-
             {(() => {
-              const NUTRIENT_META: Record<string, {label: string, icon: string, defaultUnit: string}> = {
-                calories: { label: 'Calories', icon: '🔥', defaultUnit: 'kcal' },
-                sugar: { label: 'Sugars', icon: '🍬', defaultUnit: 'g' },
-                sodium: { label: 'Sodium', icon: '🧂', defaultUnit: 'mg' },
-                fat: { label: 'Total Fat', icon: '🥑', defaultUnit: 'g' },
-                satFat: { label: 'Sat Fat', icon: '🧈', defaultUnit: 'g' },
-                protein: { label: 'Protein', icon: '💪', defaultUnit: 'g' },
-                fiber: { label: 'Fiber', icon: '🌿', defaultUnit: 'g' },
-                carbs: { label: 'Carbs', icon: '🌾', defaultUnit: 'g' },
+              // 1. Serving Size Parsing
+              const rawServing = product.servingSize || '';
+              const servingMatch = rawServing.match(/(\d+(?:\.\d+)?)\s*([a-zA-Z]+)/);
+              const servingNumeric = servingMatch ? parseFloat(servingMatch[1]) : null;
+              const hasServing = servingNumeric !== null;
+
+              // 2. Unit Detection Hierarchy
+              let baseUnit = 'g';
+              if (servingMatch && servingMatch[2].toLowerCase() === 'ml') {
+                baseUnit = 'ml';
+              } else if (product.normalizedNutrients?.unit === '100ml' || product.normalizedNutrients?.unit === 'ml') {
+                baseUnit = 'ml';
+              } else if (product.category && ['drink', 'milk', 'juice', 'beverage', 'soda', 'cola'].some(kw => product.category!.toLowerCase().includes(kw))) {
+                baseUnit = 'ml';
+              }
+              const servingStr = hasServing ? `${servingNumeric} ${baseUnit}` : '';
+
+              // FDA Daily Values
+              const FDA_DV: Record<string, number> = {
+                protein: 50,
+                fiber: 28,
+                fat: 78,
+                satFat: 20,
+                carbs: 275,
+                sodium: 2300,
+                sugar: 50
               };
 
-              const allKeys = Array.from(new Set([
-                ...Object.keys(product.nutrients || {}),
-                ...Object.keys(product.rawNutrients || {})
-              ])).filter(k => k !== 'unit' && !k.startsWith('_'));
+              const formatValue = (val: number, unit: string) => {
+                if (unit === 'mg' || unit === 'kcal') return Math.round(val).toString();
+                if (val > 0 && val < 0.1) return '<0.1';
+                return Number(val).toFixed(1).replace(/\.0$/, '');
+              };
 
-              return allKeys.map((key, idx) => {
-                const normVal = (product.normalizedNutrients || product.nutrients)[key as keyof typeof product.nutrients] as number | null;
-                const rawVal = (product.rawNutrients || product.nutrients)[key as keyof typeof product.nutrients] as number | null;
-                
-                // Only show if we have either a raw or normalized value
-                if (normVal === null && rawVal === null && normVal === undefined && rawVal === undefined) return null;
+              const getBadge = (key: string, val100: number) => {
+                if ((key === 'sugar' && val100 > 10) || (key === 'sodium' && val100 > 400) || (key === 'satFat' && val100 > 5) || (key === 'fat' && val100 > 20) || (key === 'calories' && val100 > 400)) return { color: 'text-brand-hazardous bg-brand-hazardous/10 border-brand-hazardous/30', label: 'High' };
+                if ((key === 'protein' && val100 > 10) || (key === 'fiber' && val100 > 5)) return { color: 'text-brand-safe bg-brand-safe/10 border-brand-safe/30', label: 'Good' };
+                if (key === 'carbs' || key === 'sodium' || key === 'sugar') return { color: 'text-brand-caution bg-brand-caution/10 border-brand-caution/30', label: 'Mod' };
+                return null;
+              };
 
-                const meta = NUTRIENT_META[key] || { 
-                  label: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim(), 
-                  icon: '✨', 
-                  defaultUnit: 'g' 
-                };
+              const gridClass = hasServing 
+                ? "grid grid-cols-[1fr_70px_70px_50px] gap-2" 
+                : "grid grid-cols-[1fr_80px] gap-2";
 
-                const isDanger = (key === 'sugar' && normVal! > 10) || (key === 'sodium' && normVal! > 400) || (key === 'satFat' && normVal! > 5);
-                const isGood = (key === 'protein' && normVal! > 10) || (key === 'fiber' && normVal! > 5);
-
-                return (
-                  <div key={key} className="grid grid-cols-[1fr_80px_80px] gap-2 items-center py-2.5 border-b border-white/5 last:border-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">{meta.icon}</span>
-                      <span className="text-xs text-content-secondary font-medium truncate">{meta.label}</span>
-                    </div>
-                    
-                    {/* Normalized Column */}
-                    <div className="flex items-center justify-end gap-1">
-                      {normVal !== null && normVal !== undefined && !isNaN(normVal as number) ? (
-                        <>
-                          <span className={`text-[13px] font-black ${isDanger ? 'text-brand-hazardous' : isGood ? 'text-brand-safe' : 'text-white'}`}>
-                            {Number(normVal).toFixed(1).replace(/\.0$/, '')}
-                          </span>
-                          <span className="text-[9px] text-content-secondary">{meta.defaultUnit}</span>
-                        </>
-                      ) : (
-                        <span className="text-[10px] text-content-secondary opacity-50">-</span>
-                      )}
-                    </div>
-                    
-                    {/* Raw/Serving Column */}
-                    <div className="flex items-center justify-end gap-1 opacity-75">
-                      {rawVal !== null && rawVal !== undefined && !isNaN(rawVal as number) ? (
-                        <>
-                          <span className="text-[11px] font-bold text-white">
-                            {Number(rawVal).toFixed(1).replace(/\.0$/, '')}
-                          </span>
-                          <span className="text-[9px] text-content-secondary">{meta.defaultUnit}</span>
-                        </>
-                      ) : (
-                        <span className="text-[10px] text-content-secondary opacity-50">-</span>
-                      )}
-                    </div>
+              return (
+                <>
+                  <div className={`${gridClass} border-b border-white/10 pb-2 mb-3`}>
+                    <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase">Nutrient</div>
+                    <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">Per 100 {baseUnit}</div>
+                    {hasServing && (
+                      <>
+                        <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">Per Serving<br/><span className="text-[8px] opacity-60">({servingStr})</span></div>
+                        <div className="text-[9px] text-content-secondary font-black tracking-wider uppercase text-right leading-tight">% DV</div>
+                      </>
+                    )}
                   </div>
-                );
-              });
+
+                  {(() => {
+                    const NUTRIENT_META: Record<string, {label: string, icon: string, defaultUnit: string}> = {
+                      calories: { label: 'Calories', icon: '🔥', defaultUnit: 'kcal' },
+                      sugar: { label: 'Sugars', icon: '🍬', defaultUnit: 'g' },
+                      addedSugars: { label: 'Added Sugars', icon: '🍯', defaultUnit: 'g' },
+                      sodium: { label: 'Sodium', icon: '🧂', defaultUnit: 'mg' },
+                      fat: { label: 'Total Fat', icon: '🥑', defaultUnit: 'g' },
+                      satFat: { label: 'Sat Fat', icon: '🧈', defaultUnit: 'g' },
+                      protein: { label: 'Protein', icon: '💪', defaultUnit: 'g' },
+                      fiber: { label: 'Fiber', icon: '🌿', defaultUnit: 'g' },
+                      carbs: { label: 'Carbs', icon: '🌾', defaultUnit: 'g' },
+                    };
+
+                    const allKeys = Array.from(new Set([
+                      ...Object.keys(product.nutrients || {}),
+                      ...Object.keys(product.rawNutrients || {})
+                    ])).filter(k => k !== 'unit' && !k.startsWith('_'));
+
+                    return allKeys.map((key) => {
+                      let normVal = (product.normalizedNutrients || product.nutrients)[key as keyof typeof product.nutrients] as number | null;
+                      
+                      if (normVal === null || normVal === undefined || isNaN(normVal)) return null;
+
+                      // Conversions
+                      if (key === 'sodium' && product.normalizedNutrients?.unit === 'g' && normVal < 10) {
+                        normVal = normVal * 1000;
+                      } else if (key === 'calories' && product.normalizedNutrients?.unit === 'kJ') {
+                        normVal = normVal / 4.184;
+                      }
+
+                      let perServingVal = null;
+                      if (hasServing) {
+                        perServingVal = normVal * (servingNumeric! / 100);
+                        
+                        // Scientific Validation Layer
+                        if (Math.abs(perServingVal - (normVal * servingNumeric! / 100)) > 0.01) {
+                          console.error(`Serving calculation mismatch for ${key}`);
+                        }
+                      }
+
+                      const meta = NUTRIENT_META[key] || { 
+                        label: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim(), 
+                        icon: '✨', 
+                        defaultUnit: 'g' 
+                      };
+
+                      // % DV Logic
+                      let dvPercent = null;
+                      if (hasServing && perServingVal !== null) {
+                        let dvKey = key;
+                        if (key === 'sugar' && allKeys.includes('addedSugars')) {
+                          dvKey = 'skip'; // Prefer addedSugars if both exist
+                        }
+                        if (key === 'addedSugars') dvKey = 'sugar';
+
+                        if (dvKey !== 'skip' && FDA_DV[dvKey]) {
+                          dvPercent = Math.round((perServingVal / FDA_DV[dvKey]) * 100);
+                        }
+                      }
+
+                      const badge = getBadge(key, normVal);
+
+                      return (
+                        <div key={key} className={`${gridClass} items-center py-2.5 border-b border-white/5 last:border-0`}>
+                          <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                            <span className="text-sm shrink-0">{meta.icon}</span>
+                            <span className="text-xs text-content-secondary font-medium truncate">{meta.label}</span>
+                            {badge && (
+                              <span className={`text-[8px] uppercase font-black px-1.5 py-0.5 rounded border ml-1 shrink-0 ${badge.color}`}>
+                                {badge.label}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Per 100 Column */}
+                          <div className="flex items-center justify-end gap-1">
+                            <span className="text-[12px] font-black text-white">{formatValue(normVal, meta.defaultUnit)}</span>
+                            <span className="text-[9px] text-content-secondary">{meta.defaultUnit}</span>
+                          </div>
+                          
+                          {/* Per Serving Column */}
+                          {hasServing && (
+                            <div className="flex items-center justify-end gap-1 opacity-80">
+                              <span className="text-[11px] font-bold text-white">{formatValue(perServingVal!, meta.defaultUnit)}</span>
+                              <span className="text-[9px] text-content-secondary">{meta.defaultUnit}</span>
+                            </div>
+                          )}
+
+                          {/* % DV Column */}
+                          {hasServing && (
+                            <div className="flex items-center justify-end">
+                              {dvPercent !== null ? (
+                                <span className={`text-[10px] font-bold ${dvPercent > 20 ? 'text-brand-caution' : 'text-content-secondary'}`}>{dvPercent}%</span>
+                              ) : (
+                                <span className="text-[10px] text-content-secondary opacity-50">-</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
+                </>
+              );
             })()}
             
             {(scan.nutritionConfidence && scan.nutritionConfidence < 100) && (
@@ -704,8 +788,8 @@ export function Result() {
               </p>
             )}
             
-            <p className="text-[9px] text-content-secondary mt-3 text-center italic opacity-60">
-              Health score calculated exclusively using normalized values for fair comparison.
+            <p className="text-[9px] text-content-secondary mt-3 text-center italic opacity-60 leading-relaxed">
+              Values are normalized per 100 g or 100 ml for fair comparison. Serving values are automatically adjusted using the detected serving size.
             </p>
           </div>
         </div>

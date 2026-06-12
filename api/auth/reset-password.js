@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../_lib/supabaseAdmin.js';
+import { checkRateLimit } from '../_lib/rateLimiter.js';
 import crypto from 'crypto';
 
 export default async function handler(req, res) {
@@ -10,6 +11,16 @@ export default async function handler(req, res) {
 
   if (!token || !uid || !newPassword) {
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (token.length > 255 || uid.length > 255 || newPassword.length > 255) {
+    return res.status(400).json({ error: 'Payload size limit exceeded' });
+  }
+
+  // Rate Limiting Check
+  const rateLimit = await checkRateLimit(req, 'auth');
+  if (!rateLimit.success) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   try {
