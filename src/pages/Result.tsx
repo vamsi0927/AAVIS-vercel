@@ -234,9 +234,20 @@ export function Result() {
         <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-5">
           {/* ── 1. Product Identity Card ── */}
           <div className="glass-card rounded-3xl p-5 border border-white/5 flex items-center gap-4">
-            <div className="w-16 h-16 glass-card rounded-2xl flex items-center justify-center text-3xl shrink-0 border border-white/10 shadow-xl relative">
-              <div className="absolute inset-0 bg-brand-primary/5 rounded-2xl blur-md" />
-              <span className="relative z-10">{product.imageEmoji}</span>
+            <div className="w-16 h-16 glass-card rounded-2xl flex items-center justify-center text-3xl shrink-0 border border-white/10 shadow-xl relative overflow-hidden group cursor-zoom-in" onClick={handleViewOriginal}>
+              <div className="absolute inset-0 bg-brand-primary/5 rounded-2xl blur-md z-0" />
+              {(scan.image_url || product.imageUrl) ? (
+                <img 
+                  src={scan.image_url || product.imageUrl} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover relative z-10"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              ) : null}
+              <span className={`relative z-10 ${(scan.image_url || product.imageUrl) ? 'hidden' : ''}`}>{product.imageEmoji}</span>
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-display font-black text-white leading-tight break-words line-clamp-2">{product.name}</h2>

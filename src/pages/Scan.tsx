@@ -183,14 +183,14 @@ export function Scan() {
     setPreviewMode('none');
   };
 
-  // ── Compress image to a tiny base64 thumbnail for history ──
+  // ── Compress image to a high-quality thumbnail for history and viewing ──
   const generateThumbnail = async (file: File): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
       img.src = URL.createObjectURL(file);
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const size = 150; // max width/height
+        const size = 1200; // max width/height increased for much better clarity
         const ratio = img.width / img.height;
         if (ratio > 1) {
           canvas.width = size;
@@ -202,7 +202,7 @@ export function Scan() {
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/jpeg', 0.5)); // 50% quality
+          resolve(canvas.toDataURL('image/jpeg', 0.85)); // 85% quality
         } else {
           resolve('');
         }
