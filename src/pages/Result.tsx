@@ -141,10 +141,23 @@ export function Result() {
           ? (aiResult.finalScore < 40 ? 'hazardous' : aiResult.finalScore < 70 ? 'caution' : 'safe')
           : updatedScoreData.verdict;
 
+      const newNutrientsToSave = {
+        ...aiResult.product.nutrients,
+        _productType: aiResult.product.productType || product.productType,
+        _servingSize: aiResult.product.servingSize || product.servingSize,
+        _rawNutrients: aiResult.product.rawNutrients || product.rawNutrients,
+        _dynamicAdditives: aiResult.product.dynamicAdditives || product.dynamicAdditives,
+        _dynamicIngredients: aiResult.product.dynamicIngredients || product.dynamicIngredients,
+        _aiDimensions: aiResult.aiDimensions,
+        _overallAssessment: aiResult.overallAssessment,
+        _majorBenefits: aiResult.majorBenefits,
+        _scoreBreakdown: updatedScoreData.scoreBreakdown
+      };
+
       const success = await updateScanScore(scan.id, {
         health_score: finalScore,
         verdict: finalVerdict,
-        nutrients: aiResult.product.nutrients,
+        nutrients: newNutrientsToSave,
         diet_advice: updatedScoreData.dietAdvice || aiResult.dietAdvice || '',
       });
       
