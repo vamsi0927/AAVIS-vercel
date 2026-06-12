@@ -34,8 +34,8 @@ export function Contact() {
             <Mail className="w-5 h-5 text-brand-primary" />
           </div>
           <div>
-            <p className="text-xs text-content-secondary">Email us at</p>
-            <p className="font-medium">support@aavis.app</p>
+            <h3 className="text-sm text-content-secondary uppercase tracking-wider font-bold mb-1">Email Us</h3>
+            <p className="font-medium">aavis.support@gmail.com</p>
           </div>
         </div>
 

@@ -53,8 +53,9 @@ export function Privacy() {
 
         <div className="mt-8 p-5 glass-card border border-white/5 rounded-3xl text-center space-y-1">
           <p className="text-xs text-white font-bold">Have privacy questions?</p>
-          <p className="text-xs text-content-secondary">
-            Send us a message at <span className="text-brand-primary font-bold">privacy@aavis.app</span>
+          <h3 className="text-white font-display font-black text-base">Contact Us</h3>
+          <p>
+            Send us a message at <span className="text-brand-primary font-bold">aavis.support@gmail.com</span>
           </p>
         </div>
       </div>

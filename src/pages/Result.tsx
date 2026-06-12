@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { updateScanScore } from '../lib/supabaseService';
-import { analyzeTextWithGemini } from '../lib/geminiAnalysis';
+import { analyzeMultiStepScan } from '../lib/geminiAnalysis';
 import { ADDITIVES_DB } from '../data/additives';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { toast } from 'sonner';
@@ -123,8 +123,10 @@ export function Result() {
     try {
       setReanalyzeStatus('[REANALYZE] Running AI Scoring Engine...');
       
-      const ingredientsText = product.ingredients.join(', ');
-      const aiResult = await analyzeTextWithGemini(product.name, ingredientsText, profile, (msg) => {
+      const ingredientsText = `Ingredients: ${product.ingredients.join(', ')}\nAdditives: ${product.additives.join(', ')}`;
+      const nutritionText = `Nutrients: ${JSON.stringify(product.rawNutrients || product.nutrients)}`;
+      
+      const aiResult = await analyzeMultiStepScan(ingredientsText, nutritionText, profile, (msg) => {
         setReanalyzeStatus(`[REANALYZE] ${msg}`);
       });
       
