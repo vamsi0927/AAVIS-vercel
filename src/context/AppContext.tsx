@@ -260,21 +260,26 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
             };
             
             const dynamicScore = computeHealthScore(product as any, currentProfile as any);
+            const savedDimensions = cs.nutrients?._aiDimensions;
+            const useAI = !!savedDimensions;
             
             return {
               id: cs.id,
               productId: cs.id,
               date: cs.created_at,
-              score: dynamicScore.score,
-              verdict: dynamicScore.verdict,
+              score: useAI ? cs.health_score : dynamicScore.score,
+              verdict: useAI ? cs.verdict : dynamicScore.verdict,
               warnings: dynamicScore.warnings,
               product,
               aiSummary: cs.ai_summary || undefined,
-              dietAdvice: dynamicScore.dietAdvice || cs.diet_advice || undefined,
+              dietAdvice: useAI ? cs.diet_advice : (dynamicScore.dietAdvice || cs.diet_advice || undefined),
               scoreReasons: dynamicScore.scoreReasons,
               mainConcerns: dynamicScore.mainConcerns,
               personalizedWarnings: dynamicScore.personalizedWarnings,
-              scoreBreakdown: dynamicScore.scoreBreakdown,
+              scoreBreakdown: useAI ? cs.nutrients?._scoreBreakdown : dynamicScore.scoreBreakdown,
+              aiDimensions: savedDimensions,
+              overallAssessment: cs.nutrients?._overallAssessment,
+              majorBenefits: cs.nutrients?._majorBenefits
             };
           });
 

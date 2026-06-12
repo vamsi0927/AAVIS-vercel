@@ -8,13 +8,37 @@ export function Contact() {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent. We'll get back to you within 24 hours.");
-    setName('');
-    setEmail('');
-    setSubject('');
-    setMessage('');
+    setIsSubmitting(true);
+    
+    try {
+      const res = await fetch('/api/support/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+      
+      toast.success("Message sent. We'll get back to you within 24 hours.");
+      setName('');
+      setEmail('');
+      setSubject('');
+      setMessage('');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   return (
     <div className="flex flex-col h-full bg-navy-900">
@@ -35,7 +59,7 @@ export function Contact() {
           </div>
           <div>
             <h3 className="text-sm text-content-secondary uppercase tracking-wider font-bold mb-1">Email Us</h3>
-            <p className="font-medium">aavis.support@gmail.com</p>
+            <a href="mailto:aavis.support@gmail.com" className="font-medium hover:text-brand-primary transition-colors hover:underline">aavis.support@gmail.com</a>
           </div>
         </div>
 
@@ -74,13 +98,17 @@ export function Contact() {
           
           <button
             type="submit"
-            className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl py-4 font-semibold flex items-center justify-center gap-2">
+            disabled={isSubmitting}
+            className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-4 font-semibold flex items-center justify-center gap-2 transition-all">
             
-            <Send className="w-5 h-5" />
-            Send Message
+            {isSubmitting ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+            {isSubmitting ? 'Sending...' : 'Send Message'}
           </button>
         </form>
       </div>
     </div>);
-
 }

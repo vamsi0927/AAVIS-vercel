@@ -55,7 +55,7 @@ export function Privacy() {
           <p className="text-xs text-white font-bold">Have privacy questions?</p>
           <h3 className="text-white font-display font-black text-base">Contact Us</h3>
           <p>
-            Send us a message at <span className="text-brand-primary font-bold">aavis.support@gmail.com</span>
+            Send us a message at <a href="mailto:aavis.support@gmail.com" className="text-brand-primary font-bold hover:underline">aavis.support@gmail.com</a>
           </p>
         </div>
       </div>

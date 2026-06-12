@@ -326,7 +326,11 @@ export function Scan() {
               _servingSize: result.product.servingSize,
               _rawNutrients: result.product.rawNutrients,
               _dynamicAdditives: result.product.dynamicAdditives,
-              _dynamicIngredients: result.product.dynamicIngredients
+              _dynamicIngredients: result.product.dynamicIngredients,
+              _aiDimensions: result.aiDimensions,
+              _overallAssessment: result.overallAssessment,
+              _majorBenefits: result.majorBenefits,
+              _scoreBreakdown: scoreResult.scoreBreakdown
             },
             additives: result.product.additives,
             allergens_detected: result.product.allergens,
