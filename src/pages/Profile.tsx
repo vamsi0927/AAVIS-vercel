@@ -17,131 +17,6 @@ export function Profile() {
   
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(profile);
-  
-  // Avatar state
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isRemoving, setIsRemoving] = useState(false);
-
-  const processImage = (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxSize = 512;
-        let width = img.width;
-        let height = img.height;
-        
-        const size = Math.min(width, height);
-        const startX = (width - size) / 2;
-        const startY = (height - size) / 2;
-        
-        canvas.width = Math.min(size, maxSize);
-        canvas.height = Math.min(size, maxSize);
-        
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return reject(new Error('Failed to get canvas context'));
-        
-        ctx.drawImage(img, startX, startY, size, size, 0, 0, canvas.width, canvas.height);
-        
-        canvas.toBlob((blob) => {
-          if (!blob) return reject(new Error('Canvas to Blob failed'));
-          resolve(new File([blob], file.name, { type: file.type }));
-        }, file.type, 0.9);
-      };
-      img.onerror = reject;
-      img.src = URL.createObjectURL(file);
-    });
-  };
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error('Please upload a JPG, PNG, or WEBP image.');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Maximum file size is 5 MB.');
-      return;
-    }
-
-    try {
-      const processedFile = await processImage(file);
-      setSelectedFile(processedFile);
-      setPreviewUrl(URL.createObjectURL(processedFile));
-    } catch (err) {
-      toast.error('Failed to process image');
-    }
-  };
-
-  const handleSaveAvatar = async () => {
-    if (!selectedFile || !isSupabaseConfigured() || !profile.name) return;
-    
-    setIsUploading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
-      if (!userId) throw new Error('Not authenticated');
-
-      const fileExt = selectedFile.type.split('/')[1];
-      const fileName = `avatar-${Date.now()}.${fileExt}`;
-      const filePath = `${userId}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('profile-images')
-        .upload(filePath, selectedFile, {
-          cacheControl: '3600',
-          upsert: true
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(filePath);
-
-      const uniqueUrl = `${publicUrl}?t=${Date.now()}`;
-      updateProfile({ ...profile, avatarUrl: uniqueUrl });
-      toast.success('Profile picture updated successfully.');
-      setSelectedFile(null);
-      setPreviewUrl(null);
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || 'Failed to upload profile picture.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleRemoveAvatar = async () => {
-    if (!isSupabaseConfigured()) return;
-    setIsRemoving(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
-      if (!userId) throw new Error('Not authenticated');
-
-      const { data: files } = await supabase.storage.from('profile-images').list(userId);
-      if (files && files.length > 0) {
-        const filesToRemove = files.map(x => `${userId}/${x.name}`);
-        await supabase.storage.from('profile-images').remove(filesToRemove);
-      }
-
-      updateProfile({ ...profile, avatarUrl: undefined });
-      toast.success('Profile picture removed successfully.');
-      setPreviewUrl(null);
-      setSelectedFile(null);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to remove profile picture.');
-    } finally {
-      setIsRemoving(false);
-    }
-  };
 
   const handleLogout = () => {
     logout();
@@ -213,11 +88,11 @@ export function Profile() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex flex-col items-center gap-3">
                   <div className="flex flex-col items-center">
-                    <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                    <div className="relative">
                       <div className="w-20 h-20 rounded-full bg-navy-900 border border-white/5 flex items-center justify-center text-brand-primary shadow-[0_0_20px_rgba(99,102,241,0.2)] overflow-hidden relative">
-                        {previewUrl || profile.avatarUrl ? (
+                        {profile.avatarUrl ? (
                           <img 
-                            src={previewUrl || profile.avatarUrl} 
+                            src={profile.avatarUrl} 
                             alt="Profile Avatar" 
                             loading="lazy"
                             className="absolute inset-0 w-full h-full object-cover rounded-full" 
@@ -228,51 +103,11 @@ export function Profile() {
                             }}
                           />
                         ) : null}
-                        <div className={`absolute inset-0 w-full h-full bg-navy-900 flex items-center justify-center text-3xl font-bold ${previewUrl || profile.avatarUrl ? 'hidden' : ''}`}>
+                        <div className={`absolute inset-0 w-full h-full bg-navy-900 flex items-center justify-center text-3xl font-bold ${profile.avatarUrl ? 'hidden' : ''}`}>
                           {profile.name ? profile.name.charAt(0).toUpperCase() : <User className="w-10 h-10" />}
                         </div>
                       </div>
-                      {/* Hover Camera Icon */}
-                      <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                        <Camera className="w-6 h-6 text-white" />
-                      </div>
-                      <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        className="hidden" 
-                        accept="image/jpeg, image/png, image/webp"
-                        onChange={handleFileSelect}
-                      />
                     </div>
-                    
-                    {selectedFile && (
-                      <div className="flex gap-2 mt-3">
-                        <button 
-                          onClick={handleSaveAvatar} 
-                          disabled={isUploading}
-                          className="px-3 py-1.5 bg-brand-primary text-white text-xs font-bold rounded-lg disabled:opacity-50 transition-all hover:bg-brand-primary/90"
-                        >
-                          {isUploading ? 'Saving...' : 'Save'}
-                        </button>
-                        <button 
-                          onClick={() => { setSelectedFile(null); setPreviewUrl(null); }}
-                          disabled={isUploading}
-                          className="px-3 py-1.5 bg-white/10 text-white text-xs font-bold rounded-lg disabled:opacity-50 transition-all hover:bg-white/20"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    )}
-
-                    {!selectedFile && profile.avatarUrl && (
-                      <button 
-                        onClick={handleRemoveAvatar}
-                        disabled={isRemoving}
-                        className="mt-3 text-[11px] font-bold text-red-400 hover:text-red-300 transition-colors"
-                      >
-                        {isRemoving ? 'Removing...' : 'Remove Photo'}
-                      </button>
-                    )}
                   </div>
                 </div>
                 
