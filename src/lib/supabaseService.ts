@@ -24,6 +24,7 @@ export interface DBUser {
   language: string;
   streak: number;
   last_scan_date: string | null;
+  avatar_url: string | null;
   created_at: string;
 }
 
@@ -112,6 +113,7 @@ export async function updateUserProfile(
     allergens?: string[];
     health_conditions?: string[];
     language?: string;
+    avatar_url?: string | null;
   }
 ): Promise<DBUser | null> {
   if (!isSupabaseConfigured()) return null;

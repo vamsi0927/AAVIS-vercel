@@ -164,7 +164,8 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
               activityLevel: 'Moderately Active',
               diet: 'None',
               allergens: [],
-              conditions: []
+              conditions: [],
+              avatarUrl: undefined
             }
           }));
           setIsLoadingAuth(false);
@@ -196,6 +197,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           profile: {
             ...prev.profile,
             name: dbUser.name || prev.profile.name || name,
+            avatarUrl: dbUser.avatar_url || prev.profile.avatarUrl || undefined,
             age: dbUser.age || prev.profile.age || '',
             gender: dbUser.gender || prev.profile.gender || 'Prefer not to say',
             height: dbUser.height || prev.profile.height || '',
@@ -380,6 +382,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         diet_type: profile.diet,
         health_conditions: profile.conditions,
         allergens: profile.allergens,
+        avatar_url: profile.avatarUrl
       }).catch(err => console.error('[Aavis] Profile sync error:', err));
     }
   };

@@ -78,6 +78,7 @@ export interface Product {
 
 export interface UserProfile {
   name: string;
+  avatarUrl?: string;
   age: number | '';
   gender: string;
   height: number | '';

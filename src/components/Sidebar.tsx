@@ -48,7 +48,23 @@ export function Sidebar({ className = '' }: { className?: string }) {
         {/* User Card */}
         {profile.name && (
           <div className="glass-card bg-white/3 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary text-sm font-bold">
+            {profile.avatarUrl ? (
+              <img 
+                src={profile.avatarUrl} 
+                alt={profile.name} 
+                loading="lazy"
+                className="w-10 h-10 rounded-full object-cover border border-white/10"
+                onError={(e) => {
+                  // Fallback to text if image fails to load
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  const fallback = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div 
+              className={`w-10 h-10 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary text-sm font-bold ${profile.avatarUrl ? 'hidden' : ''}`}
+            >
               {profile.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
