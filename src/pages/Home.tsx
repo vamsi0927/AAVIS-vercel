@@ -14,7 +14,8 @@ import {
   Search,
   ShieldCheck,
   Heart,
-  AlertTriangle
+  AlertTriangle,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
@@ -176,8 +177,16 @@ export function Home() {
                 </h3>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-navy-900 border border-white/5 shadow-inner shrink-0">
-                    <span className="text-2xl">{scans[0]?.product?.imageEmoji || '🍽️'}</span>
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-navy-900 border border-white/5 shadow-inner shrink-0 overflow-hidden">
+                    {scans[0]?.product?.imageUrl ? (
+                      <img src={scans[0].product.imageUrl} alt={scans[0].product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      scans[0]?.product?.imageEmoji ? (
+                        <span className="text-2xl">{scans[0].product.imageEmoji}</span>
+                      ) : (
+                        <ImageIcon className="w-6 h-6 text-content-secondary/50" />
+                      )
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-bold text-white truncate">
@@ -280,8 +289,14 @@ export function Home() {
                       onClick={() => navigate(`/result/${scan.id}`)}
                       className="w-full bg-navy-800 hover:bg-navy-700 transition-colors rounded-2xl p-4 border border-navy-700 flex items-center gap-4 text-left">
                       
-                        <div className="w-12 h-12 bg-navy-900 rounded-xl flex items-center justify-center text-2xl border border-navy-600">
-                          {product.imageEmoji}
+                        <div className="w-12 h-12 bg-navy-900 rounded-xl flex items-center justify-center text-2xl border border-navy-600 overflow-hidden shrink-0">
+                          {product.imageUrl ? (
+                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                          ) : product.imageEmoji ? (
+                            <span className="text-2xl">{product.imageEmoji}</span>
+                          ) : (
+                            <ImageIcon className="w-6 h-6 text-content-secondary/50" />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-content-primary truncate">
