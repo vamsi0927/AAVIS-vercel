@@ -7,7 +7,7 @@ export function Contact() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState('General Inquiry');
   const [category, setCategory] = useState('General Inquiry');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,7 +62,7 @@ export function Contact() {
       toast.success("Message sent successfully. We'll get back to you within 24 hours.");
       setName('');
       setEmail('');
-      setSubject('');
+      setSubject('General Inquiry');
       setCategory('General Inquiry');
       setMessage('');
     } catch (error: any) {
@@ -121,7 +121,12 @@ export function Contact() {
           <div className="relative">
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCategory(val);
+                if (val !== 'Other') setSubject(val);
+                else setSubject('');
+              }}
               className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 pr-12 text-white focus:outline-none focus:border-brand-primary appearance-none cursor-pointer"
             >
               {categories.map((cat) => (
@@ -133,13 +138,15 @@ export function Contact() {
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary pointer-events-none" />
           </div>
 
-          <input
-            type="text"
-            required
-            placeholder="Subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary" />
+          {category === 'Other' && (
+            <input
+              type="text"
+              required
+              placeholder="Please specify subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary animate-fade-in" />
+          )}
           
           <textarea
             required
