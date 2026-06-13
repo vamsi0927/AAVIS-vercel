@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Search, Bookmark, Filter, MoreVertical, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, Search, Bookmark, Filter, MoreVertical, SlidersHorizontal, Image as ImageIcon, X } from 'lucide-react';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { useAppContext } from '../context/AppContext';
 
 export function Saved() {
   const navigate = useNavigate();
   const { bookmarkedProductIds, scans, toggleBookmark } = useAppContext();
+  const [selectedImageProduct, setSelectedImageProduct] = useState<any | null>(null);
 
   // Find all products that are bookmarked.
   // Bookmarks can either be a sample product or a custom scanned product.
@@ -96,8 +97,17 @@ export function Saved() {
                       <Bookmark className="w-4 h-4 fill-current" />
                     </button>
                     
-                    <div className="w-16 h-16 mx-auto bg-navy-900 rounded-2xl flex items-center justify-center text-3xl border border-navy-700 mb-4 shadow-inner">
-                      {product.imageEmoji}
+                    <div 
+                      className="w-16 h-16 mx-auto bg-navy-900 rounded-2xl flex items-center justify-center text-3xl border border-navy-700 mb-4 shadow-inner overflow-hidden cursor-pointer hover:border-brand-primary transition-colors shrink-0"
+                      onClick={(e) => { e.stopPropagation(); setSelectedImageProduct(product); }}
+                    >
+                      {product.imageUrl ? (
+                        <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                      ) : product.imageEmoji ? (
+                        <span>{product.imageEmoji}</span>
+                      ) : (
+                        <ImageIcon className="w-6 h-6 text-content-secondary/50" />
+                      )}
                     </div>
                     
                     <div className="flex-1 flex flex-col">
@@ -121,6 +131,56 @@ export function Saved() {
           </>
         )}
       </div>
+
+      {/* Image Viewer Modal */}
+      {selectedImageProduct && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+          onClick={() => setSelectedImageProduct(null)}
+        >
+          <button 
+            className="absolute top-4 right-4 md:top-6 md:right-6 p-2 bg-black/50 hover:bg-black text-white rounded-full transition-colors z-10"
+            onClick={() => setSelectedImageProduct(null)}
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div 
+            className="w-full max-w-2xl bg-navy-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full bg-black/80 relative flex items-center justify-center border-b border-white/10" style={{ maxHeight: '50vh' }}>
+              {selectedImageProduct.imageUrl ? (
+                <img 
+                  src={selectedImageProduct.imageUrl} 
+                  alt="Original Label"
+                  className="w-full h-auto max-h-[50vh] object-contain"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.parentElement?.classList.add('fallback-icon-container-modal');
+                  }}
+                />
+              ) : (
+                <div className="w-full py-20 flex items-center justify-center">
+                  <ImageIcon className="w-16 h-16 text-content-secondary/30" />
+                </div>
+              )}
+              <div className="absolute inset-0 items-center justify-center hidden [.fallback-icon-container-modal_&]:flex">
+                <ImageIcon className="w-16 h-16 text-content-secondary/30" />
+              </div>
+            </div>
+            
+            <div className="p-6 bg-navy-800/50 flex-shrink-0 overflow-y-auto">
+              <h2 className="text-xl font-bold text-white mb-1">
+                {selectedImageProduct.name}
+              </h2>
+              <div className="flex items-center gap-2 mb-4 text-sm text-content-secondary">
+                <span>{selectedImageProduct.brand}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

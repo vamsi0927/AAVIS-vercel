@@ -10,7 +10,12 @@ import {
   Cell
 } from
   'recharts';
-import { Activity, AlertTriangle, ChevronLeft, TrendingUp } from 'lucide-react';
+import { Activity, Search,
+  ShieldCheck,
+  Heart,
+  AlertTriangle,
+  Image as ImageIcon
+} from 'lucide-react';
 import { HistoryRow } from '../../components/HistoryRow';
 import { supabase } from '../../lib/supabaseClient';
 import aiAssistantImg from '../../assets/ai-assistant.jpg';
@@ -387,8 +392,14 @@ export function HealthDashboard() {
                       onClick={() => navigate(`/result/${scan.id}`)}
                       className="w-full bg-navy-800 hover:bg-navy-700 transition-colors rounded-2xl p-4 border border-brand-hazardous/30 flex items-center gap-4 text-left">
 
-                      <div className="w-10 h-10 bg-navy-900 rounded-xl flex items-center justify-center text-xl border border-navy-600 flex-shrink-0">
-                        {product.imageEmoji}
+                      <div className="w-10 h-10 bg-navy-900 rounded-xl flex items-center justify-center text-xl border border-navy-600 flex-shrink-0 overflow-hidden">
+                        {product.imageUrl ? (
+                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                        ) : product.imageEmoji ? (
+                          <span>{product.imageEmoji}</span>
+                        ) : (
+                          <ImageIcon className="w-5 h-5 text-content-secondary/50" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-content-primary truncate">
