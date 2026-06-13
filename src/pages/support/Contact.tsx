@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Mail, Send } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Mail, Send } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function Contact() {
@@ -118,17 +118,20 @@ export function Contact() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary" />
           
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-brand-primary appearance-none"
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat} className="bg-navy-800 text-white">
-                {cat}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 pr-12 text-white focus:outline-none focus:border-brand-primary appearance-none cursor-pointer"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat} className="bg-navy-800 text-white">
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary pointer-events-none" />
+          </div>
 
           <input
             type="text"
