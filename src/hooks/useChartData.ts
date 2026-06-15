@@ -138,7 +138,7 @@ export function useChartData(
     }
 
     return data;
-  }, [allScans, timeRange, signupDate, today]);
+  }, [allScans, timeRange, signupDate, todayMs]);
 
   // Stats across ALL scans
   const stats = useMemo(() => {
