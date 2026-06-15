@@ -201,6 +201,11 @@ export function Settings() {
           </div>
         </section>
 
+        {/* App Version */}
+        <div className="col-span-1 md:col-span-3 flex justify-center items-center mt-8 pt-8">
+          <p className="text-xs font-semibold text-content-secondary/40 tracking-widest uppercase">Aavis Version 1.0.0 (Build 42)</p>
+        </div>
+
       </div>
     </div>
   );
