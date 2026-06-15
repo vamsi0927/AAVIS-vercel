@@ -101,18 +101,19 @@ export function useChartData(
         cursor.setDate(cursor.getDate() + 1);
       }
     } else {
-      // Month view: one bar per calendar month from signup month → current month
+      // Month view: one bar per calendar month from signup month → current month + 6 months
       const cursor = new Date(signupDate.getFullYear(), signupDate.getMonth(), 1);
       
-      const currentMonthStart = new Date();
-      currentMonthStart.setDate(1);
-      currentMonthStart.setHours(0, 0, 0, 0);
+      const endMonthLimit = new Date();
+      endMonthLimit.setMonth(endMonthLimit.getMonth() + 6);
+      endMonthLimit.setDate(1);
+      endMonthLimit.setHours(0, 0, 0, 0);
 
-      while (cursor.getTime() <= currentMonthStart.getTime()) {
+      while (cursor.getTime() <= endMonthLimit.getTime()) {
         const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
         const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0, 23, 59, 59, 999);
         
-        // Don't include scans from future days in the current month
+        // Don't include scans from future days in the current month/future months
         const effectiveEnd = monthEnd.getTime() > todayMs ? new Date(todayMs) : monthEnd;
 
         const scansInMonth = allScans.filter(s => {
@@ -130,7 +131,7 @@ export function useChartData(
           score: avgScore,
           scans: scansInMonth.length,
           isEmpty: scansInMonth.length === 0,
-          isGhost: false, // Months don't have ghost bars before signup (since we start at the signup month)
+          isGhost: monthStart.getTime() > todayMs,
           rawDate: new Date(monthStart),
           scansData: scansInMonth,
         });

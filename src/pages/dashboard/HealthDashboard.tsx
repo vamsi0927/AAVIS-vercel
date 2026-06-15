@@ -88,6 +88,17 @@ export function HealthDashboard() {
   // Chart data — single range from first scan to today
   const { chartData, stats, dateRangeText } = useChartData(scans, timeRange);
 
+  const containerWidth = useMemo(() => {
+    if (chartData.length === 0) return '100%';
+    if (timeRange === 'week') {
+      const weeks = chartData.length / 7;
+      return `${Math.max(100, weeks * 100)}%`;
+    } else {
+      const months = chartData.length / 6;
+      return `${Math.max(100, months * 100)}%`;
+    }
+  }, [chartData.length, timeRange]);
+
   // Auto-scroll to present when chart data loads or range changes
   useEffect(() => {
     if (chartData.length > 0) {
@@ -246,7 +257,8 @@ export function HealthDashboard() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25 }}
-                      className="h-full min-w-[600px] w-full"
+                      className="h-full"
+                      style={{ width: containerWidth }}
                     >
                       <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart
