@@ -6,6 +6,7 @@ export interface ChartDataPoint {
   score: number;
   scans: number;
   isEmpty: boolean;
+  isFuture?: boolean;
   rawDate: Date;
   scansData: ScanResult[];
 }
@@ -39,8 +40,23 @@ export function useChartData(
   timeRange: 'week' | 'month'
 ) {
   // End of today
-  const today = useMemo(() => {
+  const todayMs = useMemo(() => new Date().setHours(23, 59, 59, 999), []);
+
+  // End of current ISO week (Sunday)
+  const endOfCurrentWeek = useMemo(() => {
     const d = new Date();
+    const dow = d.getDay(); // 0=Sun
+    const daysUntilSunday = dow === 0 ? 0 : 7 - dow;
+    d.setDate(d.getDate() + daysUntilSunday);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }, []);
+
+  // End of current month + 6 months ahead
+  const endOfMonthRange = useMemo(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 6);
+    d.setDate(new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()); // last day of that month
     d.setHours(23, 59, 59, 999);
     return d;
   }, []);
@@ -55,36 +71,30 @@ export function useChartData(
 
   const chartData = useMemo((): ChartDataPoint[] => {
     const data: ChartDataPoint[] = [];
-    const todayMs = today.getTime();
 
     if (timeRange === 'week') {
-      // ── WEEK VIEW: one bar per individual day from signupDate → today ──
+      // One bar per day: signup → end of current week (Sunday)
       const cursor = new Date(signupDate);
       cursor.setHours(0, 0, 0, 0);
 
-      while (cursor.getTime() <= todayMs) {
+      while (cursor.getTime() <= endOfCurrentWeek.getTime()) {
         const dStr = cursor.toDateString();
-
-        const scansOnDay = allScans.filter(
-          s => new Date(s.date).toDateString() === dStr
-        );
+        const isFuture = cursor.getTime() > todayMs;
+        const scansOnDay = isFuture
+          ? []
+          : allScans.filter(s => new Date(s.date).toDateString() === dStr);
 
         const avgScore =
           scansOnDay.length > 0
-            ? Math.round(
-                scansOnDay.reduce((acc, s) => acc + s.score, 0) /
-                  scansOnDay.length
-              )
+            ? Math.round(scansOnDay.reduce((acc, s) => acc + s.score, 0) / scansOnDay.length)
             : 0;
 
         data.push({
-          day: cursor.toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-          }),
+          day: cursor.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
           score: avgScore,
           scans: scansOnDay.length,
           isEmpty: scansOnDay.length === 0,
+          isFuture,
           rawDate: new Date(cursor),
           scansData: scansOnDay,
         });
@@ -92,47 +102,33 @@ export function useChartData(
         cursor.setDate(cursor.getDate() + 1);
       }
     } else {
-      // ── MONTH VIEW: one bar per calendar month from signupDate → today ──
-      const cursor = new Date(
-        signupDate.getFullYear(),
-        signupDate.getMonth(),
-        1
-      );
+      // One bar per month: signup month → current month + 6
+      const cursor = new Date(signupDate.getFullYear(), signupDate.getMonth(), 1);
 
-      while (cursor.getTime() <= todayMs) {
+      while (cursor.getTime() <= endOfMonthRange.getTime()) {
         const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
-        const monthEnd = new Date(
-          cursor.getFullYear(),
-          cursor.getMonth() + 1,
-          0,
-          23,
-          59,
-          59,
-          999
-        );
-        const effectiveEnd = monthEnd.getTime() > todayMs ? today : monthEnd;
+        const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0, 23, 59, 59, 999);
+        const isFuture = monthStart.getTime() > todayMs;
 
-        const scansInMonth = allScans.filter(s => {
-          const t = new Date(s.date).getTime();
-          return t >= monthStart.getTime() && t <= effectiveEnd.getTime();
-        });
+        const scansInMonth = isFuture
+          ? []
+          : allScans.filter(s => {
+              const t = new Date(s.date).getTime();
+              const effectiveEnd = monthEnd.getTime() > todayMs ? todayMs : monthEnd.getTime();
+              return t >= monthStart.getTime() && t <= effectiveEnd;
+            });
 
         const avgScore =
           scansInMonth.length > 0
-            ? Math.round(
-                scansInMonth.reduce((acc, s) => acc + s.score, 0) /
-                  scansInMonth.length
-              )
+            ? Math.round(scansInMonth.reduce((acc, s) => acc + s.score, 0) / scansInMonth.length)
             : 0;
 
         data.push({
-          day: monthStart.toLocaleDateString(undefined, {
-            month: 'short',
-            year: '2-digit',
-          }),
+          day: monthStart.toLocaleDateString(undefined, { month: 'short', year: '2-digit' }),
           score: avgScore,
           scans: scansInMonth.length,
           isEmpty: scansInMonth.length === 0,
+          isFuture,
           rawDate: new Date(monthStart),
           scansData: scansInMonth,
         });

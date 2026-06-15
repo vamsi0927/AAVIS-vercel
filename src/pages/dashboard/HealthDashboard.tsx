@@ -27,7 +27,9 @@ import { DayDetailsPanel } from '../../components/dashboard/DayDetailsPanel';
 
 // --- Color helpers ---
 const BAR_COLOR_EMPTY = 'rgba(255,255,255,0.06)';
-const getBarColor = (score: number, isEmpty: boolean) => {
+const BAR_COLOR_FUTURE = 'rgba(255,255,255,0.03)';
+const getBarColor = (score: number, isEmpty: boolean, isFuture?: boolean) => {
+  if (isFuture) return BAR_COLOR_FUTURE;
   if (isEmpty || score === 0) return BAR_COLOR_EMPTY;
   if (score >= 80) return '#22c55e';
   if (score >= 60) return 'url(#aavisGradient)';
@@ -66,6 +68,12 @@ export function HealthDashboard() {
   const chartRef = useRef<HTMLDivElement>(null);
 
   const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
+
+  // Scroll chart to right (present) end
+  const chartScrollRef = useRef<HTMLDivElement>(null);
+  const scrollToPresent = () => {
+    chartScrollRef.current?.scrollTo({ left: 999999, behavior: 'smooth' });
+  };
 
   // Day details panel
   const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
@@ -161,28 +169,37 @@ export function HealthDashboard() {
                   <p className="text-xs text-brand-primary font-bold mt-1">{dateRangeText}</p>
                 </div>
 
-                {/* View Toggle */}
-                <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 flex-shrink-0">
+                {/* View Toggle + Present button */}
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <button
-                    onClick={() => setTimeRange('week')}
-                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
-                      timeRange === 'week'
-                        ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
-                        : 'text-content-secondary hover:text-white hover:bg-white/5'
-                    }`}
+                    onClick={scrollToPresent}
+                    title="Scroll to present"
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1"
                   >
-                    Week
+                    Present ▶
                   </button>
-                  <button
-                    onClick={() => setTimeRange('month')}
-                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
-                      timeRange === 'month'
-                        ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
-                        : 'text-content-secondary hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    Month
-                  </button>
+                  <div className="flex bg-black/20 p-1 rounded-xl border border-white/5">
+                    <button
+                      onClick={() => setTimeRange('week')}
+                      className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
+                        timeRange === 'week'
+                          ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
+                          : 'text-content-secondary hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Week
+                    </button>
+                    <button
+                      onClick={() => setTimeRange('month')}
+                      className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
+                        timeRange === 'month'
+                          ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
+                          : 'text-content-secondary hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Month
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -200,7 +217,7 @@ export function HealthDashboard() {
                 Avg Health Score
               </div>
 
-              <div className="h-56 w-full pl-1">
+              <div className="h-56 w-full pl-1 overflow-x-auto no-scrollbar scroll-smooth" ref={chartScrollRef}>
                 {hasNoData ? (
                   <div className="flex flex-col items-center justify-center h-full text-center gap-3">
                     <Activity className="w-10 h-10 text-content-secondary opacity-20" />
@@ -215,7 +232,7 @@ export function HealthDashboard() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25 }}
-                      className="h-full w-full"
+                      className="h-full min-w-[600px] w-full"
                     >
                       <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart
@@ -298,7 +315,7 @@ export function HealthDashboard() {
                             {chartData.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={getBarColor(entry.score, entry.isEmpty)}
+                                fill={getBarColor(entry.score, entry.isEmpty, entry.isFuture)}
                                 fillOpacity={entry.isEmpty ? 0.4 : 1}
                               />
                             ))}
