@@ -236,10 +236,10 @@ export function History() {
                       </div>
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <h4 className="font-semibold text-content-primary line-clamp-2 pr-2">
+                      <h4 className="font-semibold text-content-primary break-words whitespace-normal pr-2">
                         {product.name}
                       </h4>
-                      <p className="text-xs text-content-secondary line-clamp-2 mb-1 pr-2">
+                      <p className="text-xs text-content-secondary break-words whitespace-normal mb-1 pr-2">
                         {product.brand} • {dateStr}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">

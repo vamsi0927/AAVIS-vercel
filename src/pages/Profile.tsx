@@ -557,7 +557,7 @@ export function Profile() {
                 <img src={selectedFileUrl} alt="Preview" className="w-full h-full object-cover" />
               </div>
               
-              <p className="text-content-secondary text-sm font-bold mb-8 truncate w-full text-center">
+              <p className="text-content-secondary text-sm font-bold mb-8 break-words whitespace-normal w-full text-center">
                 {selectedFileName || 'avatar.jpg'}
               </p>
 

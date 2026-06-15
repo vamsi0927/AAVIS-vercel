@@ -112,7 +112,7 @@ export function Saved() {
                     
                     <div className="flex-1 flex flex-col">
                       <h3 className="font-bold text-sm text-white line-clamp-1 mb-1">{product.name}</h3>
-                      <p className="text-xs text-content-secondary truncate mb-3">{product.brand}</p>
+                      <p className="text-xs text-content-secondary break-words whitespace-normal mb-3">{product.brand}</p>
                       
                       <div className="mt-auto">
                         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${

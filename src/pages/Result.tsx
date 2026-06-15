@@ -232,7 +232,7 @@ export function Result() {
         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h1 className="font-display font-black text-lg text-white truncate px-4">Health Report</h1>
+        <h1 className="font-display font-black text-lg text-white break-words whitespace-normal px-4">Health Report</h1>
         <div className="flex items-center gap-1">
           <button onClick={handleReAnalyze} disabled={isReanalyzing} className={`p-2 rounded-xl transition-colors border border-transparent ${isReanalyzing ? 'opacity-50 text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5 hover:border-white/10'}`} title="Recalculate Score">
             {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
@@ -268,7 +268,7 @@ export function Result() {
               <span className={`relative z-10 ${(scan.image_url || product.imageUrl) ? 'hidden' : ''}`}>{product.imageEmoji}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-display font-black text-white leading-tight break-words line-clamp-2">{product.name}</h2>
+              <h2 className="text-xl font-display font-black text-white leading-tight break-words break-words whitespace-normal">{product.name}</h2>
               <p className="text-[11px] text-content-secondary font-bold uppercase tracking-widest mt-0.5">{product.brand}</p>
               {scan.verdict && (
                 <span className={`inline-block mt-2 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${
@@ -771,7 +771,7 @@ export function Result() {
                         <div key={key} className={`${gridClass} items-center py-2.5 border-b border-white/5 last:border-0`}>
                           <div className="flex items-center gap-1.5 min-w-0 pr-1">
                             <span className="text-sm shrink-0">{meta.icon}</span>
-                            <span className="text-xs text-content-secondary font-medium truncate">{meta.label}</span>
+                            <span className="text-xs text-content-secondary font-medium break-words whitespace-normal">{meta.label}</span>
                             {badge && (
                               <span className={`text-[8px] uppercase font-black px-1.5 py-0.5 rounded border ml-1 shrink-0 ${badge.color}`}>
                                 {badge.label}

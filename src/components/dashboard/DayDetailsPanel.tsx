@@ -88,8 +88,8 @@ export function DayDetailsPanel({ isOpen, onClose, data }: Props) {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-white font-bold truncate">{scan.product?.name || 'Unknown Product'}</h4>
-                          <p className="text-content-secondary text-xs truncate">{scan.product?.brand || 'Unknown Brand'}</p>
+                          <h4 className="text-white font-bold break-words whitespace-normal">{scan.product?.name || 'Unknown Product'}</h4>
+                          <p className="text-content-secondary text-xs break-words whitespace-normal">{scan.product?.brand || 'Unknown Brand'}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className={`text-xs font-bold flex items-center gap-1 ${
                               isSafe ? 'text-green-400' : isCaution ? 'text-yellow-400' : 'text-red-400'

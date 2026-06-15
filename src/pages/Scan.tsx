@@ -689,7 +689,7 @@ export function Scan() {
                         className="bg-navy-900 hover:bg-navy-700 border border-navy-700/60 rounded-xl p-2 flex flex-col items-center gap-1.5 transition-all active:scale-95"
                       >
                         <span className="text-lg">{p.imageEmoji}</span>
-                        <span className="text-[8px] font-bold text-content-secondary truncate w-full text-center">{p.name}</span>
+                        <span className="text-[8px] font-bold text-content-secondary break-words whitespace-normal w-full text-center">{p.name}</span>
                       </button>
                     ))}
                   </div>

@@ -388,7 +388,7 @@ export function HealthDashboard() {
                               tickLine={false}
                               tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
                               dy={8}
-                              interval="preserveStartEnd"
+                              interval={0}
                             />
 
                             <YAxis
@@ -586,8 +586,8 @@ export function HealthDashboard() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-content-primary truncate">{product.name}</h4>
-                        <p className="text-xs text-brand-hazardous truncate">{scan.warnings[0] || 'Hazardous additives detected'}</p>
+                        <h4 className="font-semibold text-content-primary break-words whitespace-normal">{product.name}</h4>
+                        <p className="text-xs text-brand-hazardous break-words whitespace-normal">{scan.warnings[0] || 'Hazardous additives detected'}</p>
                       </div>
                     </button>
                   );

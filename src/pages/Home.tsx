@@ -189,10 +189,10 @@ export function Home() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-base font-bold text-white truncate">
+                    <p className="text-base font-bold text-white break-words whitespace-normal">
                       {scans[0]?.product?.name || 'Scan to Start'}
                     </p>
-                    <p className="text-xs text-content-secondary line-clamp-2 mt-0.5 leading-relaxed">
+                    <p className="text-xs text-content-secondary break-words whitespace-normal mt-0.5 leading-relaxed">
                       {scans[0]?.dietAdvice || 'Check hidden ingredients & food score customized for your profile.'}
                     </p>
                   </div>
@@ -261,10 +261,10 @@ export function Home() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-content-primary truncate">
+                          <h4 className="font-semibold text-content-primary break-words whitespace-normal">
                             {product.name}
                           </h4>
-                          <p className="text-xs text-content-secondary truncate">
+                          <p className="text-xs text-content-secondary break-words whitespace-normal">
                             {product.brand} • {dateStr}
                           </p>
                         </div>
@@ -293,8 +293,8 @@ export function Home() {
                 >
                   <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg shrink-0">🤔</div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block truncate">Discover Food Myths</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Learn what's hidden on standard labels</span>
+                    <span className="text-sm font-bold text-white block break-words whitespace-normal">Discover Food Myths</span>
+                    <span className="text-xs text-content-secondary mt-0.5 block break-words whitespace-normal">Learn what's hidden on standard labels</span>
                   </div>
                   <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
                 </button>
@@ -305,8 +305,8 @@ export function Home() {
                 >
                   <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg shrink-0">💧</div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block truncate">Water Tracker</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Log and track daily hydration</span>
+                    <span className="text-sm font-bold text-white block break-words whitespace-normal">Water Tracker</span>
+                    <span className="text-xs text-content-secondary mt-0.5 block break-words whitespace-normal">Log and track daily hydration</span>
                   </div>
                   <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
                 </button>

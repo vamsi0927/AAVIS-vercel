@@ -49,7 +49,7 @@ export function CompareProducts() {
               {product1.imageEmoji}
             </div>
             <h3 className="font-bold text-sm text-white line-clamp-1">{product1.name}</h3>
-            <p className="text-xs text-content-secondary truncate">{product1.brand}</p>
+            <p className="text-xs text-content-secondary break-words whitespace-normal">{product1.brand}</p>
           </div>
           <div className="w-1/2 p-4 text-center flex flex-col items-center relative">
             <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-navy-700 border-4 border-navy-900 flex items-center justify-center z-10">
@@ -59,7 +59,7 @@ export function CompareProducts() {
               {product2.imageEmoji}
             </div>
             <h3 className="font-bold text-sm text-white line-clamp-1">{product2.name}</h3>
-            <p className="text-xs text-content-secondary truncate">{product2.brand}</p>
+            <p className="text-xs text-content-secondary break-words whitespace-normal">{product2.brand}</p>
           </div>
         </div>
 

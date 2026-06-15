@@ -146,7 +146,7 @@ export function Search() {
                       className="w-full bg-navy-800 border border-navy-700 rounded-xl px-4 py-3 text-left flex items-center gap-3 hover:bg-navy-700 transition-colors"
                     >
                       <Clock className="w-4 h-4 text-content-secondary flex-shrink-0" />
-                      <span className="text-sm text-content-primary capitalize truncate">{item.query}</span>
+                      <span className="text-sm text-content-primary capitalize break-words whitespace-normal">{item.query}</span>
                     </button>
                   ))}
                 </div>
@@ -246,10 +246,10 @@ export function Search() {
                         {p.imageEmoji}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-content-primary truncate">
+                        <h4 className="font-semibold text-content-primary break-words whitespace-normal">
                           {p.name}
                         </h4>
-                        <p className="text-xs text-content-secondary truncate">
+                        <p className="text-xs text-content-secondary break-words whitespace-normal">
                           {p.brand}
                         </p>
                       </div>

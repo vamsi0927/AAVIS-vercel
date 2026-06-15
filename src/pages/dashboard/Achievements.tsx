@@ -65,7 +65,7 @@ export function Achievements() {
               
               <div className="flex-1 min-w-0 py-1">
                 <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-bold text-white text-base truncate">{item.title}</h4>
+                  <h4 className="font-bold text-white text-base break-words whitespace-normal">{item.title}</h4>
                   {item.unlocked && <span className="text-[10px] text-content-secondary bg-navy-900 px-2 py-0.5 rounded-full whitespace-nowrap ml-2">{item.date}</span>}
                 </div>
                 <p className="text-xs text-content-secondary mb-3">{item.desc}</p>
