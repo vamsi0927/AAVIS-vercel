@@ -21,10 +21,8 @@ import {
   ChevronRight,
   ChevronsLeft,
   SkipForward,
-  RefreshCw,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HistoryRow } from '../../components/HistoryRow';
 import aiAssistantImg from '../../assets/ai-assistant.jpg';
 import { useAppContext } from '../../context/AppContext';
 import { SAMPLE_PRODUCTS } from '../../data/sampleProducts';
@@ -32,7 +30,6 @@ import { useChartData, ChartDataPoint } from '../../hooks/useChartData';
 import { TrendSummaryCard } from '../../components/dashboard/TrendSummaryCard';
 import { DayDetailsPanel } from '../../components/dashboard/DayDetailsPanel';
 import { ChartSkeleton } from '../../components/dashboard/ChartSkeleton';
-import { ExportMenu } from '../../components/dashboard/ExportMenu';
 
 // --- Color helpers ---
 const BAR_COLOR_EMPTY = 'rgba(255,255,255,0.06)';
@@ -109,7 +106,7 @@ const LS_TIME_OFFSET = 'health_chart_timeOffset';
 
 export function HealthDashboard() {
   const navigate = useNavigate();
-  const { scans, supabaseUserId } = useAppContext();
+  const { scans } = useAppContext();
   const chartRef = useRef<HTMLDivElement>(null);
 
   // Restore from localStorage
@@ -129,9 +126,9 @@ export function HealthDashboard() {
   const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
   const [isDayPanelOpen, setIsDayPanelOpen] = useState(false);
 
-  // Chart data via custom hook
-  const { chartData, stats, periodInfo, isLoading, isError, retry } = useChartData(
-    supabaseUserId || undefined,
+  // Chart data via custom hook — uses already-loaded scans from context
+  const { chartData, stats, periodInfo } = useChartData(
+    scans,
     timeRange,
     timeOffset
   );
@@ -254,20 +251,12 @@ export function HealthDashboard() {
             {/* Chart Header */}
             <div className="flex flex-col gap-4 mb-6 relative z-10">
               {/* Title row */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
+              <div className="flex-1">
                   <h3 className="text-lg font-display font-bold text-white">Health Score History</h3>
                   <p className="text-xs text-content-secondary mt-0.5 font-medium">
                     Track how your average scan scores evolve over time
                   </p>
                   <p className="text-xs text-brand-primary font-bold mt-1">{periodInfo.dateRangeText}</p>
-                </div>
-                <ExportMenu
-                  chartRef={chartRef}
-                  chartData={chartData}
-                  dateRangeText={periodInfo.dateRangeText}
-                  timeRange={timeRange}
-                />
               </div>
 
               {/* Controls row */}
@@ -350,20 +339,7 @@ export function HealthDashboard() {
 
               {/* Chart area */}
               <div className="h-56 w-full pl-1">
-                {isLoading ? (
-                  <ChartSkeleton />
-                ) : isError ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center gap-3">
-                    <AlertTriangle className="w-10 h-10 text-red-400 opacity-60" />
-                    <p className="text-content-secondary text-sm font-bold">Unable to load history.</p>
-                    <button
-                      onClick={retry}
-                      className="flex items-center gap-2 text-xs font-bold text-brand-primary hover:text-white transition-colors"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" /> Retry
-                    </button>
-                  </div>
-                ) : hasNoData ? (
+                {hasNoData ? (
                   <div className="flex flex-col items-center justify-center h-full text-center gap-3">
                     <Activity className="w-10 h-10 text-content-secondary opacity-20" />
                     <p className="text-content-secondary text-sm font-bold">No scans found for this period.</p>
