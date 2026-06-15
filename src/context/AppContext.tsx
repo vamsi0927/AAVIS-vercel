@@ -1,4 +1,5 @@
-import React, { useEffect, useState, createContext, useContext } from 'react';
+import React, { useEffect, useState, createContext, useContext, useRef } from 'react';
+import { toast } from 'sonner';
 import {
   AppState,
   UserProfile,
@@ -108,6 +109,10 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [state, setState] = useState<AppState>(getInitialState);
 
+  const hasInitializedRef = useRef(false);
+  const currentUserRef = useRef<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   // Persist only local preferences
   useEffect(() => {
     saveLocalPrefs({
@@ -130,70 +135,97 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
 
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        handleAuthUser(session.user).finally(() => {
+      if (!hasInitializedRef.current) {
+        hasInitializedRef.current = true;
+        if (session?.user) {
+          currentUserRef.current = session.user.id;
+          handleAuthUser(session.user).finally(() => setIsLoadingAuth(false));
+        } else {
           setIsLoadingAuth(false);
-        });
-      } else {
-        setIsLoadingAuth(false);
+        }
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Only set loading if we don't already have an active authenticated session
-        if (event === 'SIGNED_IN' && session?.user) {
-          if (!state.isAuthenticated) {
-            setIsLoadingAuth(true);
+        if (event === 'INITIAL_SESSION') {
+          if (!hasInitializedRef.current) {
+            hasInitializedRef.current = true;
+            if (session?.user) {
+              currentUserRef.current = session.user.id;
+              handleAuthUser(session.user).finally(() => setIsLoadingAuth(false));
+            } else {
+              setIsLoadingAuth(false);
+            }
           }
-          handleAuthUser(session.user).finally(() => {
-            setIsLoadingAuth(false);
-          });
-        } else if (event === 'SIGNED_OUT') {
+          return;
+        }
+
+        if (event === 'SIGNED_IN') {
+          if (session?.user) {
+            if (currentUserRef.current === session.user.id) return;
+            currentUserRef.current = session.user.id;
+            setIsLoadingAuth(true);
+            handleAuthUser(session.user).finally(() => setIsLoadingAuth(false));
+          }
+        } 
+        else if (event === 'TOKEN_REFRESHED') {
+          return;
+        }
+        else if (event === 'SIGNED_OUT') {
+          const wasAuthenticated = currentUserRef.current !== null;
+          currentUserRef.current = null;
           setSupabaseUserId(null);
-          // Clear all user-specific state on logout so a new login starts fresh
+          
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+          }
+
+          if (hasInitializedRef.current && wasAuthenticated) {
+            toast.error('Session expired. Please sign in again.');
+          }
+
           setState(prev => ({
             ...prev,
             isAuthenticated: false,
             scans: [],
             bookmarkedProductIds: [],
-            profile: {
-              name: '',
-              age: '',
-              gender: 'Prefer not to say',
-              height: '',
-              weight: '',
-              activityLevel: 'Moderately Active',
-              diet: 'None',
-              allergens: [],
-              conditions: [],
-              avatarUrl: undefined
-            }
+            profile: { ...prev.profile, name: '', age: '', gender: 'Prefer not to say', height: '', weight: '', activityLevel: 'Moderately Active', diet: 'None', allergens: [], conditions: [], avatarUrl: undefined }
           }));
           setIsLoadingAuth(false);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
   // Handle authenticated user — sync to Supabase users table
   const handleAuthUser = async (authUser: any) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     try {
       const email = authUser.email || '';
       const name = authUser.user_metadata?.name || email.split('@')[0] || 'User';
 
-      // authUser.id IS the auth.uid() — always use it as the canonical user ID
       const authUid = authUser.id as string;
       setSupabaseUserId(authUid);
 
-      // Fetch profile from Supabase users table (row created by trigger on signup)
       const dbUser = await getOrCreateUser(email, name);
+      if (abortController.signal.aborted) return;
 
       if (dbUser) {
-        // Sync profile from cloud (cloud is source of truth if it has data)
         setState(prev => ({
           ...prev,
           isAuthenticated: true,
@@ -212,7 +244,6 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           }
         }));
       } else {
-        // Supabase users table unavailable, still authenticate
         setState(prev => ({
           ...prev,
           isAuthenticated: true,
@@ -223,25 +254,24 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         }));
       }
 
-      // FIRE THE SYNC: Automatically fetch user's scan history when they log in!
-      await loadCloudScans();
+      await loadCloudScans(abortController.signal);
 
     } catch (err) {
+      if (abortController.signal.aborted) return;
       console.error('[Aavis] Auth sync error:', err);
       setState(prev => ({ ...prev, isAuthenticated: true }));
     }
   };
 
   // ── Load scans from cloud ──
-  const loadCloudScans = async () => {
-    // Wait until authUid is available from state (either setupAuthListener or manual pass)
-    // Actually, we pass userId directly if we want, or use supabase.auth.getSession
+  const loadCloudScans = async (signal?: AbortSignal) => {
     const { data: { session } } = await supabase.auth.getSession();
     const userId = session?.user?.id;
     if (!userId || !isSupabaseConfigured()) return;
 
     try {
       const cloudScans = await getUserScans(userId, 100);
+      if (signal?.aborted) return;
       if (cloudScans.length > 0) {
         setState(prev => {
           const currentProfile = prev.profile;
