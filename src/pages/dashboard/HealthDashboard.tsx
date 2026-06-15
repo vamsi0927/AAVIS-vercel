@@ -91,13 +91,11 @@ export function HealthDashboard() {
 
   if (timeRange === 'week') {
     const today = new Date();
-    const sunday = new Date(today);
-    sunday.setDate(today.getDate() - today.getDay()); // Go back to Sunday
-    
     const days = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(sunday);
-      d.setDate(sunday.getDate() + i);
+    // Generate the last 7 days ending with today
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
       days.push(d);
     }
     
