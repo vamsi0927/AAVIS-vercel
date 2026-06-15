@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ComposedChart,
@@ -17,10 +17,6 @@ import {
   Activity,
   AlertTriangle,
   Image as ImageIcon,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  SkipForward,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import aiAssistantImg from '../../assets/ai-assistant.jpg';
@@ -41,15 +37,14 @@ const getBarColor = (score: number, isEmpty: boolean) => {
 };
 
 // --- Custom Tooltip ---
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload || payload.length === 0) return null;
   const data: ChartDataPoint = payload[0]?.payload;
   if (!data) return null;
-
   return (
-    <div className="bg-navy-800 border border-white/10 rounded-2xl p-4 shadow-2xl min-w-[180px]">
+    <div className="bg-navy-800 border border-white/10 rounded-2xl p-4 shadow-2xl min-w-[160px]">
       <p className="text-content-secondary text-xs font-bold mb-2 uppercase tracking-wider">
-        {data.rawDate?.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+        {data.day}
       </p>
       {data.isEmpty ? (
         <p className="text-content-secondary text-sm">No scans</p>
@@ -58,7 +53,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <p className="text-white font-black text-2xl leading-none">{data.score}</p>
           <p className="text-content-secondary text-xs mt-1 font-bold">Avg Health Score</p>
           <div className="mt-2 pt-2 border-t border-white/5 text-xs text-content-secondary font-bold">
-            {data.scans} scan{data.scans !== 1 ? 's' : ''} recorded
+            {data.scans} scan{data.scans !== 1 ? 's' : ''}
           </div>
         </>
       )}
@@ -66,107 +61,27 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-// --- Custom X-Axis Tick: show day label + scan count below ---
-const CustomXAxisTick = ({ x, y, payload, chartData, todayStr }: any) => {
-  const point = chartData?.find((d: ChartDataPoint) => d.day === payload.value);
-  const isToday = point?.rawDate?.toDateString() === todayStr;
-
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={14}
-        textAnchor="middle"
-        fontSize={11}
-        fontWeight={isToday ? 900 : 600}
-        fill={isToday ? '#818cf8' : '#9ca3b8'}
-        style={isToday ? { filter: 'drop-shadow(0 0 4px rgba(129,140,248,0.6))' } : {}}
-      >
-        {payload.value}
-      </text>
-      {isToday && (
-        <text x={0} y={0} dy={26} textAnchor="middle" fontSize={8} fill="#818cf8" fontWeight={700}>
-          Today
-        </text>
-      )}
-      {point && !isToday && (
-        <text x={0} y={0} dy={26} textAnchor="middle" fontSize={8} fill="#9ca3b850" fontWeight={600}>
-          {point.scans > 0 ? `${point.scans}×` : ''}
-        </text>
-      )}
-    </g>
-  );
-};
-
-// LS Keys
-const LS_TIME_RANGE = 'health_chart_timeRange';
-const LS_TIME_OFFSET = 'health_chart_timeOffset';
-
 export function HealthDashboard() {
   const navigate = useNavigate();
   const { scans } = useAppContext();
   const chartRef = useRef<HTMLDivElement>(null);
 
-  // Restore from localStorage
-  const [timeRange, setTimeRange] = useState<'week' | 'month'>(() =>
-    (localStorage.getItem(LS_TIME_RANGE) as 'week' | 'month') || 'week'
-  );
-  const [timeOffset, setTimeOffset] = useState<number>(() =>
-    parseInt(localStorage.getItem(LS_TIME_OFFSET) || '0', 10)
-  );
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
-
-  // Persist to localStorage
-  useEffect(() => { localStorage.setItem(LS_TIME_RANGE, timeRange); }, [timeRange]);
-  useEffect(() => { localStorage.setItem(LS_TIME_OFFSET, String(timeOffset)); }, [timeOffset]);
+  const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
 
   // Day details panel
   const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
   const [isDayPanelOpen, setIsDayPanelOpen] = useState(false);
 
-  // Chart data via custom hook — uses already-loaded scans from context
-  const { chartData, stats, periodInfo } = useChartData(
-    scans,
-    timeRange,
-    timeOffset
-  );
+  // Chart data — single range from first scan to today
+  const { chartData, stats, dateRangeText } = useChartData(scans, timeRange);
 
-  const todayStr = useMemo(() => new Date().toDateString(), []);
+  const hasNoData = chartData.every(d => d.isEmpty);
 
-  // Navigation handlers
-  const goBack = useCallback(() => {
-    setSlideDirection('left');
-    setTimeOffset(o => o + 1);
-  }, []);
-
-  const goForward = useCallback(() => {
-    if (timeOffset === 0) return;
-    setSlideDirection('right');
-    setTimeOffset(o => o - 1);
-  }, [timeOffset]);
-
-  const jumpToPreviousYear = useCallback(() => {
-    setSlideDirection('left');
-    setTimeOffset(o => o + (timeRange === 'week' ? 52 : 12));
-  }, [timeRange]);
-
-  const jumpToCurrent = useCallback(() => {
-    setSlideDirection('right');
-    setTimeOffset(0);
-  }, []);
-
-  const switchTimeRange = (r: 'week' | 'month') => {
-    setTimeRange(r);
-    setTimeOffset(0);
-  };
-
-  // Existing scans stats (still used for right column)
+  // Existing stats for the right column (rolling 7/30 days)
   const scansInRange = useMemo(() => scans.filter(s => {
     const d = new Date(s.date);
-    const today = new Date();
     const ms = timeRange === 'week' ? 7 * 86400000 : 30 * 86400000;
-    return (today.getTime() - d.getTime()) <= ms;
+    return (Date.now() - d.getTime()) <= ms;
   }), [scans, timeRange]);
 
   const avgScore = useMemo(() =>
@@ -216,17 +131,6 @@ export function HealthDashboard() {
   else if (streak >= 14 && streak <= 29) quoteText = `${streak} days of eating consciously — you're unstoppable! 💪`;
   else if (streak >= 30) quoteText = `${streak} days! You're an inspiration to everyone around you 🏆`;
 
-  // Average score for the trend line
-  const trendAvg = stats.average;
-
-  const hasNoData = chartData.every(d => d.isEmpty);
-
-  const chartVariants = {
-    enter: (dir: string) => ({ x: dir === 'left' ? '60px' : '-60px', opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: string) => ({ x: dir === 'left' ? '-60px' : '60px', opacity: 0 }),
-  };
-
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24 overflow-y-auto no-scrollbar">
       <header className="pt-safe pt-8 px-6 pb-4 sticky top-0 bg-navy-900/90 backdrop-blur-md z-10">
@@ -249,74 +153,36 @@ export function HealthDashboard() {
 
             {/* Chart Header */}
             <div className="flex flex-col gap-4 mb-6 relative z-10">
-              {/* Title row */}
-              <div className="flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <div>
                   <h3 className="text-lg font-display font-bold text-white">Health Score History</h3>
                   <p className="text-xs text-content-secondary mt-0.5 font-medium">
                     Track how your average scan scores evolve over time
                   </p>
-                  <p className="text-xs text-brand-primary font-bold mt-1">{periodInfo.dateRangeText}</p>
-              </div>
-
-              {/* Controls row */}
-              <div className="flex items-center justify-between gap-3">
-                {/* Timeline Navigation */}
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={jumpToPreviousYear}
-                    title={`Jump back 1 ${timeRange === 'week' ? 'year' : 'year'}`}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-content-secondary hover:text-white transition-colors"
-                    aria-label="Jump to previous year"
-                  >
-                    <ChevronsLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={goBack}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-content-secondary hover:text-white transition-colors"
-                    aria-label="Previous period"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={goForward}
-                    disabled={timeOffset === 0}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-content-secondary hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    aria-label="Next period"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={jumpToCurrent}
-                    disabled={timeOffset === 0}
-                    title="Jump to current period"
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-content-secondary hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    aria-label="Jump to current period"
-                  >
-                    <SkipForward className="w-4 h-4" />
-                  </button>
+                  <p className="text-xs text-brand-primary font-bold mt-1">{dateRangeText}</p>
                 </div>
 
-                {/* Toggle */}
-                <div className="flex bg-black/20 p-1 rounded-xl border border-white/5">
+                {/* View Toggle */}
+                <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 flex-shrink-0">
                   <button
-                    onClick={() => switchTimeRange('week')}
+                    onClick={() => setTimeRange('week')}
                     className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
                       timeRange === 'week'
                         ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
                         : 'text-content-secondary hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    Week View
+                    Week
                   </button>
                   <button
-                    onClick={() => switchTimeRange('month')}
+                    onClick={() => setTimeRange('month')}
                     className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
                       timeRange === 'month'
                         ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
                         : 'text-content-secondary hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    Month View
+                    Month
                   </button>
                 </div>
               </div>
@@ -325,41 +191,37 @@ export function HealthDashboard() {
             {/* Y-axis label */}
             <div className="relative">
               <div
-                className="absolute -left-2 top-1/2 text-[9px] text-content-secondary font-bold uppercase tracking-widest"
+                className="absolute -left-2 top-1/2 text-[9px] text-content-secondary font-bold uppercase tracking-widest pointer-events-none"
                 style={{
                   transform: 'translateX(-100%) translateY(-50%) rotate(-90deg)',
                   transformOrigin: 'right center',
                   whiteSpace: 'nowrap',
-                  pointerEvents: 'none',
                 }}
               >
                 Avg Health Score
               </div>
 
-              {/* Chart area */}
               <div className="h-56 w-full pl-1">
                 {hasNoData ? (
                   <div className="flex flex-col items-center justify-center h-full text-center gap-3">
                     <Activity className="w-10 h-10 text-content-secondary opacity-20" />
-                    <p className="text-content-secondary text-sm font-bold">No scans found for this period.</p>
-                    <p className="text-content-secondary text-xs opacity-60">Scan products to start tracking your health score here.</p>
+                    <p className="text-content-secondary text-sm font-bold">No scans recorded yet.</p>
+                    <p className="text-content-secondary text-xs opacity-60">Start scanning products to see your health trend here.</p>
                   </div>
                 ) : (
-                  <AnimatePresence mode="wait" custom={slideDirection}>
+                  <AnimatePresence mode="wait">
                     <motion.div
-                      key={`${timeRange}-${timeOffset}`}
-                      custom={slideDirection}
-                      variants={chartVariants}
-                      initial="enter"
-                      animate="center"
-                      exit="exit"
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                      key={timeRange}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
                       className="h-full w-full"
                     >
                       <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart
                           data={chartData}
-                          margin={{ top: 20, right: 4, left: -16, bottom: 24 }}
+                          margin={{ top: 20, right: 4, left: -16, bottom: 10 }}
                           onClick={(data) => {
                             if (data?.activePayload?.[0]) {
                               const pt = data.activePayload[0].payload as ChartDataPoint;
@@ -377,8 +239,8 @@ export function HealthDashboard() {
                               <stop offset="100%" stopColor="#6366f1" />
                             </linearGradient>
                             <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                              <stop offset="0%" stopColor="#818cf8" stopOpacity={0.6} />
-                              <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.6} />
+                              <stop offset="0%" stopColor="#818cf8" stopOpacity={0.7} />
+                              <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.7} />
                             </linearGradient>
                           </defs>
 
@@ -388,8 +250,9 @@ export function HealthDashboard() {
                             dataKey="day"
                             axisLine={false}
                             tickLine={false}
-                            height={44}
-                            tick={<CustomXAxisTick chartData={chartData} todayStr={todayStr} />}
+                            tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
+                            dy={8}
+                            interval="preserveStartEnd"
                           />
 
                           <YAxis
@@ -406,21 +269,27 @@ export function HealthDashboard() {
                           />
 
                           {/* Average reference line */}
-                          {trendAvg > 0 && (
+                          {stats.average > 0 && (
                             <ReferenceLine
-                              y={trendAvg}
+                              y={stats.average}
                               stroke="url(#lineGradient)"
                               strokeWidth={1.5}
                               strokeDasharray="5 3"
-                              label={{ value: `Avg: ${trendAvg}`, position: 'insideTopRight', fill: '#818cf8', fontSize: 10, fontWeight: 700 }}
+                              label={{
+                                value: `Avg: ${stats.average}`,
+                                position: 'insideTopRight',
+                                fill: '#818cf8',
+                                fontSize: 10,
+                                fontWeight: 700,
+                              }}
                             />
                           )}
 
                           <Bar
                             dataKey="score"
                             radius={[8, 8, 8, 8]}
-                            maxBarSize={32}
-                            isAnimationActive={true}
+                            maxBarSize={28}
+                            isAnimationActive
                             animationDuration={600}
                             animationEasing="ease-out"
                             minPointSize={4}
@@ -428,21 +297,19 @@ export function HealthDashboard() {
                             <LabelList
                               dataKey="score"
                               position="top"
-                              style={{ fontSize: 10, fontWeight: 700, fill: '#9ca3b8' }}
+                              style={{ fontSize: 9, fontWeight: 700, fill: '#9ca3b8' }}
                               formatter={(v: number) => v === 0 ? '' : v}
                             />
                             {chartData.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
                                 fill={getBarColor(entry.score, entry.isEmpty)}
-                                fillOpacity={entry.isEmpty ? 0.5 : 1}
-                                aria-label={`${entry.day}: score ${entry.score}, ${entry.scans} scans`}
-                                tabIndex={0}
+                                fillOpacity={entry.isEmpty ? 0.4 : 1}
                               />
                             ))}
                           </Bar>
 
-                          {/* Trend line (average score line through non-empty days) */}
+                          {/* Trend line connecting non-empty bars */}
                           <Line
                             type="monotone"
                             dataKey={(d: ChartDataPoint) => d.isEmpty ? null : d.score}
@@ -464,17 +331,15 @@ export function HealthDashboard() {
           </div>
 
           {/* Ask AI Navigation */}
-          <div className="grid grid-cols-1 gap-4">
-            <button
-              onClick={() => navigate('/dashboard/chat')}
-              className="bg-navy-800 rounded-2xl p-4 flex items-center justify-center text-center gap-3 hover:bg-navy-700 transition-colors shadow-lg shadow-black/20"
-            >
-              <div className="w-10 h-10 rounded-full bg-navy-800 flex items-center justify-center overflow-hidden border border-brand-primary/30">
-                <img src={aiAssistantImg} alt="AI" className="w-full h-full object-cover" />
-              </div>
-              <span className="text-sm font-medium text-white">Ask AI Nutritionist</span>
-            </button>
-          </div>
+          <button
+            onClick={() => navigate('/dashboard/chat')}
+            className="bg-navy-800 rounded-2xl p-4 flex items-center justify-center text-center gap-3 hover:bg-navy-700 transition-colors shadow-lg shadow-black/20"
+          >
+            <div className="w-10 h-10 rounded-full bg-navy-800 flex items-center justify-center overflow-hidden border border-brand-primary/30">
+              <img src={aiAssistantImg} alt="AI" className="w-full h-full object-cover" />
+            </div>
+            <span className="text-sm font-medium text-white">Ask AI Nutritionist</span>
+          </button>
 
           {/* Grade Breakdown */}
           <div className="glass-card border border-white/5 rounded-2xl p-5">
@@ -503,9 +368,7 @@ export function HealthDashboard() {
                 );
               })}
             </div>
-            <p className="text-xs text-content-secondary mt-5 text-center">
-              Scan more products daily to improve your grade
-            </p>
+            <p className="text-xs text-content-secondary mt-5 text-center">Scan more products daily to improve your grade</p>
           </div>
         </div>
 

@@ -25,11 +25,6 @@ export interface ChartStats {
   comparisonToPrevious: number | null;
 }
 
-export interface ChartPeriodInfo {
-  dateRangeText: string;
-  isCurrentPeriod: boolean;
-}
-
 const calculateMedian = (arr: number[]) => {
   if (arr.length === 0) return 0;
   const sorted = [...arr].sort((a, b) => a - b);
@@ -39,148 +34,123 @@ const calculateMedian = (arr: number[]) => {
 
 export function useChartData(
   allScans: ScanResult[],
-  timeRange: 'week' | 'month',
-  timeOffset: number
+  timeRange: 'week' | 'month'
 ) {
-  // Derive date bounds purely from offset — no async, no loading state needed
-  const currentBounds = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }, []);
 
-    if (timeRange === 'week') {
-      // "end" = today minus (offset * 7) days
-      const end = new Date(today);
-      end.setDate(today.getDate() - timeOffset * 7);
-      // "start" = 6 days before end
-      const start = new Date(end);
-      start.setDate(end.getDate() - 6);
-
-      // Previous period
-      const prevEnd = new Date(start);
-      prevEnd.setDate(start.getDate() - 1);
-      const prevStart = new Date(prevEnd);
-      prevStart.setDate(prevEnd.getDate() - 6);
-
-      return { start, end, prevStart, prevEnd };
-    } else {
-      // Month: find the target calendar month
-      const target = new Date(today.getFullYear(), today.getMonth() - timeOffset, 1);
-      const start = new Date(target.getFullYear(), target.getMonth(), 1);
-      // End of that month
-      const end = new Date(target.getFullYear(), target.getMonth() + 1, 0);
-      // Clamp end to today if current month
-      if (timeOffset === 0 && end > today) end.setTime(today.getTime());
-
-      const prevEnd = new Date(start);
-      prevEnd.setDate(0); // last day of previous month
-      const prevStart = new Date(prevEnd.getFullYear(), prevEnd.getMonth(), 1);
-
-      return { start, end, prevStart, prevEnd };
+  // Earliest scan date = effective "signup date" for chart purposes
+  const earliestDate = useMemo(() => {
+    if (allScans.length === 0) {
+      // Default: 7 days ago if no scans
+      const d = new Date();
+      d.setDate(d.getDate() - 6);
+      d.setHours(0, 0, 0, 0);
+      return d;
     }
-  }, [timeRange, timeOffset]);
+    const timestamps = allScans.map(s => new Date(s.date).getTime());
+    const d = new Date(Math.min(...timestamps));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [allScans]);
 
-  // Filter scans that fall within the current period
-  const currentScans = useMemo(() => {
-    const startMs = currentBounds.start.getTime();
-    // End of day for end date
-    const endMs = new Date(currentBounds.end).setHours(23, 59, 59, 999);
-    return allScans.filter(s => {
-      const t = new Date(s.date).getTime();
-      return t >= startMs && t <= endMs;
-    });
-  }, [allScans, currentBounds]);
-
-  // Filter scans for previous period (for comparison)
-  const previousScans = useMemo(() => {
-    const startMs = currentBounds.prevStart.getTime();
-    const endMs = new Date(currentBounds.prevEnd).setHours(23, 59, 59, 999);
-    return allScans.filter(s => {
-      const t = new Date(s.date).getTime();
-      return t >= startMs && t <= endMs;
-    });
-  }, [allScans, currentBounds]);
-
-  // Build chart data points
-  const chartData = useMemo(() => {
+  // Build chart data: one bar per week or per month, from earliest → today
+  const chartData = useMemo((): ChartDataPoint[] => {
     const data: ChartDataPoint[] = [];
 
     if (timeRange === 'week') {
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(currentBounds.start);
-        d.setDate(currentBounds.start.getDate() + i);
-        const dStr = d.toDateString();
+      // Snap earliestDate back to Monday of that week
+      const periodStart = new Date(earliestDate);
+      const dayOfWeek = periodStart.getDay(); // 0=Sun
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // go to Monday
+      periodStart.setDate(periodStart.getDate() + diff);
+      periodStart.setHours(0, 0, 0, 0);
 
-        const scansOnDay = currentScans.filter(s => new Date(s.date).toDateString() === dStr);
-        const avgScore = scansOnDay.length > 0
-          ? Math.round(scansOnDay.reduce((acc, s) => acc + s.score, 0) / scansOnDay.length)
+      let cursor = new Date(periodStart);
+      while (cursor <= today) {
+        const weekStart = new Date(cursor);
+        const weekEnd = new Date(cursor);
+        weekEnd.setDate(cursor.getDate() + 6);
+        weekEnd.setHours(23, 59, 59, 999);
+
+        const label = weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+        const scansInWeek = allScans.filter(s => {
+          const t = new Date(s.date).getTime();
+          return t >= weekStart.getTime() && t <= Math.min(weekEnd.getTime(), today.getTime());
+        });
+        const avgScore = scansInWeek.length > 0
+          ? Math.round(scansInWeek.reduce((a, s) => a + s.score, 0) / scansInWeek.length)
           : 0;
 
         data.push({
-          day: d.toLocaleDateString(undefined, { weekday: 'short' }),
+          day: label,
           score: avgScore,
-          scans: scansOnDay.length,
-          isEmpty: scansOnDay.length === 0,
-          rawDate: new Date(d),
-          scansData: scansOnDay,
+          scans: scansInWeek.length,
+          isEmpty: scansInWeek.length === 0,
+          rawDate: new Date(weekStart),
+          scansData: scansInWeek,
         });
+
+        cursor.setDate(cursor.getDate() + 7);
       }
     } else {
-      const daysInMonth = new Date(currentBounds.start.getFullYear(), currentBounds.start.getMonth() + 1, 0).getDate();
-      const today = new Date();
-      for (let i = 1; i <= daysInMonth; i++) {
-        const d = new Date(currentBounds.start.getFullYear(), currentBounds.start.getMonth(), i);
-        // Don't render future days
-        if (d > today) break;
-        const dStr = d.toDateString();
+      // Month view: one bar per calendar month from earliest → today
+      const cursor = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
 
-        const scansOnDay = currentScans.filter(s => new Date(s.date).toDateString() === dStr);
-        const avgScore = scansOnDay.length > 0
-          ? Math.round(scansOnDay.reduce((acc, s) => acc + s.score, 0) / scansOnDay.length)
+      while (cursor <= today) {
+        const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+        const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
+        monthEnd.setHours(23, 59, 59, 999);
+
+        const label = monthStart.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+
+        const scansInMonth = allScans.filter(s => {
+          const t = new Date(s.date).getTime();
+          return t >= monthStart.getTime() && t <= Math.min(monthEnd.getTime(), today.getTime());
+        });
+        const avgScore = scansInMonth.length > 0
+          ? Math.round(scansInMonth.reduce((a, s) => a + s.score, 0) / scansInMonth.length)
           : 0;
 
         data.push({
-          day: i.toString(),
+          day: label,
           score: avgScore,
-          scans: scansOnDay.length,
-          isEmpty: scansOnDay.length === 0,
-          rawDate: new Date(d),
-          scansData: scansOnDay,
+          scans: scansInMonth.length,
+          isEmpty: scansInMonth.length === 0,
+          rawDate: new Date(monthStart),
+          scansData: scansInMonth,
         });
+
+        cursor.setMonth(cursor.getMonth() + 1);
       }
     }
 
     return data;
-  }, [currentScans, currentBounds, timeRange]);
+  }, [allScans, timeRange, earliestDate, today]);
 
-  // Stats
+  // Stats over ALL scans in the visible range
   const stats = useMemo(() => {
-    const scores = currentScans.map(s => s.score);
+    const scores = allScans.map(s => s.score);
     const avg = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-
-    const prevScores = previousScans.map(s => s.score);
-    const prevAvg = prevScores.length > 0 ? Math.round(prevScores.reduce((a, b) => a + b, 0) / prevScores.length) : 0;
-
     const highest = scores.length > 0 ? Math.max(...scores) : 0;
     const lowest = scores.length > 0 ? Math.min(...scores) : 0;
     const median = calculateMedian(scores);
 
-    const activeDays = chartData.filter(d => !d.isEmpty).length;
-    const consistency = chartData.length > 0 ? Math.round((activeDays / chartData.length) * 100) : 0;
+    const activePeriods = chartData.filter(d => !d.isEmpty).length;
+    const consistency = chartData.length > 0 ? Math.round((activePeriods / chartData.length) * 100) : 0;
 
-    const safeCount = currentScans.filter(s => s.verdict === 'safe').length;
-    const cautionCount = currentScans.filter(s => s.verdict === 'caution').length;
-    const hazardousCount = currentScans.filter(s => s.verdict === 'hazardous').length;
+    const safeCount = allScans.filter(s => s.verdict === 'safe').length;
+    const cautionCount = allScans.filter(s => s.verdict === 'caution').length;
+    const hazardousCount = allScans.filter(s => s.verdict === 'hazardous').length;
 
     const daysWithData = chartData.filter(d => !d.isEmpty);
-    let bestDay = null;
-    let worstDay = null;
-    if (daysWithData.length > 0) {
-      const sorted = [...daysWithData].sort((a, b) => b.score - a.score);
-      bestDay = { day: sorted[0].day, score: sorted[0].score };
-      worstDay = { day: sorted[sorted.length - 1].day, score: sorted[sorted.length - 1].score };
-    }
-
-    const comparison = (prevScores.length > 0 && scores.length > 0) ? avg - prevAvg : null;
+    const sortedByScore = [...daysWithData].sort((a, b) => b.score - a.score);
+    const bestDay = sortedByScore.length > 0 ? { day: sortedByScore[0].day, score: sortedByScore[0].score } : null;
+    const worstDay = sortedByScore.length > 0 ? { day: sortedByScore[sortedByScore.length - 1].day, score: sortedByScore[sortedByScore.length - 1].score } : null;
 
     return {
       average: avg,
@@ -188,28 +158,23 @@ export function useChartData(
       lowest,
       median,
       consistency,
-      totalScans: currentScans.length,
+      totalScans: allScans.length,
       safeCount,
       cautionCount,
       hazardousCount,
       bestDay,
       worstDay,
-      comparisonToPrevious: comparison,
+      comparisonToPrevious: null,
     } as ChartStats;
-  }, [currentScans, previousScans, chartData]);
+  }, [allScans, chartData]);
 
-  // Period info text
-  const periodInfo = useMemo(() => {
-    let text = '';
-    if (timeRange === 'week') {
-      const sDate = currentBounds.start.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-      const eDate = currentBounds.end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-      text = `${sDate} – ${eDate}`;
-    } else {
-      text = currentBounds.start.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-    }
-    return { dateRangeText: text, isCurrentPeriod: timeOffset === 0 };
-  }, [currentBounds, timeRange, timeOffset]);
+  // Date range text
+  const dateRangeText = useMemo(() => {
+    const start = earliestDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    const end = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    if (allScans.length === 0) return 'No scan history yet';
+    return `${start} – ${end}`;
+  }, [earliestDate, allScans.length]);
 
-  return { chartData, stats, periodInfo };
+  return { chartData, stats, dateRangeText };
 }
