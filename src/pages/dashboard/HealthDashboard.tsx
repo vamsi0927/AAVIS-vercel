@@ -332,7 +332,7 @@ export function HealthDashboard() {
                           axisLine={false}
                           tickLine={false}
                           tick={false}
-                          height={30}
+                          height={45}
                         />
                       </ComposedChart>
                     </ResponsiveContainer>
@@ -386,9 +386,10 @@ export function HealthDashboard() {
                               dataKey="day"
                               axisLine={false}
                               tickLine={false}
-                              tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
-                              dy={8}
+                              tick={{ fill: '#9ca3b8', fontSize: 9, fontWeight: 600, angle: -45, textAnchor: 'end' }}
+                              dy={14}
                               interval={0}
+                              height={45}
                             />
 
                             <YAxis
