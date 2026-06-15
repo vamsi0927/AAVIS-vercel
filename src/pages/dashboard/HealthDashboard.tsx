@@ -88,6 +88,13 @@ export function HealthDashboard() {
     }
   }, []);
 
+  const scrollRight = useCallback(() => {
+    if (chartScrollRef.current) {
+      const clientWidth = chartScrollRef.current.clientWidth;
+      chartScrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+    }
+  }, []);
+
   // Day details panel
   const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
   const [isDayPanelOpen, setIsDayPanelOpen] = useState(false);
@@ -211,6 +218,13 @@ export function HealthDashboard() {
                     &lt;
                   </button>
                   <button
+                    onClick={scrollRight}
+                    title="Scroll right"
+                    className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center w-8 h-8"
+                  >
+                    &gt;
+                  </button>
+                  <button
                     onClick={scrollToPresent}
                     title="Scroll to present"
                     className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1"
@@ -259,7 +273,7 @@ export function HealthDashboard() {
               <div className="flex h-56 w-full relative">
                 {/* Static Y-axis on the left */}
                 {!hasNoData && (
-                  <div className="w-8 h-full flex-shrink-0 relative z-10 bg-navy-900 pr-1">
+                  <div className="w-8 h-full flex-shrink-0 relative z-10 pr-1" style={{ backgroundColor: 'rgba(13, 15, 28, 0.95)' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart
                         data={chartData}

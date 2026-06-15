@@ -89,7 +89,7 @@ export function useChartData(
             : 0;
 
         data.push({
-          day: cursor.getDate().toString(), // Just the date number as requested
+          day: `${cursor.toLocaleDateString(undefined, { month: 'short' })} ${cursor.getDate()}`,
           score: avgScore,
           scans: scansOnDay.length,
           isEmpty: scansOnDay.length === 0,
