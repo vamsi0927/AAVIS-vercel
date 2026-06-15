@@ -29,7 +29,6 @@ import { SAMPLE_PRODUCTS } from '../../data/sampleProducts';
 import { useChartData, ChartDataPoint } from '../../hooks/useChartData';
 import { TrendSummaryCard } from '../../components/dashboard/TrendSummaryCard';
 import { DayDetailsPanel } from '../../components/dashboard/DayDetailsPanel';
-import { ChartSkeleton } from '../../components/dashboard/ChartSkeleton';
 
 // --- Color helpers ---
 const BAR_COLOR_EMPTY = 'rgba(255,255,255,0.06)';
@@ -220,7 +219,7 @@ export function HealthDashboard() {
   // Average score for the trend line
   const trendAvg = stats.average;
 
-  const hasNoData = !isLoading && !isError && chartData.every(d => d.isEmpty);
+  const hasNoData = chartData.every(d => d.isEmpty);
 
   const chartVariants = {
     enter: (dir: string) => ({ x: dir === 'left' ? '60px' : '-60px', opacity: 0 }),
@@ -240,7 +239,7 @@ export function HealthDashboard() {
         <div className="md:col-span-7 lg:col-span-8 flex flex-col gap-6 mb-6 md:mb-0">
 
           {/* Trend Summary Card */}
-          {!isLoading && !isError && !hasNoData && (
+          {!hasNoData && (
             <TrendSummaryCard stats={stats} timeRange={timeRange} />
           )}
 
