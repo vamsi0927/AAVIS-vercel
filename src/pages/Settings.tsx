@@ -8,6 +8,7 @@ import {
   Camera,
   Trash2,
   Shield,
+  FileText,
   HelpCircle,
   Mail,
   Info,
