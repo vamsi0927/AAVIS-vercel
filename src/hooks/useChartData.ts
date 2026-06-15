@@ -7,6 +7,7 @@ export interface ChartDataPoint {
   scans: number;
   isEmpty: boolean;
   isGhost?: boolean;
+  isFuture?: boolean;
   rawDate: Date;
   scansData: ScanResult[];
 }
@@ -93,7 +94,8 @@ export function useChartData(
           score: avgScore,
           scans: scansOnDay.length,
           isEmpty: scansOnDay.length === 0,
-          isGhost: isGhost || isFuture, // Reusing ghost style for future dates too so they are faded
+          isGhost: isGhost,
+          isFuture: isFuture,
           rawDate: new Date(cursor),
           scansData: scansOnDay,
         });
@@ -131,7 +133,8 @@ export function useChartData(
           score: avgScore,
           scans: scansInMonth.length,
           isEmpty: scansInMonth.length === 0,
-          isGhost: monthStart.getTime() > todayMs,
+          isGhost: false,
+          isFuture: monthStart.getTime() > todayMs,
           rawDate: new Date(monthStart),
           scansData: scansInMonth,
         });

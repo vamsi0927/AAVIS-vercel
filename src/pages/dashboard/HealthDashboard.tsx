@@ -51,7 +51,7 @@ const CustomTooltip = ({ active, payload }: any) => {
       </p>
       {data.isGhost ? (
         <p className="text-content-secondary text-sm">Before signup</p>
-      ) : data.isEmpty ? (
+      ) : (data.isEmpty || data.isFuture) ? (
         <p className="text-content-secondary text-sm">No scans</p>
       ) : (
         <>
@@ -113,13 +113,69 @@ export function HealthDashboard() {
     }
   }, [chartData.length, timeRange]);
 
+  // Visible items tracking
+  const [visibleStartIndex, setVisibleStartIndex] = useState(0);
+  const [visibleEndIndex, setVisibleEndIndex] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    if (!chartScrollRef.current || chartData.length === 0) return;
+    const { scrollLeft, scrollWidth, clientWidth } = chartScrollRef.current;
+    
+    if (timeRange === 'week') {
+      const totalWeeks = chartData.length / 7;
+      const currentWeek = Math.min(totalWeeks - 1, Math.max(0, Math.round(scrollLeft / clientWidth)));
+      const start = currentWeek * 7;
+      const end = Math.min(chartData.length - 1, start + 6);
+      setVisibleStartIndex(start);
+      setVisibleEndIndex(end);
+    } else {
+      const ratio = scrollWidth > clientWidth ? scrollLeft / (scrollWidth - clientWidth) : 0;
+      const maxStart = Math.max(0, chartData.length - 6);
+      const start = Math.min(maxStart, Math.max(0, Math.round(ratio * maxStart)));
+      const end = Math.min(chartData.length - 1, start + 5);
+      setVisibleStartIndex(start);
+      setVisibleEndIndex(end);
+    }
+  }, [chartData, timeRange]);
+
   // Auto-scroll to present when chart data loads or range changes
   useEffect(() => {
     if (chartData.length > 0) {
-      // Small delay to ensure DOM is updated
-      setTimeout(scrollToPresent, 100);
+      setTimeout(() => {
+        scrollToPresent();
+        handleScroll();
+      }, 150);
     }
-  }, [timeRange, chartData.length, scrollToPresent]);
+  }, [timeRange, chartData.length, scrollToPresent, handleScroll]);
+
+  const visibleDateText = useMemo(() => {
+    if (chartData.length === 0) return 'No scan history yet';
+    const startPt = chartData[visibleStartIndex];
+    const endPt = chartData[visibleEndIndex] || startPt;
+    if (!startPt || !startPt.rawDate) return '';
+    
+    const startStr = startPt.rawDate.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    
+    const endStr = endPt.rawDate.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+        
+    return `${startStr} – ${endStr}`;
+  }, [chartData, visibleStartIndex, visibleEndIndex]);
+
+  const visibleAverage = useMemo(() => {
+    const visiblePoints = chartData.slice(visibleStartIndex, visibleEndIndex + 1);
+    const scansInWindow = visiblePoints.flatMap(pt => pt.scansData || []);
+    if (scansInWindow.length === 0) return 0;
+    const totalScore = scansInWindow.reduce((acc, s) => acc + s.score, 0);
+    return Math.round(totalScore / scansInWindow.length);
+  }, [chartData, visibleStartIndex, visibleEndIndex]);
 
   const hasNoData = chartData.every(d => d.isEmpty);
 
@@ -205,7 +261,7 @@ export function HealthDashboard() {
                   <p className="text-xs text-content-secondary mt-0.5 font-medium">
                     Track how your average scan scores evolve over time
                   </p>
-                  <p className="text-xs text-brand-primary font-bold mt-1">{dateRangeText}</p>
+                  <p className="text-xs text-brand-primary font-bold mt-1">{visibleDateText}</p>
                 </div>
 
                 {/* View Toggle + Present button */}
@@ -299,7 +355,7 @@ export function HealthDashboard() {
                 )}
 
                 {/* Scrollable chart content */}
-                <div className="flex-1 h-full overflow-x-auto no-scrollbar scroll-smooth" ref={chartScrollRef}>
+                <div className="flex-1 h-full overflow-x-auto no-scrollbar scroll-smooth" ref={chartScrollRef} onScroll={handleScroll}>
                   {hasNoData ? (
                     <div className="flex flex-col items-center justify-center h-full text-center gap-3">
                       <Activity className="w-10 h-10 text-content-secondary opacity-20" />
@@ -314,12 +370,18 @@ export function HealthDashboard() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.25 }}
-                        className="h-full"
-                        style={{ width: containerWidth }}
+                        className="h-full mx-auto"
+                        style={{ 
+                          width: containerWidth, 
+                          maxWidth: timeRange === 'week' 
+                            ? `calc(${(chartData.length / 7)} * 600px)` 
+                            : `calc(${(chartData.length / 6)} * 600px)` 
+                        }}
                       >
                         <ResponsiveContainer width="100%" height="100%">
                           <ComposedChart
                             data={chartData}
+                            barCategoryGap="18%"
                             margin={{ top: 20, right: 4, left: 4, bottom: 10 }}
                             onClick={(data) => {
                               if (data?.activePayload?.[0]) {
@@ -365,14 +427,14 @@ export function HealthDashboard() {
                           />
 
                           {/* Average reference line */}
-                          {stats.average > 0 && (
+                          {visibleAverage > 0 && (
                             <ReferenceLine
-                              y={stats.average}
+                              y={visibleAverage}
                               stroke="#818cf8"
                               strokeWidth={1.5}
                               strokeDasharray="5 3"
                               label={{
-                                value: `Avg: ${stats.average}`,
+                                value: `Avg: ${visibleAverage}`,
                                 position: 'insideTopRight',
                                 fill: '#818cf8',
                                 fontSize: 10,
@@ -384,7 +446,7 @@ export function HealthDashboard() {
                           <Bar
                             dataKey="score"
                             radius={[8, 8, 8, 8]}
-                            maxBarSize={28}
+                            maxBarSize={35}
                             isAnimationActive
                             animationDuration={600}
                             animationEasing="ease-out"
@@ -399,8 +461,8 @@ export function HealthDashboard() {
                             {chartData.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={getBarColor(entry.score, entry.isEmpty, entry.isGhost)}
-                                fillOpacity={entry.isGhost ? 0.2 : entry.isEmpty ? 0.4 : 1}
+                                fill={getBarColor(entry.score, entry.isEmpty, entry.isGhost || entry.isFuture)}
+                                fillOpacity={(entry.isGhost || entry.isFuture) ? 0.2 : entry.isEmpty ? 0.4 : 1}
                               />
                             ))}
                           </Bar>
