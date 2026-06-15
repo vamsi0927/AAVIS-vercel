@@ -72,6 +72,12 @@ export function HealthDashboard() {
   const chartRef = useRef<HTMLDivElement>(null);
 
   const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [periodOffset, setPeriodOffset] = useState(0);
 
@@ -322,9 +328,9 @@ export function HealthDashboard() {
                       >
                         <YAxis
                           domain={[0, 100]}
-                          axisLine={false}
+                          axisLine={{ stroke: theme === 'light' ? '#64748b' : '#475569', strokeWidth: 1.5 }}
                           tickLine={false}
-                          tick={{ fill: theme === 'light' ? '#5a6478' : '#9ca3b8', fontSize: 10, fontWeight: 600 }}
+                          tick={{ fill: theme === 'light' ? '#334155' : '#e2e8f0', fontSize: 10, fontWeight: 700 }}
                           tickCount={5}
                         />
                         <XAxis
@@ -384,9 +390,9 @@ export function HealthDashboard() {
 
                             <XAxis
                               dataKey="day"
-                              axisLine={false}
+                              axisLine={{ stroke: theme === 'light' ? '#64748b' : '#475569', strokeWidth: 1.5 }}
                               tickLine={false}
-                              tick={{ fill: '#9ca3b8', fontSize: 9, fontWeight: 600, angle: -45, textAnchor: 'end' }}
+                              tick={{ fill: theme === 'light' ? '#334155' : '#e2e8f0', fontSize: 9, fontWeight: 700, ...(isMobile ? { angle: -45, textAnchor: 'end' } : {}) }}
                               dy={14}
                               interval={0}
                               height={45}
