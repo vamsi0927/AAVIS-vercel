@@ -27,9 +27,9 @@ import { DayDetailsPanel } from '../../components/dashboard/DayDetailsPanel';
 
 // --- Color helpers ---
 const BAR_COLOR_EMPTY = 'rgba(255,255,255,0.06)';
-const BAR_COLOR_FUTURE = 'rgba(255,255,255,0.03)';
-const getBarColor = (score: number, isEmpty: boolean, isFuture?: boolean) => {
-  if (isFuture) return BAR_COLOR_FUTURE;
+const BAR_COLOR_GHOST = 'rgba(255,255,255,0.02)';
+const getBarColor = (score: number, isEmpty: boolean, isGhost?: boolean) => {
+  if (isGhost) return BAR_COLOR_GHOST;
   if (isEmpty || score === 0) return BAR_COLOR_EMPTY;
   if (score >= 80) return '#22c55e';
   if (score >= 60) return 'url(#aavisGradient)';
@@ -45,9 +45,11 @@ const CustomTooltip = ({ active, payload }: any) => {
   return (
     <div className="bg-navy-800 border border-white/10 rounded-2xl p-4 shadow-2xl min-w-[160px]">
       <p className="text-content-secondary text-xs font-bold mb-2 uppercase tracking-wider">
-        {data.day}
+        {data.rawDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
       </p>
-      {data.isEmpty ? (
+      {data.isGhost ? (
+        <p className="text-content-secondary text-sm">Before signup</p>
+      ) : data.isEmpty ? (
         <p className="text-content-secondary text-sm">No scans</p>
       ) : (
         <>
@@ -71,9 +73,19 @@ export function HealthDashboard() {
 
   // Scroll chart to right (present) end
   const chartScrollRef = useRef<HTMLDivElement>(null);
-  const scrollToPresent = () => {
-    chartScrollRef.current?.scrollTo({ left: 999999, behavior: 'smooth' });
-  };
+  const scrollToPresent = useCallback(() => {
+    if (chartScrollRef.current) {
+      chartScrollRef.current.scrollTo({ left: 999999, behavior: 'smooth' });
+    }
+  }, []);
+
+  // Auto-scroll to present when chart data loads or range changes
+  useEffect(() => {
+    if (chartData.length > 0) {
+      // Small delay to ensure DOM is updated
+      setTimeout(scrollToPresent, 100);
+    }
+  }, [timeRange, chartData.length, scrollToPresent]);
 
   // Day details panel
   const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
@@ -315,8 +327,8 @@ export function HealthDashboard() {
                             {chartData.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={getBarColor(entry.score, entry.isEmpty, entry.isFuture)}
-                                fillOpacity={entry.isEmpty ? 0.4 : 1}
+                                fill={getBarColor(entry.score, entry.isEmpty, entry.isGhost)}
+                                fillOpacity={entry.isGhost ? 0.2 : entry.isEmpty ? 0.4 : 1}
                               />
                             ))}
                           </Bar>

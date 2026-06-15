@@ -6,7 +6,7 @@ export interface ChartDataPoint {
   score: number;
   scans: number;
   isEmpty: boolean;
-  isFuture?: boolean;
+  isGhost?: boolean;
   rawDate: Date;
   scansData: ScanResult[];
 }
@@ -42,21 +42,12 @@ export function useChartData(
   // End of today
   const todayMs = useMemo(() => new Date().setHours(23, 59, 59, 999), []);
 
-  // End of current ISO week (Sunday)
+  // End of current week (Saturday)
   const endOfCurrentWeek = useMemo(() => {
     const d = new Date();
-    const dow = d.getDay(); // 0=Sun
-    const daysUntilSunday = dow === 0 ? 0 : 7 - dow;
-    d.setDate(d.getDate() + daysUntilSunday);
-    d.setHours(23, 59, 59, 999);
-    return d;
-  }, []);
-
-  // End of current month + 6 months ahead
-  const endOfMonthRange = useMemo(() => {
-    const d = new Date();
-    d.setMonth(d.getMonth() + 6);
-    d.setDate(new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()); // last day of that month
+    const dow = d.getDay(); // 0=Sun, 6=Sat
+    const daysUntilSaturday = 6 - dow;
+    d.setDate(d.getDate() + daysUntilSaturday);
     d.setHours(23, 59, 59, 999);
     return d;
   }, []);
@@ -73,14 +64,20 @@ export function useChartData(
     const data: ChartDataPoint[] = [];
 
     if (timeRange === 'week') {
-      // One bar per day: signup → end of current week (Sunday)
-      const cursor = new Date(signupDate);
-      cursor.setHours(0, 0, 0, 0);
+      // Find the Sunday of the signup week
+      const startCursor = new Date(signupDate);
+      startCursor.setDate(startCursor.getDate() - startCursor.getDay());
+      startCursor.setHours(0, 0, 0, 0);
 
+      // Loop from that Sunday to the end of the current week (Saturday)
+      const cursor = new Date(startCursor);
+      
       while (cursor.getTime() <= endOfCurrentWeek.getTime()) {
         const dStr = cursor.toDateString();
+        const isGhost = cursor.getTime() < signupDate.getTime();
         const isFuture = cursor.getTime() > todayMs;
-        const scansOnDay = isFuture
+        
+        const scansOnDay = (isGhost || isFuture)
           ? []
           : allScans.filter(s => new Date(s.date).toDateString() === dStr);
 
@@ -90,11 +87,11 @@ export function useChartData(
             : 0;
 
         data.push({
-          day: cursor.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+          day: cursor.getDate().toString(), // Just the date number as requested
           score: avgScore,
           scans: scansOnDay.length,
           isEmpty: scansOnDay.length === 0,
-          isFuture,
+          isGhost: isGhost || isFuture, // Reusing ghost style for future dates too so they are faded
           rawDate: new Date(cursor),
           scansData: scansOnDay,
         });
@@ -102,21 +99,24 @@ export function useChartData(
         cursor.setDate(cursor.getDate() + 1);
       }
     } else {
-      // One bar per month: signup month → current month + 6
+      // Month view: one bar per calendar month from signup month → current month
       const cursor = new Date(signupDate.getFullYear(), signupDate.getMonth(), 1);
+      
+      const currentMonthStart = new Date();
+      currentMonthStart.setDate(1);
+      currentMonthStart.setHours(0, 0, 0, 0);
 
-      while (cursor.getTime() <= endOfMonthRange.getTime()) {
+      while (cursor.getTime() <= currentMonthStart.getTime()) {
         const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
         const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0, 23, 59, 59, 999);
-        const isFuture = monthStart.getTime() > todayMs;
+        
+        // Don't include scans from future days in the current month
+        const effectiveEnd = monthEnd.getTime() > todayMs ? new Date(todayMs) : monthEnd;
 
-        const scansInMonth = isFuture
-          ? []
-          : allScans.filter(s => {
-              const t = new Date(s.date).getTime();
-              const effectiveEnd = monthEnd.getTime() > todayMs ? todayMs : monthEnd.getTime();
-              return t >= monthStart.getTime() && t <= effectiveEnd;
-            });
+        const scansInMonth = allScans.filter(s => {
+          const t = new Date(s.date).getTime();
+          return t >= monthStart.getTime() && t <= effectiveEnd.getTime();
+        });
 
         const avgScore =
           scansInMonth.length > 0
@@ -128,7 +128,7 @@ export function useChartData(
           score: avgScore,
           scans: scansInMonth.length,
           isEmpty: scansInMonth.length === 0,
-          isFuture,
+          isGhost: false, // Months don't have ghost bars before signup (since we start at the signup month)
           rawDate: new Date(monthStart),
           scansData: scansInMonth,
         });
@@ -138,7 +138,7 @@ export function useChartData(
     }
 
     return data;
-  }, [allScans, timeRange, signupDate, todayMs]);
+  }, [allScans, timeRange, signupDate, todayMs, endOfCurrentWeek]);
 
   // Stats across ALL scans
   const stats = useMemo(() => {
@@ -151,10 +151,11 @@ export function useChartData(
     const lowest = scores.length > 0 ? Math.min(...scores) : 0;
     const median = calculateMedian(scores);
 
-    const activePeriods = chartData.filter(d => !d.isEmpty).length;
+    const activePeriods = chartData.filter(d => !d.isEmpty && !d.isGhost).length;
+    const totalPeriods = chartData.filter(d => !d.isGhost).length;
     const consistency =
-      chartData.length > 0
-        ? Math.round((activePeriods / chartData.length) * 100)
+      totalPeriods > 0
+        ? Math.round((activePeriods / totalPeriods) * 100)
         : 0;
 
     const safeCount = allScans.filter(s => s.verdict === 'safe').length;
@@ -163,7 +164,7 @@ export function useChartData(
       s => s.verdict === 'hazardous'
     ).length;
 
-    const daysWithData = chartData.filter(d => !d.isEmpty);
+    const daysWithData = chartData.filter(d => !d.isEmpty && !d.isGhost);
     const sortedByScore = [...daysWithData].sort((a, b) => b.score - a.score);
     const bestDay =
       sortedByScore.length > 0
