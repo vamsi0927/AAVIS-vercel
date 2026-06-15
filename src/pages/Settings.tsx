@@ -14,6 +14,7 @@ import {
   Info,
   LogOut,
   User,
+  BookOpen,
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { toast } from 'sonner';
@@ -167,10 +168,19 @@ export function Settings() {
         {/* Column 3: SUPPORT & ACCOUNT */}
         <section className="space-y-5">
           <h3 className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">
-            Support
+            Support & Guides
           </h3>
 
           <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
+            <button
+              onClick={() => navigate('/education/additives')}
+              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
+              <div className="flex items-center gap-4">
+                <BookOpen className="w-5 h-5 text-brand-primary" />
+                <span className="font-bold text-[15px] text-content-primary">E-Numbers Guide</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-content-secondary" />
+            </button>
             <button
               onClick={() => navigate('/help')}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
