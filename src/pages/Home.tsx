@@ -126,40 +126,106 @@ export function Home() {
         </header>
         
         {/* Desktop SaaS Stats Cards */}
-        <div className="hidden md:grid md:grid-cols-4 gap-4 md:max-w-7xl md:mx-auto md:w-full md:px-8 mb-6">
-          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-navy-800/40">
-            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block">Average Score</span>
-            <div className="flex items-baseline gap-2 mt-2">
-              <span className={`text-2xl font-black ${avgScore >= 75 ? 'text-brand-safe' : avgScore >= 40 ? 'text-brand-caution' : 'text-brand-hazardous'}`}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 px-6 md:px-8 md:max-w-7xl md:mx-auto md:w-full mb-8">
+          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-gradient-to-br from-brand-primary/10 to-transparent relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:scale-110 transition-transform">
+               <Activity className="w-8 h-8 text-brand-primary" />
+            </div>
+            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block relative z-10">Avg Score</span>
+            <div className="flex items-baseline gap-1.5 mt-2 relative z-10">
+              <span className={`text-3xl font-black ${avgScore >= 75 ? 'text-brand-safe' : avgScore >= 40 ? 'text-brand-caution' : 'text-brand-hazardous'}`}>
                 {avgScore}
               </span>
-              <span className="text-xs text-content-secondary">/ 100</span>
+              <span className="text-xs text-content-secondary font-semibold">/ 100</span>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-navy-800/40">
-            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block">Daily Streak</span>
-            <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-2xl font-black text-orange-400">{streak}</span>
-              <span className="text-xs text-content-secondary font-semibold">days 🔥</span>
+          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-gradient-to-br from-orange-500/10 to-transparent relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:scale-110 transition-transform">
+               <Sparkles className="w-8 h-8 text-orange-400" />
+            </div>
+            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block relative z-10">Daily Streak</span>
+            <div className="flex items-baseline gap-1.5 mt-2 relative z-10">
+              <span className="text-3xl font-black text-orange-400">{streak}</span>
+              <span className="text-xs text-content-secondary font-semibold">days</span>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-navy-800/40">
-            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block">Total Scans</span>
-            <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-2xl font-black text-brand-primary">{totalScans}</span>
-              <span className="text-xs text-content-secondary font-semibold">products</span>
+          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-gradient-to-br from-blue-500/10 to-transparent relative overflow-hidden group">
+             <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:scale-110 transition-transform">
+               <ScanLine className="w-8 h-8 text-blue-400" />
+            </div>
+            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block relative z-10">Total Scans</span>
+            <div className="flex items-baseline gap-1.5 mt-2 relative z-10">
+              <span className="text-3xl font-black text-blue-400">{totalScans}</span>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-navy-800/40">
-            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block">Hazardous Flagged</span>
-            <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-2xl font-black text-brand-hazardous">{hazardousCount}</span>
-              <span className="text-xs text-content-secondary font-semibold">avoided ⚠️</span>
+          <div className="glass-card rounded-2xl p-4 border border-white/5 bg-gradient-to-br from-red-500/10 to-transparent relative overflow-hidden group">
+             <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:scale-110 transition-transform">
+               <AlertTriangle className="w-8 h-8 text-red-500" />
+            </div>
+            <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block relative z-10">Hazardous</span>
+            <div className="flex items-baseline gap-1.5 mt-2 relative z-10">
+              <span className="text-3xl font-black text-brand-hazardous">{hazardousCount}</span>
+              <span className="text-xs text-content-secondary font-semibold">avoided</span>
             </div>
           </div>
         </div>
 
-        <div className="md:grid md:grid-cols-12 md:gap-8 md:max-w-7xl md:mx-auto md:w-full md:px-8">
+        
+        {/* Recent Scans Carousel */}
+        <div className="mb-8">
+          <div className="flex justify-between items-end mb-4 px-6 md:px-8 md:max-w-7xl md:mx-auto md:w-full">
+            <h3 className="text-xl font-display font-bold text-white">Recent Scans</h3>
+            {scans.length > 0 &&
+              <button onClick={() => navigate('/history')} className="text-sm text-brand-primary font-bold flex items-center hover:text-brand-secondary transition-colors">
+                See all <ChevronRight className="w-4 h-4 ml-1" />
+              </button>
+            }
+          </div>
+          
+          <div className="flex overflow-x-auto no-scrollbar pb-6 -mx-6 px-6 md:mx-0 md:px-8 md:max-w-7xl md:-ml-8 snap-x gap-4 hide-scrollbar">
+            {scans.length === 0 ? (
+              <div className="bg-navy-800/50 rounded-2xl p-6 border border-navy-700/50 text-center border-dashed w-full max-w-sm shrink-0">
+                  <Clock className="w-8 h-8 text-navy-600 mx-auto mb-3" />
+                  <p className="text-content-secondary text-sm">No recent scans.</p>
+              </div>
+            ) : (
+              recentScans.map((scan) => {
+                const product = scan.product || SAMPLE_PRODUCTS.find(p => p.id === scan.productId);
+                if (!product) return null;
+                const date = new Date(scan.date);
+                const isToday = date.toDateString() === new Date().toDateString();
+                const dateStr = isToday ? 'Today' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                return (
+                  <button
+                    key={scan.id}
+                    onClick={() => navigate(`/result/${scan.id}`)}
+                    className="shrink-0 w-[280px] bg-navy-800 hover:bg-navy-700 transition-colors rounded-3xl p-5 border border-navy-700 flex flex-col gap-4 text-left snap-start shadow-xl"
+                  >
+                    <div className="flex justify-between items-start w-full">
+                      <div className="w-14 h-14 bg-navy-900 rounded-2xl flex items-center justify-center text-3xl border border-navy-600 overflow-hidden shrink-0 shadow-inner">
+                        {product.imageUrl ? (
+                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                        ) : product.imageEmoji ? (
+                          <span>{product.imageEmoji}</span>
+                        ) : (
+                          <ImageIcon className="w-6 h-6 text-content-secondary/50" />
+                        )}
+                      </div>
+                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shrink-0 whitespace-nowrap ${scan.verdict === 'safe' ? 'bg-brand-safe/10 text-brand-safe border border-brand-safe/20' : scan.verdict === 'caution' ? 'bg-brand-caution/10 text-brand-caution border border-brand-caution/20' : 'bg-brand-hazardous/10 text-brand-hazardous border border-brand-hazardous/20'}`}>
+                        {scan.verdict}
+                      </span>
+                    </div>
+                    <div className="min-w-0 w-full mt-2">
+                      <h4 className="font-bold text-lg text-white truncate w-full">{product.name}</h4>
+                      <p className="text-sm text-content-secondary truncate w-full mt-1">{product.brand} • {dateStr}</p>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+\n        <div className="md:grid md:grid-cols-12 md:gap-8 md:max-w-7xl md:mx-auto md:w-full md:px-8">
           
           {/* Left Column: Daily Status Card & Insights */}
           <div className="md:col-span-7 lg:col-span-8 flex flex-col gap-6 mb-6 md:mb-0">
@@ -211,114 +277,41 @@ export function Home() {
               </div>
             </div>
 
-            {/* Personalized Insights */}
-            <div className="px-6 md:px-0">
-              <PersonalizedInsights />
-            </div>
+            
           </div>
 
-          {/* Right Column: Quick Links & Recent Scans */}
+          
+          {/* Right Column: Quick Links */}
           <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-6">
-            {/* New Quick Links */}
             <div className="px-6 md:px-0">
-              <h3 className="text-lg font-display font-bold mb-4 hidden md:block">Quick Tools</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3">
+              <h3 className="text-xl font-display font-bold text-white mb-4">Quick Tools</h3>
+              <div className="flex flex-col gap-4">
                 <button 
                   onClick={() => navigate('/education/myths')}
-                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
+                  className="w-full glass-card glass-card-hover rounded-3xl p-5 flex items-center gap-4 text-left transition-all border border-white/5 shadow-xl"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg shrink-0">🤔</div>
+                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl shrink-0">🤔</div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block truncate">Discover Food Myths</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Learn what's hidden on standard labels</span>
+                    <span className="text-base font-bold text-white block truncate">Discover Food Myths</span>
+                    <span className="text-xs text-content-secondary mt-1 block truncate">Learn what's hidden on labels</span>
                   </div>
                   <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
                 </button>
 
                 <button 
                   onClick={() => navigate('/dashboard/water')}
-                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
+                  className="w-full glass-card glass-card-hover rounded-3xl p-5 flex items-center gap-4 text-left transition-all border border-white/5 shadow-xl"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg shrink-0">💧</div>
+                  <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl shrink-0">💧</div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block truncate">Water Tracker</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Log and track daily hydration</span>
+                    <span className="text-base font-bold text-white block truncate">Water Tracker</span>
+                    <span className="text-xs text-content-secondary mt-1 block truncate">Log and track daily hydration</span>
                   </div>
                   <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
                 </button>
               </div>
             </div>
-
-            {/* Recent Scans */}
-            <div className="px-6 md:px-0">
-              <div className="flex justify-between items-end mb-4">
-                <h3 className="text-lg font-display font-bold">Recent Scans</h3>
-                {scans.length > 0 &&
-                <button
-                  onClick={() => navigate('/history')}
-                  className="text-sm text-brand-primary font-medium flex items-center">
-                  
-                    See all <ChevronRight className="w-4 h-4 ml-1" />
-                  </button>
-                }
-              </div>
-
-              {scans.length === 0 ?
-              <div className="bg-navy-800/50 rounded-2xl p-6 border border-navy-700/50 text-center border-dashed">
-                  <Clock className="w-8 h-8 text-navy-600 mx-auto mb-3" />
-                  <p className="text-content-secondary text-sm">No recent scans.</p>
-                </div> :
-
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                  {recentScans.map((scan) => {
-                  const product = scan.product || SAMPLE_PRODUCTS.find(
-                    (p) => p.id === scan.productId
-                  );
-                  if (!product) return null;
-                  const date = new Date(scan.date);
-                  const isToday = date.toDateString() === new Date().toDateString();
-                  const dateStr = isToday ?
-                  'Today' :
-                  date.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric'
-                  });
-                  return (
-                    <button
-                      key={scan.id}
-                      onClick={() => navigate(`/result/${scan.id}`)}
-                      className="w-full bg-navy-800 hover:bg-navy-700 transition-colors rounded-2xl p-4 border border-navy-700 flex items-center gap-4 text-left">
-                      
-                        <div className="w-12 h-12 bg-navy-900 rounded-xl flex items-center justify-center text-2xl border border-navy-600 overflow-hidden shrink-0">
-                          {product.imageUrl ? (
-                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-                          ) : product.imageEmoji ? (
-                            <span className="text-2xl">{product.imageEmoji}</span>
-                          ) : (
-                            <ImageIcon className="w-6 h-6 text-content-secondary/50" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-content-primary truncate">
-                            {product.name}
-                          </h4>
-                          <p className="text-xs text-content-secondary truncate">
-                            {product.brand} • {dateStr}
-                          </p>
-                        </div>
-                          <span
-                          className={`text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-md shrink-0 whitespace-nowrap ${scan.verdict === 'safe' ? 'bg-brand-safe/20 text-brand-safe' : scan.verdict === 'caution' ? 'bg-brand-caution/20 text-brand-caution' : 'bg-brand-hazardous/20 text-brand-hazardous'}`}>
-                          
-                            {scan.verdict}
-                          </span>
-                      </button>);
-
-                })}
-                </div>
-              }
-            </div>
-
-          </div>
+</div>
 
         </div>
       </div>
