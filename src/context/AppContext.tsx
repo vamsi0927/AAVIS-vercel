@@ -209,12 +209,6 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
 
   // Handle authenticated user — sync to Supabase users table
   const handleAuthUser = async (authUser: any) => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    const abortController = new AbortController();
-    abortControllerRef.current = abortController;
-
     try {
       const email = authUser.email || '';
       const name = authUser.user_metadata?.name || email.split('@')[0] || 'User';
@@ -222,8 +216,10 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       const authUid = authUser.id as string;
       setSupabaseUserId(authUid);
 
-      const dbUser = await getOrCreateUser(email, name);
-      if (abortController.signal.aborted) return;
+      const dbUser = await getOrCreateUser(email, name).catch(err => {
+        console.error('Error fetching user from DB:', err);
+        return null; // Fallback to basic auth if DB fails
+      });
 
       if (dbUser) {
         setState(prev => ({
@@ -254,11 +250,10 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         }));
       }
 
-      await loadCloudScans(abortController.signal);
+      await loadCloudScans();
 
-    } catch (err) {
-      if (abortController.signal.aborted) return;
-      console.error('[Aavis] Auth sync error:', err);
+    } catch (error: any) {
+      console.error('Error in handleAuthUser:', error);
       setState(prev => ({ ...prev, isAuthenticated: true }));
     }
   };
