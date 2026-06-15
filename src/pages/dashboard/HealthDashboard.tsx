@@ -437,7 +437,7 @@ export function HealthDashboard() {
                               style={{ fontSize: 9, fontWeight: 700, fill: '#9ca3b8' }}
                               formatter={(v: number) => v === 0 ? '' : v}
                             />
-                            {chartData.map((entry, index) => (
+                            {visibleData.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
                                 fill={getBarColor(entry.score, entry.isEmpty, entry.isGhost || entry.isFuture)}
