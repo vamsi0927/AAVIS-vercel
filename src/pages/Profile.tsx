@@ -16,25 +16,27 @@ export function Profile() {
   const { profile, updateProfile, logout } = useAppContext();
   
   const [isEditing, setIsEditing] = useState(() => {
+    const ts = sessionStorage.getItem('profile_draftTimestamp');
+    if (ts && Date.now() - parseInt(ts, 10) > 30 * 60 * 1000) return false;
     const saved = sessionStorage.getItem('profile_isEditing');
     return saved ? JSON.parse(saved) : false;
   });
   const [isSaving, setIsSaving] = useState(false);
   const [editData, setEditData] = useState(() => {
+    const ts = sessionStorage.getItem('profile_draftTimestamp');
+    if (ts && Date.now() - parseInt(ts, 10) > 30 * 60 * 1000) return profile;
     const saved = sessionStorage.getItem('profile_editData');
     return saved ? JSON.parse(saved) : profile;
   });
   
   // Avatar state
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(() => {
-    return sessionStorage.getItem('profile_selectedFileUrl') || null;
-  });
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(() => {
-    return sessionStorage.getItem('profile_selectedFileName') || null;
-  });
+  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   
   const [showPreviewModal, setShowPreviewModal] = useState(() => {
+    const ts = sessionStorage.getItem('profile_draftTimestamp');
+    if (ts && Date.now() - parseInt(ts, 10) > 30 * 60 * 1000) return false;
     const saved = sessionStorage.getItem('profile_showPreviewModal');
     return saved ? JSON.parse(saved) : false;
   });
@@ -43,20 +45,18 @@ export function Profile() {
 
   React.useEffect(() => {
     if (isEditing) {
+      sessionStorage.setItem('profile_draftTimestamp', Date.now().toString());
       sessionStorage.setItem('profile_isEditing', JSON.stringify(isEditing));
       sessionStorage.setItem('profile_editData', JSON.stringify(editData));
       sessionStorage.setItem('profile_showPreviewModal', JSON.stringify(showPreviewModal));
-      if (selectedFileUrl) sessionStorage.setItem('profile_selectedFileUrl', selectedFileUrl);
-      if (selectedFileName) sessionStorage.setItem('profile_selectedFileName', selectedFileName);
     }
-  }, [isEditing, editData, showPreviewModal, selectedFileUrl, selectedFileName]);
+  }, [isEditing, editData, showPreviewModal]);
 
   const clearDraft = () => {
+    sessionStorage.removeItem('profile_draftTimestamp');
     sessionStorage.removeItem('profile_isEditing');
     sessionStorage.removeItem('profile_editData');
     sessionStorage.removeItem('profile_showPreviewModal');
-    sessionStorage.removeItem('profile_selectedFileUrl');
-    sessionStorage.removeItem('profile_selectedFileName');
   };
 
   const processImage = (file: File): Promise<string> => {
@@ -273,9 +273,9 @@ export function Profile() {
                       onClick={() => isEditing && setIsActionMenuOpen(true)}
                     >
                       <div className="w-20 h-20 rounded-full bg-navy-900 border border-white/5 flex items-center justify-center text-brand-primary shadow-[0_0_20px_rgba(99,102,241,0.2)] overflow-hidden relative">
-                        {previewUrl || profile.avatarUrl ? (
+                        {selectedFileUrl || profile.avatarUrl ? (
                           <img 
-                            src={previewUrl || profile.avatarUrl} 
+                            src={selectedFileUrl || profile.avatarUrl} 
                             alt="Profile Avatar" 
                             loading="lazy"
                             className="absolute inset-0 w-full h-full object-cover rounded-full" 
@@ -286,7 +286,7 @@ export function Profile() {
                             }}
                           />
                         ) : null}
-                        <div className={`absolute inset-0 w-full h-full bg-navy-900 flex items-center justify-center text-3xl font-bold ${previewUrl || profile.avatarUrl ? 'hidden' : ''}`}>
+                        <div className={`absolute inset-0 w-full h-full bg-navy-900 flex items-center justify-center text-3xl font-bold ${selectedFileUrl || profile.avatarUrl ? 'hidden' : ''}`}>
                           {profile.name ? profile.name.charAt(0).toUpperCase() : <User className="w-10 h-10" />}
                         </div>
                       </div>
