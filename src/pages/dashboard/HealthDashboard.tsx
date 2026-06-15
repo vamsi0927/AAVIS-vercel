@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   ComposedChart,
   Bar,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -238,10 +237,6 @@ export function HealthDashboard() {
                               <stop offset="0%" stopColor="#818cf8" />
                               <stop offset="100%" stopColor="#6366f1" />
                             </linearGradient>
-                            <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                              <stop offset="0%" stopColor="#818cf8" stopOpacity={0.7} />
-                              <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.7} />
-                            </linearGradient>
                           </defs>
 
                           <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
@@ -272,7 +267,7 @@ export function HealthDashboard() {
                           {stats.average > 0 && (
                             <ReferenceLine
                               y={stats.average}
-                              stroke="url(#lineGradient)"
+                              stroke="#818cf8"
                               strokeWidth={1.5}
                               strokeDasharray="5 3"
                               label={{
@@ -309,18 +304,8 @@ export function HealthDashboard() {
                             ))}
                           </Bar>
 
-                          {/* Trend line connecting non-empty bars */}
-                          <Line
-                            type="monotone"
-                            dataKey={(d: ChartDataPoint) => d.isEmpty ? null : d.score}
-                            stroke="url(#lineGradient)"
-                            strokeWidth={2}
-                            dot={false}
-                            activeDot={{ r: 5, fill: '#818cf8', strokeWidth: 2, stroke: '#fff' }}
-                            connectNulls={false}
-                            isAnimationActive
-                            animationDuration={800}
-                          />
+
+
                         </ComposedChart>
                       </ResponsiveContainer>
                     </motion.div>
