@@ -57,45 +57,32 @@ export function useChartData(
     return d;
   }, [allScans]);
 
-  // Build chart data: one bar per week or per month, from earliest → today
+  // Build chart data points
   const chartData = useMemo((): ChartDataPoint[] => {
     const data: ChartDataPoint[] = [];
 
     if (timeRange === 'week') {
-      // Snap earliestDate back to Monday of that week
-      const periodStart = new Date(earliestDate);
-      const dayOfWeek = periodStart.getDay(); // 0=Sun
-      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // go to Monday
-      periodStart.setDate(periodStart.getDate() + diff);
-      periodStart.setHours(0, 0, 0, 0);
+      // Show each individual day from earliest scan to today
+      const cursor = new Date(earliestDate);
+      cursor.setHours(0, 0, 0, 0);
 
-      let cursor = new Date(periodStart);
       while (cursor <= today) {
-        const weekStart = new Date(cursor);
-        const weekEnd = new Date(cursor);
-        weekEnd.setDate(cursor.getDate() + 6);
-        weekEnd.setHours(23, 59, 59, 999);
-
-        const label = weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-
-        const scansInWeek = allScans.filter(s => {
-          const t = new Date(s.date).getTime();
-          return t >= weekStart.getTime() && t <= Math.min(weekEnd.getTime(), today.getTime());
-        });
-        const avgScore = scansInWeek.length > 0
-          ? Math.round(scansInWeek.reduce((a, s) => a + s.score, 0) / scansInWeek.length)
+        const dStr = cursor.toDateString();
+        const scansOnDay = allScans.filter(s => new Date(s.date).toDateString() === dStr);
+        const avgScore = scansOnDay.length > 0
+          ? Math.round(scansOnDay.reduce((a, s) => a + s.score, 0) / scansOnDay.length)
           : 0;
 
         data.push({
-          day: label,
+          day: cursor.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
           score: avgScore,
-          scans: scansInWeek.length,
-          isEmpty: scansInWeek.length === 0,
-          rawDate: new Date(weekStart),
-          scansData: scansInWeek,
+          scans: scansOnDay.length,
+          isEmpty: scansOnDay.length === 0,
+          rawDate: new Date(cursor),
+          scansData: scansOnDay,
         });
 
-        cursor.setDate(cursor.getDate() + 7);
+        cursor.setDate(cursor.getDate() + 1);
       }
     } else {
       // Month view: one bar per calendar month from earliest → today
