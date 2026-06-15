@@ -81,6 +81,13 @@ export function HealthDashboard() {
     }
   }, []);
 
+  // Day details panel
+  const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
+  const [isDayPanelOpen, setIsDayPanelOpen] = useState(false);
+
+  // Chart data — single range from first scan to today
+  const { chartData, stats, dateRangeText } = useChartData(scans, timeRange);
+
   // Auto-scroll to present when chart data loads or range changes
   useEffect(() => {
     if (chartData.length > 0) {
@@ -88,13 +95,6 @@ export function HealthDashboard() {
       setTimeout(scrollToPresent, 100);
     }
   }, [timeRange, chartData.length, scrollToPresent]);
-
-  // Day details panel
-  const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
-  const [isDayPanelOpen, setIsDayPanelOpen] = useState(false);
-
-  // Chart data — single range from first scan to today
-  const { chartData, stats, dateRangeText } = useChartData(scans, timeRange);
 
   const hasNoData = chartData.every(d => d.isEmpty);
 
