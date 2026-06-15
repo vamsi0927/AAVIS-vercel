@@ -81,6 +81,13 @@ export function HealthDashboard() {
     }
   }, []);
 
+  const scrollLeft = useCallback(() => {
+    if (chartScrollRef.current) {
+      const clientWidth = chartScrollRef.current.clientWidth;
+      chartScrollRef.current.scrollBy({ left: -clientWidth, behavior: 'smooth' });
+    }
+  }, []);
+
   // Day details panel
   const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
   const [isDayPanelOpen, setIsDayPanelOpen] = useState(false);
@@ -197,6 +204,13 @@ export function HealthDashboard() {
                 {/* View Toggle + Present button */}
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
+                    onClick={scrollLeft}
+                    title="Scroll left"
+                    className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center w-8 h-8"
+                  >
+                    &lt;
+                  </button>
+                  <button
                     onClick={scrollToPresent}
                     title="Scroll to present"
                     className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1"
@@ -242,64 +256,94 @@ export function HealthDashboard() {
                 Avg Health Score
               </div>
 
-              <div className="h-56 w-full pl-1 overflow-x-auto no-scrollbar scroll-smooth" ref={chartScrollRef}>
-                {hasNoData ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center gap-3">
-                    <Activity className="w-10 h-10 text-content-secondary opacity-20" />
-                    <p className="text-content-secondary text-sm font-bold">No scans recorded yet.</p>
-                    <p className="text-content-secondary text-xs opacity-60">Start scanning products to see your health trend here.</p>
+              <div className="flex h-56 w-full relative">
+                {/* Static Y-axis on the left */}
+                {!hasNoData && (
+                  <div className="w-8 h-full flex-shrink-0 relative z-10 bg-navy-900 pr-1">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart
+                        data={chartData}
+                        margin={{ top: 20, right: 0, left: -24, bottom: 10 }}
+                      >
+                        <YAxis
+                          domain={[0, 100]}
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
+                          tickCount={5}
+                        />
+                        <XAxis
+                          dataKey="day"
+                          axisLine={false}
+                          tickLine={false}
+                          tick={false}
+                          height={30}
+                        />
+                      </ComposedChart>
+                    </ResponsiveContainer>
                   </div>
-                ) : (
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={timeRange}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25 }}
-                      className="h-full"
-                      style={{ width: containerWidth }}
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart
-                          data={chartData}
-                          margin={{ top: 20, right: 4, left: -16, bottom: 10 }}
-                          onClick={(data) => {
-                            if (data?.activePayload?.[0]) {
-                              const pt = data.activePayload[0].payload as ChartDataPoint;
-                              if (!pt.isEmpty) {
-                                setSelectedDay(pt);
-                                setIsDayPanelOpen(true);
+                )}
+
+                {/* Scrollable chart content */}
+                <div className="flex-1 h-full overflow-x-auto no-scrollbar scroll-smooth" ref={chartScrollRef}>
+                  {hasNoData ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center gap-3">
+                      <Activity className="w-10 h-10 text-content-secondary opacity-20" />
+                      <p className="text-content-secondary text-sm font-bold">No scans recorded yet.</p>
+                      <p className="text-content-secondary text-xs opacity-60">Start scanning products to see your health trend here.</p>
+                    </div>
+                  ) : (
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={timeRange}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        className="h-full"
+                        style={{ width: containerWidth }}
+                      >
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ComposedChart
+                            data={chartData}
+                            margin={{ top: 20, right: 4, left: 4, bottom: 10 }}
+                            onClick={(data) => {
+                              if (data?.activePayload?.[0]) {
+                                const pt = data.activePayload[0].payload as ChartDataPoint;
+                                if (!pt.isEmpty) {
+                                  setSelectedDay(pt);
+                                  setIsDayPanelOpen(true);
+                                }
                               }
-                            }
-                          }}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <defs>
-                            <linearGradient id="aavisGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#818cf8" />
-                              <stop offset="100%" stopColor="#6366f1" />
-                            </linearGradient>
-                          </defs>
+                            }}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <defs>
+                              <linearGradient id="aavisGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#818cf8" />
+                                <stop offset="100%" stopColor="#6366f1" />
+                              </linearGradient>
+                            </defs>
 
-                          <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
 
-                          <XAxis
-                            dataKey="day"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
-                            dy={8}
-                            interval="preserveStartEnd"
-                          />
+                            <XAxis
+                              dataKey="day"
+                              axisLine={false}
+                              tickLine={false}
+                              tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
+                              dy={8}
+                              interval="preserveStartEnd"
+                            />
 
-                          <YAxis
-                            domain={[0, 100]}
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
-                            tickCount={5}
-                          />
+                            <YAxis
+                              domain={[0, 100]}
+                              axisLine={false}
+                              tickLine={false}
+                              tick={false}
+                              width={0}
+                              tickCount={5}
+                            />
 
                           <Tooltip
                             content={<CustomTooltip />}
@@ -356,6 +400,7 @@ export function HealthDashboard() {
                 )}
               </div>
             </div>
+          </div>
           </div>
 
           {/* Ask AI Navigation */}
