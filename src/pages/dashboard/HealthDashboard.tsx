@@ -68,7 +68,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 export function HealthDashboard() {
   const navigate = useNavigate();
-  const { scans } = useAppContext();
+  const { scans, theme } = useAppContext();
   const chartRef = useRef<HTMLDivElement>(null);
 
   const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
@@ -273,7 +273,7 @@ export function HealthDashboard() {
               <div className="flex h-56 w-full relative">
                 {/* Static Y-axis on the left */}
                 {!hasNoData && (
-                  <div className="w-8 h-full flex-shrink-0 relative z-10 pr-1" style={{ backgroundColor: 'rgba(13, 15, 28, 0.95)' }}>
+                  <div className="w-8 h-full flex-shrink-0 relative z-10 pr-1" style={{ backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(13, 15, 28, 0.95)' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart
                         data={chartData}
@@ -283,7 +283,7 @@ export function HealthDashboard() {
                           domain={[0, 100]}
                           axisLine={false}
                           tickLine={false}
-                          tick={{ fill: '#9ca3b8', fontSize: 10, fontWeight: 600 }}
+                          tick={{ fill: theme === 'light' ? '#5a6478' : '#9ca3b8', fontSize: 10, fontWeight: 600 }}
                           tickCount={5}
                         />
                         <XAxis
