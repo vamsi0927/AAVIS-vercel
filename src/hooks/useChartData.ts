@@ -103,11 +103,10 @@ export function useChartData(
         cursor.setDate(cursor.getDate() + 1);
       }
     } else {
-      // Month view: one bar per calendar month from signup month → current month + 6 months
+      // Month view: one bar per calendar month from signup month → current month
       const cursor = new Date(signupDate.getFullYear(), signupDate.getMonth(), 1);
       
       const endMonthLimit = new Date();
-      endMonthLimit.setMonth(endMonthLimit.getMonth() + 6);
       endMonthLimit.setDate(1);
       endMonthLimit.setHours(0, 0, 0, 0);
 
@@ -115,7 +114,7 @@ export function useChartData(
         const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
         const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0, 23, 59, 59, 999);
         
-        // Don't include scans from future days in the current month/future months
+        // Don't include scans from future days in the current month
         const effectiveEnd = monthEnd.getTime() > todayMs ? new Date(todayMs) : monthEnd;
 
         const scansInMonth = allScans.filter(s => {

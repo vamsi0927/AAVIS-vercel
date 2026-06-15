@@ -73,27 +73,12 @@ export function HealthDashboard() {
 
   const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
 
-  // Scroll chart to right (present) end
-  const chartScrollRef = useRef<HTMLDivElement>(null);
-  const scrollToPresent = useCallback(() => {
-    if (chartScrollRef.current) {
-      chartScrollRef.current.scrollTo({ left: 999999, behavior: 'smooth' });
-    }
-  }, []);
+  const [periodOffset, setPeriodOffset] = useState(0);
 
-  const scrollLeft = useCallback(() => {
-    if (chartScrollRef.current) {
-      const clientWidth = chartScrollRef.current.clientWidth;
-      chartScrollRef.current.scrollBy({ left: -clientWidth, behavior: 'smooth' });
-    }
-  }, []);
-
-  const scrollRight = useCallback(() => {
-    if (chartScrollRef.current) {
-      const clientWidth = chartScrollRef.current.clientWidth;
-      chartScrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
-    }
-  }, []);
+  // Reset offset when timeRange changes
+  useEffect(() => {
+    setPeriodOffset(0);
+  }, [timeRange]);
 
   // Day details panel
   const [selectedDay, setSelectedDay] = useState<ChartDataPoint | null>(null);
@@ -102,56 +87,42 @@ export function HealthDashboard() {
   // Chart data — single range from first scan to today
   const { chartData, stats, dateRangeText } = useChartData(scans, timeRange);
 
-  const containerWidth = useMemo(() => {
-    if (chartData.length === 0) return '100%';
-    if (timeRange === 'week') {
-      const weeks = chartData.length / 7;
-      return `${Math.max(100, weeks * 100)}%`;
-    } else {
-      const months = chartData.length / 6;
-      return `${Math.max(100, months * 100)}%`;
-    }
-  }, [chartData.length, timeRange]);
+  const itemsPerPeriod = timeRange === 'week' ? 7 : 6;
+  const stepSize = itemsPerPeriod;
 
-  // Visible items tracking
-  const [visibleStartIndex, setVisibleStartIndex] = useState(0);
-  const [visibleEndIndex, setVisibleEndIndex] = useState(0);
-
-  const handleScroll = useCallback(() => {
-    if (!chartScrollRef.current || chartData.length === 0) return;
-    const { scrollLeft, scrollWidth, clientWidth } = chartScrollRef.current;
-    
-    if (timeRange === 'week') {
-      const totalWeeks = chartData.length / 7;
-      const currentWeek = Math.min(totalWeeks - 1, Math.max(0, Math.round(scrollLeft / clientWidth)));
-      const start = currentWeek * 7;
-      const end = Math.min(chartData.length - 1, start + 6);
-      setVisibleStartIndex(start);
-      setVisibleEndIndex(end);
-    } else {
-      const ratio = scrollWidth > clientWidth ? scrollLeft / (scrollWidth - clientWidth) : 0;
-      const maxStart = Math.max(0, chartData.length - 6);
-      const start = Math.min(maxStart, Math.max(0, Math.round(ratio * maxStart)));
-      const end = Math.min(chartData.length - 1, start + 5);
-      setVisibleStartIndex(start);
-      setVisibleEndIndex(end);
+  const visibleData = useMemo(() => {
+    if (chartData.length === 0) return [];
+    let endIdx = chartData.length + periodOffset * stepSize;
+    let startIdx = endIdx - itemsPerPeriod;
+    if (endIdx <= 0) {
+      endIdx = itemsPerPeriod;
+      startIdx = 0;
     }
-  }, [chartData, timeRange]);
-
-  // Auto-scroll to present when chart data loads or range changes
-  useEffect(() => {
-    if (chartData.length > 0) {
-      setTimeout(() => {
-        scrollToPresent();
-        handleScroll();
-      }, 150);
+    if (startIdx < 0) {
+      startIdx = 0;
     }
-  }, [timeRange, chartData.length, scrollToPresent, handleScroll]);
+    return chartData.slice(startIdx, endIdx);
+  }, [chartData, periodOffset, stepSize, itemsPerPeriod]);
+
+  const canGoBack = chartData.length > 0 && (chartData.length + periodOffset * stepSize - itemsPerPeriod > 0);
+  const canGoForward = periodOffset < 0;
+
+  const handlePrev = useCallback(() => {
+    if (canGoBack) setPeriodOffset(p => p - 1);
+  }, [canGoBack]);
+
+  const handleNext = useCallback(() => {
+    if (canGoForward) setPeriodOffset(p => p + 1);
+  }, [canGoForward]);
+
+  const handlePresent = useCallback(() => {
+    setPeriodOffset(0);
+  }, []);
 
   const visibleDateText = useMemo(() => {
-    if (chartData.length === 0) return 'No scan history yet';
-    const startPt = chartData[visibleStartIndex];
-    const endPt = chartData[visibleEndIndex] || startPt;
+    if (visibleData.length === 0) return 'No scan history yet';
+    const startPt = visibleData[0];
+    const endPt = visibleData[visibleData.length - 1] || startPt;
     if (!startPt || !startPt.rawDate) return '';
     
     const startStr = startPt.rawDate.toLocaleDateString(undefined, {
@@ -167,15 +138,14 @@ export function HealthDashboard() {
     });
         
     return `${startStr} – ${endStr}`;
-  }, [chartData, visibleStartIndex, visibleEndIndex]);
+  }, [visibleData]);
 
   const visibleAverage = useMemo(() => {
-    const visiblePoints = chartData.slice(visibleStartIndex, visibleEndIndex + 1);
-    const scansInWindow = visiblePoints.flatMap(pt => pt.scansData || []);
+    const scansInWindow = visibleData.flatMap(pt => pt.scansData || []);
     if (scansInWindow.length === 0) return 0;
     const totalScore = scansInWindow.reduce((acc, s) => acc + s.score, 0);
     return Math.round(totalScore / scansInWindow.length);
-  }, [chartData, visibleStartIndex, visibleEndIndex]);
+  }, [visibleData]);
 
   const hasNoData = chartData.every(d => d.isEmpty);
 
@@ -267,23 +237,38 @@ export function HealthDashboard() {
                 {/* View Toggle + Present button */}
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
-                    onClick={scrollLeft}
-                    title="Scroll left"
-                    className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center w-8 h-8"
+                    onClick={handlePrev}
+                    disabled={!canGoBack}
+                    title="Previous"
+                    className={`px-2.5 py-1.5 text-xs font-bold rounded-lg border flex items-center justify-center w-8 h-8 transition-colors ${
+                      canGoBack 
+                        ? 'bg-white/5 border-white/10 text-content-secondary hover:text-white hover:bg-white/10'
+                        : 'bg-white/5 border-transparent text-white/20 cursor-not-allowed'
+                    }`}
                   >
                     &lt;
                   </button>
                   <button
-                    onClick={scrollRight}
-                    title="Scroll right"
-                    className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center w-8 h-8"
+                    onClick={handleNext}
+                    disabled={!canGoForward}
+                    title="Next"
+                    className={`px-2.5 py-1.5 text-xs font-bold rounded-lg border flex items-center justify-center w-8 h-8 transition-colors ${
+                      canGoForward
+                        ? 'bg-white/5 border-white/10 text-content-secondary hover:text-white hover:bg-white/10'
+                        : 'bg-white/5 border-transparent text-white/20 cursor-not-allowed'
+                    }`}
                   >
                     &gt;
                   </button>
                   <button
-                    onClick={scrollToPresent}
-                    title="Scroll to present"
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/5 border border-white/10 text-content-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1"
+                    onClick={handlePresent}
+                    disabled={!canGoForward}
+                    title="Present"
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg border flex items-center gap-1 transition-colors ${
+                      canGoForward
+                        ? 'bg-white/5 border-white/10 text-content-secondary hover:text-white hover:bg-white/10'
+                        : 'bg-white/5 border-transparent text-white/20 cursor-not-allowed'
+                    }`}
                   >
                     Present ▶
                   </button>
@@ -332,7 +317,7 @@ export function HealthDashboard() {
                   <div className="w-8 h-full flex-shrink-0 relative z-10 pr-1" style={{ backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(13, 15, 28, 0.95)' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart
-                        data={chartData}
+                        data={visibleData}
                         margin={{ top: 20, right: 0, left: -24, bottom: 10 }}
                       >
                         <YAxis
@@ -354,8 +339,8 @@ export function HealthDashboard() {
                   </div>
                 )}
 
-                {/* Scrollable chart content */}
-                <div className="flex-1 h-full overflow-x-auto no-scrollbar scroll-smooth" ref={chartScrollRef} onScroll={handleScroll}>
+                {/* Chart content */}
+                <div className="flex-1 h-full relative">
                   {hasNoData ? (
                     <div className="flex flex-col items-center justify-center h-full text-center gap-3">
                       <Activity className="w-10 h-10 text-content-secondary opacity-20" />
@@ -365,22 +350,16 @@ export function HealthDashboard() {
                   ) : (
                     <AnimatePresence mode="wait">
                       <motion.div
-                        key={timeRange}
+                        key={`${timeRange}-${periodOffset}`}
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.25 }}
-                        className="h-full mx-auto"
-                        style={{ 
-                          width: containerWidth, 
-                          maxWidth: timeRange === 'week' 
-                            ? `calc(${(chartData.length / 7)} * 600px)` 
-                            : `calc(${(chartData.length / 6)} * 600px)` 
-                        }}
+                        className="h-full w-full mx-auto"
                       >
                         <ResponsiveContainer width="100%" height="100%">
                           <ComposedChart
-                            data={chartData}
+                            data={visibleData}
                             barCategoryGap="18%"
                             margin={{ top: 20, right: 4, left: 4, bottom: 10 }}
                             onClick={(data) => {
