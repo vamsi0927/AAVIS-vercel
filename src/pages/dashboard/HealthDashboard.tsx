@@ -225,7 +225,7 @@ export function HealthDashboard() {
 
             {/* Chart Header */}
             <div className="flex flex-col gap-4 mb-6 relative z-10">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-display font-bold text-white">Health Score History</h3>
                   <p className="text-xs text-content-secondary mt-0.5 font-medium">
@@ -235,7 +235,7 @@ export function HealthDashboard() {
                 </div>
 
                 {/* View Toggle + Present button */}
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
                   <button
                     onClick={handlePrev}
                     disabled={!canGoBack}

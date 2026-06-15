@@ -211,45 +211,7 @@ export function Home() {
               </div>
             </div>
 
-            {/* Personalized Insights */}
-            <div className="px-6 md:px-0">
-              <PersonalizedInsights />
-            </div>
-          </div>
-
-          {/* Right Column: Quick Links & Recent Scans */}
-          <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-6">
-            {/* New Quick Links */}
-            <div className="px-6 md:px-0">
-              <h3 className="text-lg font-display font-bold mb-4 hidden md:block">Quick Tools</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3">
-                <button 
-                  onClick={() => navigate('/education/myths')}
-                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg shrink-0">🤔</div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block truncate">Discover Food Myths</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Learn what's hidden on standard labels</span>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
-                </button>
-
-                <button 
-                  onClick={() => navigate('/dashboard/water')}
-                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg shrink-0">💧</div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block truncate">Water Tracker</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Log and track daily hydration</span>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Scans */}
+            {/* Recent Scans (Moved from Right Column) */}
             <div className="px-6 md:px-0">
               <div className="flex justify-between items-end mb-4">
                 <h3 className="text-lg font-display font-bold">Recent Scans</h3>
@@ -317,6 +279,41 @@ export function Home() {
                 </div>
               }
             </div>
+          </div>
+
+          {/* Right Column: Quick Links & Recent Scans */}
+          <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-6">
+            {/* New Quick Links */}
+            <div className="px-6 md:px-0">
+              <h3 className="text-lg font-display font-bold mb-4 hidden md:block">Quick Tools</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3">
+                <button 
+                  onClick={() => navigate('/education/myths')}
+                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg shrink-0">🤔</div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-bold text-white block truncate">Discover Food Myths</span>
+                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Learn what's hidden on standard labels</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
+                </button>
+
+                <button 
+                  onClick={() => navigate('/dashboard/water')}
+                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg shrink-0">💧</div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-bold text-white block truncate">Water Tracker</span>
+                    <span className="text-xs text-content-secondary mt-0.5 block truncate">Log and track daily hydration</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
+                </button>
+              </div>
+            </div>
+
+
 
           </div>
 
