@@ -45,7 +45,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   return (
     <div className="bg-navy-800 border border-white/10 rounded-2xl p-4 shadow-2xl min-w-[160px]">
       <p className="text-content-secondary text-xs font-bold mb-2 uppercase tracking-wider">
-        {data.rawDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+        {data.rawDate instanceof Date && !isNaN(data.rawDate.getTime())
+          ? data.rawDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+          : data.day}
       </p>
       {data.isGhost ? (
         <p className="text-content-secondary text-sm">Before signup</p>

@@ -55,7 +55,9 @@ export function useChartData(
   // Start = earliest scan date (proxy for signup). Fallback to today.
   const signupDate = useMemo(() => {
     if (allScans.length === 0) return new Date();
-    const d = new Date(Math.min(...allScans.map(s => new Date(s.date).getTime())));
+    const validScans = allScans.filter(s => s.date && !isNaN(new Date(s.date).getTime()));
+    if (validScans.length === 0) return new Date();
+    const d = new Date(Math.min(...validScans.map(s => new Date(s.date).getTime())));
     d.setHours(0, 0, 0, 0);
     return d;
   }, [allScans]);
@@ -197,6 +199,7 @@ export function useChartData(
   // Date range label
   const dateRangeText = useMemo(() => {
     if (allScans.length === 0) return 'No scan history yet';
+    if (isNaN(signupDate.getTime())) return 'Present';
     const start = signupDate.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
