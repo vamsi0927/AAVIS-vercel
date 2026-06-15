@@ -142,8 +142,11 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Only set loading if we don't already have an active authenticated session
         if (event === 'SIGNED_IN' && session?.user) {
-          setIsLoadingAuth(true);
+          if (!state.isAuthenticated) {
+            setIsLoadingAuth(true);
+          }
           handleAuthUser(session.user).finally(() => {
             setIsLoadingAuth(false);
           });

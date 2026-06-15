@@ -15,8 +15,183 @@ export function Profile() {
   const navigate = useNavigate();
   const { profile, updateProfile, logout } = useAppContext();
   
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState(profile);
+  const [isEditing, setIsEditing] = useState(() => {
+    const saved = sessionStorage.getItem('profile_isEditing');
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [editData, setEditData] = useState(() => {
+    const saved = sessionStorage.getItem('profile_editData');
+    return saved ? JSON.parse(saved) : profile;
+  });
+  
+  // Avatar state
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(() => {
+    return sessionStorage.getItem('profile_selectedFileUrl') || null;
+  });
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(() => {
+    return sessionStorage.getItem('profile_selectedFileName') || null;
+  });
+  
+  const [showPreviewModal, setShowPreviewModal] = useState(() => {
+    const saved = sessionStorage.getItem('profile_showPreviewModal');
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+
+  React.useEffect(() => {
+    if (isEditing) {
+      sessionStorage.setItem('profile_isEditing', JSON.stringify(isEditing));
+      sessionStorage.setItem('profile_editData', JSON.stringify(editData));
+      sessionStorage.setItem('profile_showPreviewModal', JSON.stringify(showPreviewModal));
+      if (selectedFileUrl) sessionStorage.setItem('profile_selectedFileUrl', selectedFileUrl);
+      if (selectedFileName) sessionStorage.setItem('profile_selectedFileName', selectedFileName);
+    }
+  }, [isEditing, editData, showPreviewModal, selectedFileUrl, selectedFileName]);
+
+  const clearDraft = () => {
+    sessionStorage.removeItem('profile_isEditing');
+    sessionStorage.removeItem('profile_editData');
+    sessionStorage.removeItem('profile_showPreviewModal');
+    sessionStorage.removeItem('profile_selectedFileUrl');
+    sessionStorage.removeItem('profile_selectedFileName');
+  };
+
+  const processImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxSize = 512;
+        let width = img.width;
+        let height = img.height;
+        
+        const size = Math.min(width, height);
+        const startX = (width - size) / 2;
+        const startY = (height - size) / 2;
+        
+        canvas.width = Math.min(size, maxSize);
+        canvas.height = Math.min(size, maxSize);
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('Failed to get canvas context'));
+        
+        ctx.drawImage(img, startX, startY, size, size, 0, 0, canvas.width, canvas.height);
+        
+        const dataUrl = canvas.toDataURL(file.type, 0.9);
+        resolve(dataUrl);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('Please upload a JPG, PNG, or WEBP image.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Maximum file size is 5 MB.');
+      return;
+    }
+
+    try {
+      const dataUrl = await processImage(file);
+      setSelectedFileUrl(dataUrl);
+      setSelectedFileName(file.name);
+      setShowPreviewModal(true);
+      setIsActionMenuOpen(false);
+    } catch (err) {
+      toast.error('Failed to process image');
+    }
+  };
+
+  const dataURLtoBlob = (dataurl: string) => {
+    let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+  };
+
+  const handleSaveAvatar = async () => {
+    if (!selectedFileUrl || !isSupabaseConfigured() || !profile.name) return;
+    
+    setIsSaving(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) throw new Error('Not authenticated');
+
+      const blob = dataURLtoBlob(selectedFileUrl);
+      const fileExt = blob.type.split('/')[1];
+      const fileName = `avatar-${Date.now()}.${fileExt}`;
+      const filePath = `${userId}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(filePath, blob, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(filePath);
+
+      const uniqueUrl = `${publicUrl}?t=${Date.now()}`;
+      setEditData({...editData, avatarUrl: uniqueUrl});
+      updateProfile({...editData, avatarUrl: uniqueUrl});
+      toast.success('Profile picture updated successfully.');
+      setShowPreviewModal(false);
+      setSelectedFileUrl(null);
+      setSelectedFileName(null);
+      
+    } catch (err: any) {
+      toast.error('Failed to upload profile picture.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (!isSupabaseConfigured()) return;
+    setIsSaving(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) throw new Error('Not authenticated');
+
+      const { data: files } = await supabase.storage.from('profile-images').list(userId);
+      if (files && files.length > 0) {
+        const filesToRemove = files.map(x => `${userId}/${x.name}`);
+        await supabase.storage.from('profile-images').remove(filesToRemove);
+      }
+
+      setEditData({...editData, avatarUrl: undefined});
+      updateProfile({...editData, avatarUrl: undefined});
+      toast.success('Profile picture removed successfully.');
+      setShowRemoveConfirm(false);
+      setShowPreviewModal(false);
+      setIsActionMenuOpen(false);
+      setSelectedFileUrl(null);
+      setSelectedFileName(null);
+    } catch (err: any) {
+      toast.error('Failed to remove profile picture.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -38,11 +213,16 @@ export function Profile() {
   const handleSave = () => {
     updateProfile(editData);
     setIsEditing(false);
+    clearDraft();
   };
 
   const handleCancel = () => {
     setEditData(profile);
     setIsEditing(false);
+    setShowPreviewModal(false);
+    setSelectedFileUrl(null);
+    setSelectedFileName(null);
+    clearDraft();
   };
 
   const activeAllergens = profile.allergens || [];
@@ -59,10 +239,10 @@ export function Profile() {
         <div className="flex items-center gap-2">
           {isEditing ? (
             <>
-              <button onClick={handleCancel} className="p-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
+              <button onClick={handleCancel} disabled={isSaving} className="p-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors disabled:opacity-50">
                 <X className="w-5 h-5" />
               </button>
-              <button onClick={handleSave} className="p-2 text-white bg-gradient-to-r from-brand-primary to-brand-secondary rounded-xl shadow-lg shadow-brand-primary/30 transition-transform active:scale-95">
+              <button onClick={handleSave} disabled={isSaving} className="p-2 text-white bg-gradient-to-r from-brand-primary to-brand-secondary rounded-xl shadow-lg shadow-brand-primary/30 transition-transform active:scale-95 disabled:opacity-50">
                 <Save className="w-5 h-5" />
               </button>
             </>
@@ -88,11 +268,14 @@ export function Profile() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex flex-col items-center gap-3">
                   <div className="flex flex-col items-center">
-                    <div className="relative">
+                    <div 
+                      className={`relative ${isEditing ? 'group cursor-pointer' : ''}`}
+                      onClick={() => isEditing && setIsActionMenuOpen(true)}
+                    >
                       <div className="w-20 h-20 rounded-full bg-navy-900 border border-white/5 flex items-center justify-center text-brand-primary shadow-[0_0_20px_rgba(99,102,241,0.2)] overflow-hidden relative">
-                        {profile.avatarUrl ? (
+                        {previewUrl || profile.avatarUrl ? (
                           <img 
-                            src={profile.avatarUrl} 
+                            src={previewUrl || profile.avatarUrl} 
                             alt="Profile Avatar" 
                             loading="lazy"
                             className="absolute inset-0 w-full h-full object-cover rounded-full" 
@@ -103,10 +286,24 @@ export function Profile() {
                             }}
                           />
                         ) : null}
-                        <div className={`absolute inset-0 w-full h-full bg-navy-900 flex items-center justify-center text-3xl font-bold ${profile.avatarUrl ? 'hidden' : ''}`}>
+                        <div className={`absolute inset-0 w-full h-full bg-navy-900 flex items-center justify-center text-3xl font-bold ${previewUrl || profile.avatarUrl ? 'hidden' : ''}`}>
                           {profile.name ? profile.name.charAt(0).toUpperCase() : <User className="w-10 h-10" />}
                         </div>
                       </div>
+                      {isEditing && (
+                        <>
+                          <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                            <Camera className="w-6 h-6 text-white" />
+                          </div>
+                          <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            className="hidden" 
+                            accept="image/jpeg, image/png, image/webp"
+                            onChange={handleFileSelect}
+                          />
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -271,6 +468,141 @@ export function Profile() {
           </div>
         </div>
       </div>
+      {/* Modals */}
+      <AnimatePresence>
+        {isActionMenuOpen && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm px-4 pb-8 sm:p-0">
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              className="bg-navy-800 w-full sm:w-96 rounded-3xl p-6 border border-white/10 shadow-2xl flex flex-col gap-3"
+            >
+              <h3 className="text-lg font-bold text-white text-center mb-2">Profile Picture</h3>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-colors"
+              >
+                Change Photo
+              </button>
+              {profile.avatarUrl && (
+                <button
+                  onClick={() => { setIsActionMenuOpen(false); setShowRemoveConfirm(true); }}
+                  className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-bold transition-colors"
+                >
+                  Remove Photo
+                </button>
+              )}
+              <button
+                onClick={() => setIsActionMenuOpen(false)}
+                className="w-full py-3 mt-2 text-content-secondary hover:text-white rounded-xl font-bold transition-colors"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </div>
+        )}
+
+        {showPreviewModal && selectedFileUrl && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md px-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-navy-800 w-full max-w-sm rounded-3xl p-8 border border-white/10 shadow-2xl flex flex-col items-center"
+            >
+              <h3 className="text-xl font-black text-white mb-6">Preview Photo</h3>
+              
+              <div className="w-40 h-40 rounded-full border-4 border-brand-primary overflow-hidden shadow-[0_0_30px_rgba(99,102,241,0.3)] mb-4">
+                <img src={selectedFileUrl} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+              
+              <p className="text-content-secondary text-sm font-bold mb-8 truncate w-full text-center">
+                {selectedFileName || 'avatar.jpg'}
+              </p>
+
+              <div className="flex flex-col gap-3 w-full">
+                <button
+                  onClick={handleSaveAvatar}
+                  disabled={isSaving}
+                  className="w-full py-3.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-xl font-bold shadow-lg shadow-brand-primary/30 transition-transform active:scale-95 disabled:opacity-50 flex justify-center items-center gap-2"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Uploading...
+                    </>
+                  ) : 'Save Photo'}
+                </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isSaving}
+                  className="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-colors disabled:opacity-50"
+                >
+                  Choose Another Photo
+                </button>
+                {profile.avatarUrl && (
+                  <button
+                    onClick={() => { setShowPreviewModal(false); setShowRemoveConfirm(true); }}
+                    disabled={isSaving}
+                    className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-bold transition-colors disabled:opacity-50"
+                  >
+                    Remove Current Photo
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setShowPreviewModal(false);
+                    setSelectedFileUrl(null);
+                    setSelectedFileName(null);
+                    clearDraft();
+                  }}
+                  disabled={isSaving}
+                  className="w-full py-3 text-content-secondary hover:text-white rounded-xl font-bold transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {showRemoveConfirm && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md px-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-navy-800 w-full max-w-sm rounded-3xl p-6 border border-white/10 shadow-2xl flex flex-col gap-6"
+            >
+              <div>
+                <h3 className="text-xl font-black text-white mb-2">Remove profile picture?</h3>
+                <p className="text-content-secondary text-sm">
+                  This action will revert your profile to the default avatar.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowRemoveConfirm(false)}
+                  disabled={isSaving}
+                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRemovePhoto}
+                  disabled={isSaving}
+                  className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-colors disabled:opacity-50 flex justify-center items-center"
+                >
+                  {isSaving ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : 'Remove'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
