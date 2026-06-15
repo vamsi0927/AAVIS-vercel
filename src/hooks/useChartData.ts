@@ -42,74 +42,86 @@ export function useChartData(
     return d;
   }, []);
 
-  // Earliest scan date = effective "signup date" for chart purposes
-  const earliestDate = useMemo(() => {
-    if (allScans.length === 0) {
-      // Default: 7 days ago if no scans
-      const d = new Date();
-      d.setDate(d.getDate() - 6);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    }
+  // Earliest scan date = signup anchor. Fallback to today if no scans.
+  const signupDate = useMemo(() => {
+    if (allScans.length === 0) return new Date();
     const timestamps = allScans.map(s => new Date(s.date).getTime());
     const d = new Date(Math.min(...timestamps));
     d.setHours(0, 0, 0, 0);
     return d;
   }, [allScans]);
 
-  // Build chart data points
+  // Build chart data: weekly or monthly buckets from signupDate → today
   const chartData = useMemo((): ChartDataPoint[] => {
+    if (allScans.length === 0) return [];
     const data: ChartDataPoint[] = [];
 
     if (timeRange === 'week') {
-      // Show each individual day from earliest scan to today
-      const cursor = new Date(earliestDate);
-      cursor.setHours(0, 0, 0, 0);
+      // Snap signupDate back to the Monday of that week
+      const firstDay = new Date(signupDate);
+      const dow = firstDay.getDay(); // 0=Sun, 1=Mon...
+      const snapBack = dow === 0 ? 6 : dow - 1; // days to subtract to reach Monday
+      firstDay.setDate(firstDay.getDate() - snapBack);
+      firstDay.setHours(0, 0, 0, 0);
+
+      const cursor = new Date(firstDay);
 
       while (cursor <= today) {
-        const dStr = cursor.toDateString();
-        const scansOnDay = allScans.filter(s => new Date(s.date).toDateString() === dStr);
-        const avgScore = scansOnDay.length > 0
-          ? Math.round(scansOnDay.reduce((a, s) => a + s.score, 0) / scansOnDay.length)
+        const weekStart = new Date(cursor);
+        const weekEnd = new Date(cursor);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        weekEnd.setHours(23, 59, 59, 999);
+
+        const effectiveEnd = weekEnd > today ? today : weekEnd;
+
+        const scansInBucket = allScans.filter(s => {
+          const t = new Date(s.date).getTime();
+          return t >= weekStart.getTime() && t <= effectiveEnd.getTime();
+        });
+
+        const avgScore = scansInBucket.length > 0
+          ? Math.round(scansInBucket.reduce((acc, s) => acc + s.score, 0) / scansInBucket.length)
           : 0;
 
         data.push({
-          day: cursor.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+          day: weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
           score: avgScore,
-          scans: scansOnDay.length,
-          isEmpty: scansOnDay.length === 0,
-          rawDate: new Date(cursor),
-          scansData: scansOnDay,
+          scans: scansInBucket.length,
+          isEmpty: scansInBucket.length === 0,
+          rawDate: new Date(weekStart),
+          scansData: scansInBucket,
         });
 
-        cursor.setDate(cursor.getDate() + 1);
+        cursor.setDate(cursor.getDate() + 7);
       }
+
     } else {
-      // Month view: one bar per calendar month from earliest → today
-      const cursor = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
+      // Monthly buckets from the first calendar month of signupDate → today
+      const cursor = new Date(signupDate.getFullYear(), signupDate.getMonth(), 1);
 
       while (cursor <= today) {
         const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
         const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
         monthEnd.setHours(23, 59, 59, 999);
 
-        const label = monthStart.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+        const effectiveEnd = monthEnd > today ? today : monthEnd;
 
-        const scansInMonth = allScans.filter(s => {
+        const scansInBucket = allScans.filter(s => {
           const t = new Date(s.date).getTime();
-          return t >= monthStart.getTime() && t <= Math.min(monthEnd.getTime(), today.getTime());
+          return t >= monthStart.getTime() && t <= effectiveEnd.getTime();
         });
-        const avgScore = scansInMonth.length > 0
-          ? Math.round(scansInMonth.reduce((a, s) => a + s.score, 0) / scansInMonth.length)
+
+        const avgScore = scansInBucket.length > 0
+          ? Math.round(scansInBucket.reduce((acc, s) => acc + s.score, 0) / scansInBucket.length)
           : 0;
 
         data.push({
-          day: label,
+          day: monthStart.toLocaleDateString(undefined, { month: 'short', year: '2-digit' }),
           score: avgScore,
-          scans: scansInMonth.length,
-          isEmpty: scansInMonth.length === 0,
+          scans: scansInBucket.length,
+          isEmpty: scansInBucket.length === 0,
           rawDate: new Date(monthStart),
-          scansData: scansInMonth,
+          scansData: scansInBucket,
         });
 
         cursor.setMonth(cursor.getMonth() + 1);
@@ -117,9 +129,9 @@ export function useChartData(
     }
 
     return data;
-  }, [allScans, timeRange, earliestDate, today]);
+  }, [allScans, timeRange, signupDate, today]);
 
-  // Stats over ALL scans in the visible range
+  // Stats calculated over all scans
   const stats = useMemo(() => {
     const scores = allScans.map(s => s.score);
     const avg = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
@@ -155,13 +167,12 @@ export function useChartData(
     } as ChartStats;
   }, [allScans, chartData]);
 
-  // Date range text
+  // Date range label: "<signup date> – Present"
   const dateRangeText = useMemo(() => {
-    const start = earliestDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-    const end = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     if (allScans.length === 0) return 'No scan history yet';
-    return `${start} – ${end}`;
-  }, [earliestDate, allScans.length]);
+    const start = signupDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    return `${start} – Present`;
+  }, [signupDate, allScans.length]);
 
   return { chartData, stats, dateRangeText };
 }
