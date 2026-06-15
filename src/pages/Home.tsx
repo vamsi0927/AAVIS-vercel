@@ -307,7 +307,7 @@ export function Home() {
                           </p>
                         </div>
                           <span
-                          className={`text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-md ${scan.verdict === 'safe' ? 'bg-brand-safe/20 text-brand-safe' : scan.verdict === 'caution' ? 'bg-brand-caution/20 text-brand-caution' : 'bg-brand-hazardous/20 text-brand-hazardous'}`}>
+                          className={`text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-md shrink-0 whitespace-nowrap ${scan.verdict === 'safe' ? 'bg-brand-safe/20 text-brand-safe' : scan.verdict === 'caution' ? 'bg-brand-caution/20 text-brand-caution' : 'bg-brand-hazardous/20 text-brand-hazardous'}`}>
                           
                             {scan.verdict}
                           </span>

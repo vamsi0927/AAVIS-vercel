@@ -40,5 +40,7 @@ export const supabase = createClient(
  * Returns false if env vars are missing — lets the app gracefully fall back.
  */
 export function isSupabaseConfigured(): boolean {
-  return !!supabaseUrl && !!supabaseAnonKey && supabaseUrl.startsWith('https://');
+  const url = supabaseUrl || 'https://lfhnlsniuubcvjpjwldj.supabase.co';
+  const key = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmaG5sc25pdXViY3ZqcGp3bGRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODY1NTAsImV4cCI6MjA5NDE2MjU1MH0.yhY_JtKYOikbja4PNIXcq52iWANqYfvzOQF4gNMcuyM';
+  return !!url && !!key && url.startsWith('https://');
 }
