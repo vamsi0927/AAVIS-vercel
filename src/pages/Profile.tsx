@@ -239,7 +239,7 @@ export function Profile() {
   const activeConditions = profile.conditions || [];
 
   return (
-    <div className="flex flex-col h-full bg-navy-900 pb-24 relative overflow-hidden">
+    <div className="flex flex-col h-full bg-navy-900 pb-0 relative overflow-hidden">
       {/* Background ambient glow */}
       <div className="absolute top-0 left-0 right-0 h-[40vh] bg-gradient-to-b from-brand-primary/10 to-transparent blur-3xl pointer-events-none" />
       <div className="absolute bottom-20 right-0 w-72 h-72 bg-brand-secondary/5 rounded-full blur-[100px] pointer-events-none" />
@@ -267,7 +267,7 @@ export function Profile() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar px-6 pb-8 mt-2 relative z-10 md:px-8 md:max-w-7xl md:mx-auto md:w-full">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-6 pb-32 mt-2 relative z-10 md:px-8 md:max-w-7xl md:mx-auto md:w-full">
         
                 <div className="md:grid md:grid-cols-12 md:gap-8">
           

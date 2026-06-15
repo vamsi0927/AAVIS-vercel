@@ -80,7 +80,7 @@ export function Home() {
       <div className="absolute top-0 right-0 w-80 h-80 bg-brand-primary/10 rounded-full blur-[100px]" />
       <div className="absolute bottom-20 left-0 w-72 h-72 bg-brand-secondary/5 rounded-full blur-[100px]" />
 
-      <div className="flex-1 overflow-y-auto no-scrollbar pb-24 relative z-10">
+      <div className="flex-1 overflow-y-auto no-scrollbar pb-32 relative z-10">
         {/* Header */}
         <header className="pt-safe pt-8 px-6 pb-6 md:max-w-7xl md:mx-auto md:w-full md:px-8">
           <div className="flex justify-between items-center mb-6">
