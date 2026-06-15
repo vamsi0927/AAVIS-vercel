@@ -428,6 +428,32 @@ export async function getUserScans(userId: string, limit = 50): Promise<DBScan[]
 }
 
 /**
+ * Get scan history for a user within a specific date range.
+ * Used for dynamic historical timeline loading.
+ */
+export async function getUserScansByDateRange(userId: string, startDate: Date, endDate: Date): Promise<DBScan[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  // End of day for endDate to ensure we capture scans happening on the last day
+  const endOfDay = new Date(endDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const { data, error } = await supabase
+    .from('scans')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('date', startDate.toISOString())
+    .lte('date', endOfDay.toISOString())
+    .order('date', { ascending: false });
+
+  if (error) {
+    console.error('[Aavis] Failed to fetch historical scans:', error);
+    return [];
+  }
+  return (data || []) as DBScan[];
+}
+
+/**
  * Delete a specific scan for a user.
  */
 export async function deleteUserScan(scanId: string, userId: string): Promise<boolean> {
