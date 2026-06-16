@@ -512,10 +512,8 @@ export function HealthDashboard() {
           {/* Streak & Grade */}
           <div className="grid grid-cols-2 gap-4">
             <div className="glass-card border border-brand-caution/30 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
-              <div className="text-3xl mb-1">🔥</div>
-              <div className="text-4xl font-display font-bold text-white leading-none mb-1">{streak}</div>
-              <div className="text-sm font-medium text-white">Day Streak</div>
-              <div className="text-xs text-brand-safe font-medium mt-1">{streak === 0 ? 'Start today 💪' : 'Keep it going!'}</div>
+              <div className="text-3xl mb-2">🔥</div>
+              <p className="text-sm italic text-white/90 leading-relaxed font-medium">"{quoteText}"</p>
             </div>
             <div className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
               <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold mb-2 ${
@@ -530,11 +528,6 @@ export function HealthDashboard() {
             </div>
           </div>
 
-          {/* Motivational Quote */}
-          <div className="glass-card rounded-2xl p-5 border border-white/5 flex items-center gap-4">
-            <div className="text-3xl flex-shrink-0">🔥</div>
-            <p className="text-sm italic text-white/90 leading-relaxed font-medium">"{quoteText}"</p>
-          </div>
 
           {/* Products Avoided */}
           <div className="glass-card border border-brand-safe/30 rounded-2xl p-5 flex flex-col relative overflow-hidden">

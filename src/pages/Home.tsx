@@ -29,7 +29,7 @@ export function Home() {
   const { profile, scans } = useAppContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
-  const recentScans = scans.slice(0, 6);
+  const recentScans = scans.slice(0, 2);
   
   // Calculate dynamic stats
   const totalScans = scans.length;
@@ -120,8 +120,8 @@ export function Home() {
           </div>
         </header>
         
-        {/* Desktop SaaS Stats Cards */}
-        <div className="hidden md:grid md:grid-cols-4 gap-4 md:max-w-7xl md:mx-auto md:w-full md:px-8 mb-6">
+        {/* SaaS Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-6 md:px-8 md:max-w-7xl md:mx-auto md:w-full mb-6">
           <div className="glass-card rounded-2xl p-4 border border-white/5 bg-navy-800/40">
             <span className="text-[10px] text-content-secondary uppercase tracking-widest font-bold block">Average Score</span>
             <div className="flex items-baseline gap-2 mt-2">
@@ -206,7 +206,40 @@ export function Home() {
               </div>
             </div>
 
-            {/* Recent Scans (Moved from Right Column) */}
+            {/* New Quick Links */}
+            <div className="px-6 md:px-0">
+              <h3 className="text-lg font-display font-bold mb-4 hidden md:block">Quick Tools</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3">
+                <button 
+                  onClick={() => navigate('/education/myths')}
+                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg shrink-0">🤔</div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-bold text-white block break-words whitespace-normal">Discover Food Myths</span>
+                    <span className="text-xs text-content-secondary mt-0.5 block break-words whitespace-normal">Learn what's hidden on standard labels</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
+                </button>
+
+                <button 
+                  onClick={() => navigate('/dashboard/water')}
+                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg shrink-0">💧</div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-bold text-white block break-words whitespace-normal">Water Tracker</span>
+                    <span className="text-xs text-content-secondary mt-0.5 block break-words whitespace-normal">Log and track daily hydration</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Quick Links & Recent Scans */}
+          <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-6">
+            {/* Recent Scans (Moved from Left Column) */}
             <div className="px-6 md:px-0">
               <div className="flex justify-between items-end mb-4">
                 <h3 className="text-lg font-display font-bold">Recent Scans</h3>
@@ -226,7 +259,7 @@ export function Home() {
                   <p className="text-content-secondary text-sm">No recent scans.</p>
                 </div> :
 
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                   {recentScans.map((scan) => {
                   const product = scan.product || SAMPLE_PRODUCTS.find(
                     (p) => p.id === scan.productId
@@ -273,39 +306,6 @@ export function Home() {
                 })}
                 </div>
               }
-            </div>
-          </div>
-
-          {/* Right Column: Quick Links & Recent Scans */}
-          <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-6">
-            {/* New Quick Links */}
-            <div className="px-6 md:px-0">
-              <h3 className="text-lg font-display font-bold mb-4 hidden md:block">Quick Tools</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3">
-                <button 
-                  onClick={() => navigate('/education/myths')}
-                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg shrink-0">🤔</div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block break-words whitespace-normal">Discover Food Myths</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block break-words whitespace-normal">Learn what's hidden on standard labels</span>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
-                </button>
-
-                <button 
-                  onClick={() => navigate('/dashboard/water')}
-                  className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg shrink-0">💧</div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-sm font-bold text-white block break-words whitespace-normal">Water Tracker</span>
-                    <span className="text-xs text-content-secondary mt-0.5 block break-words whitespace-normal">Log and track daily hydration</span>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
-                </button>
-              </div>
             </div>
 
 

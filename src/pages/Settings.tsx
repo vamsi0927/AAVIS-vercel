@@ -202,6 +202,27 @@ export function Settings() {
           </div>
         </section>
 
+        {/* Column 4: ACCOUNT */}
+        <section className="space-y-5 md:hidden">
+          <h3 className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">
+            Account
+          </h3>
+          <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
+            <button
+              onClick={() => {
+                logout();
+                navigate('/login');
+                toast.success('Logged out successfully');
+              }}
+              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors text-red-400">
+              <div className="flex items-center gap-4">
+                <LogOut className="w-5 h-5" />
+                <span className="font-bold text-[15px]">Sign Out</span>
+              </div>
+            </button>
+          </div>
+        </section>
+
         {/* App Version */}
         <div className="col-span-1 md:col-span-3 flex justify-center items-center mt-8 pt-8">
           <p className="text-xs font-semibold text-content-secondary/40 tracking-widest uppercase">Aavis Version 1.0.0 (Build 42)</p>
