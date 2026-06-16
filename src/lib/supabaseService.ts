@@ -711,3 +711,83 @@ export async function getDietAdvice(
     return 'Could not generate diet advice. Try again later.';
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// SAVED MYTHS
+// ═══════════════════════════════════════════════════════════════
+
+export async function saveMythToCloud(
+  userId: string,
+  mythData: Omit<import('./types').SavedMyth, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+): Promise<import('./types').SavedMyth | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  try {
+    const payload = {
+      user_id: userId,
+      question: mythData.question,
+      correct_answer: mythData.correct_answer,
+      user_answer: mythData.user_answer,
+      is_correct: mythData.is_correct,
+      explanation: mythData.explanation,
+      sources: mythData.sources,
+      category: mythData.category
+    };
+    console.log('[SupabaseService] Inserting myth payload:', payload);
+
+    const { data, error } = await supabase
+      .from('saved_myths')
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        // Unique violation
+        console.log('[SupabaseService] Myth already saved by this user.');
+      } else {
+        console.error('[SupabaseService] Error saving myth to DB:', error);
+      }
+      return null;
+    }
+    
+    console.log('[SupabaseService] Insert successful. Returned data:', data);
+    return data as import('./types').SavedMyth;
+  } catch (e) {
+    console.error('[SupabaseService] Error in saveMythToCloud:', e);
+    return null;
+  }
+}
+
+export async function getSavedMyths(userId: string): Promise<import('./types').SavedMyth[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const { data, error } = await supabase
+    .from('saved_myths')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[Supabase] Error fetching saved myths:', error);
+    return [];
+  }
+
+  return data as import('./types').SavedMyth[];
+}
+
+export async function deleteSavedMyth(mythId: string): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false;
+
+  const { error } = await supabase
+    .from('saved_myths')
+    .delete()
+    .eq('id', mythId);
+
+  if (error) {
+    console.error('[Supabase] Error deleting saved myth:', error);
+    return false;
+  }
+
+  return true;
+}

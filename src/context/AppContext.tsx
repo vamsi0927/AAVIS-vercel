@@ -4,12 +4,11 @@ import {
   AppState,
   UserProfile,
   ScanResult,
-  NotificationPrefs,
-  AppNotification } from
+  SavedMyth } from
 '../lib/types';
 import { loadLocalPrefs, saveLocalPrefs } from '../lib/storage';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { getOrCreateUser, updateUserProfile, getUserScans } from '../lib/supabaseService';
+import { getOrCreateUser, updateUserProfile, getUserScans, getSavedMyths, saveMythToCloud, deleteSavedMyth } from '../lib/supabaseService';
 import { computeHealthScore } from '../lib/scoring';
 
 interface AppContextType extends AppState {
@@ -27,52 +26,17 @@ interface AppContextType extends AppState {
   restoreScans: (scans: ScanResult[]) => void;
   toggleBookmark: (productId: string) => void;
   setLanguage: (lang: 'en' | 'hi') => void;
-  updateNotificationPrefs: (prefs: NotificationPrefs) => void;
   setTheme: (theme: 'dark' | 'light') => void;
   setCameraPermission: (permission: 'unknown' | 'granted' | 'denied') => void;
-  setNotificationsEnabled: (enabled: boolean) => void;
-  addNotification: (notification: Omit<AppNotification, 'id' | 'time' | 'read'>) => void;
-  markNotificationAsRead: (id: string) => void;
-  clearNotifications: () => void;
   supabaseUserId: string | null;
   loadCloudScans: () => Promise<void>;
+  loadSavedMythsContext: () => Promise<void>;
+  saveMyth: (mythData: Omit<SavedMyth, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<SavedMyth | null>;
+  removeSavedMyth: (mythId: string) => Promise<boolean>;
 }
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const defaultNotifications: AppNotification[] = [
-  {
-    id: 'default-1',
-    type: 'warning',
-    title: 'Recall Alert',
-    body: 'A product you recently scanned has been recalled. Tap for details.',
-    time: '2h ago',
-    read: false
-  },
-  {
-    id: 'default-2',
-    type: 'tip',
-    title: 'Daily Tip',
-    body: 'Foods labeled "fat-free" often contain extra sugar. Always check the label.',
-    time: '5h ago',
-    read: false
-  },
-  {
-    id: 'default-3',
-    type: 'report',
-    title: 'Weekly Report Ready',
-    body: 'Your weekly health summary is here. See how you did this week.',
-    time: 'Yesterday',
-    read: true
-  },
-  {
-    id: 'default-4',
-    type: 'tip',
-    title: 'Did you know?',
-    body: 'E621 (MSG) can trigger headaches in sensitive individuals.',
-    time: '2 days ago',
-    read: true
-  }
-];
+
 
 const getInitialState = (): AppState => {
   const prefs = loadLocalPrefs();
@@ -93,14 +57,11 @@ const getInitialState = (): AppState => {
     bookmarkedProductIds: [],
     scanCount: 0,
     hasRated: false,
-    notifications: defaultNotifications,
-    // Loaded from local preferences
     theme: prefs.theme,
     language: prefs.language,
-    notificationPrefs: prefs.notificationPrefs,
     cameraPermission: prefs.cameraPermission,
-    notificationsEnabled: prefs.notificationsEnabled,
     hasCompletedOnboarding: prefs.hasCompletedOnboarding,
+    savedMyths: [],
   };
 };
 
@@ -118,12 +79,10 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     saveLocalPrefs({
       theme: state.theme,
       language: state.language,
-      notificationPrefs: state.notificationPrefs,
       cameraPermission: state.cameraPermission,
-      notificationsEnabled: state.notificationsEnabled,
       hasCompletedOnboarding: state.hasCompletedOnboarding,
     });
-  }, [state.theme, state.language, state.notificationPrefs, state.cameraPermission, state.notificationsEnabled, state.hasCompletedOnboarding]);
+  }, [state.theme, state.language, state.cameraPermission, state.hasCompletedOnboarding]);
 
 
   // ── Supabase Auth Listener ──
@@ -251,6 +210,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       }
 
       await loadCloudScans();
+      await loadSavedMythsContext();
 
     } catch (error: any) {
       console.error('Error in handleAuthUser:', error);
@@ -330,9 +290,67 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           return { ...prev, scans: deduped, scanCount: deduped.length, bookmarkedProductIds: allBookmarks };
         });
       }
-    } catch (err) {
-      console.error('[Aavis] Failed to load cloud scans:', err);
+    } catch (e) {
+      console.error('Error fetching cloud scans:', e);
     }
+  };
+
+  const loadSavedMythsContext = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    if (!userId || !isSupabaseConfigured()) return;
+
+    try {
+      console.log('[AppContext] Loading saved myths for user:', userId);
+      const dbMyths = await getSavedMyths(userId);
+      console.log('[AppContext] Successfully loaded', dbMyths.length, 'myths from cloud.');
+      setState(prev => ({
+        ...prev,
+        savedMyths: dbMyths
+      }));
+    } catch (e) {
+      console.error('[AppContext] Error fetching saved myths:', e);
+    }
+  };
+
+  const saveMyth = async (mythData: Omit<import('../lib/types').SavedMyth, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
+    if (!supabaseUserId) {
+      console.log('[AppContext] Save Myth aborted: No Supabase User ID');
+      return null;
+    }
+
+    console.log('[AppContext] Checking duplicates for myth:', mythData.question);
+    const isDuplicate = state.savedMyths.some(
+      m => m.question === mythData.question && m.correct_answer === mythData.correct_answer
+    );
+    if (isDuplicate) {
+      console.log('[AppContext] Myth is already saved in state (duplicate check passed)');
+      return null;
+    }
+
+    console.log('[AppContext] Calling saveMythToCloud...');
+    const newMyth = await saveMythToCloud(supabaseUserId, mythData);
+    if (newMyth) {
+      console.log('[AppContext] Successfully saved to cloud. Updating local state.');
+      setState(prev => ({
+        ...prev,
+        savedMyths: [newMyth, ...prev.savedMyths]
+      }));
+    } else {
+      console.log('[AppContext] saveMythToCloud returned null.');
+    }
+    return newMyth;
+  };
+
+  const removeSavedMyth = async (mythId: string) => {
+    const success = await deleteSavedMyth(mythId);
+    if (success) {
+      setState(prev => ({
+        ...prev,
+        savedMyths: prev.savedMyths.filter(m => m.id !== mythId)
+      }));
+    }
+    return success;
   };
 
   const login = (userData: { username: string; name?: string }) => {
@@ -494,12 +512,6 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       language
     }));
   };
-  const updateNotificationPrefs = (notificationPrefs: NotificationPrefs) => {
-    setState((prev) => ({
-      ...prev,
-      notificationPrefs
-    }));
-  };
 
   const setTheme = (theme: 'dark' | 'light') => {
     setState((prev) => ({ ...prev, theme }));
@@ -515,46 +527,6 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     setState((prev) => ({ ...prev, cameraPermission }));
   };
 
-  const setNotificationsEnabled = (notificationsEnabled: boolean) => {
-    setState((prev) => ({ ...prev, notificationsEnabled }));
-  };
-
-  const addNotification = (n: Omit<AppNotification, 'id' | 'time' | 'read'>) => {
-    const newNotif: AppNotification = {
-      ...n,
-      id: `notif-${Date.now()}`,
-      time: 'Just now',
-      read: false
-    };
-    
-    setState((prev) => ({
-      ...prev,
-      notifications: [newNotif, ...prev.notifications]
-    }));
-
-    // Trigger dynamic Web Notification if permitted
-    if ("Notification" in window && Notification.permission === "granted") {
-      try {
-        new Notification(newNotif.title, { body: newNotif.body });
-      } catch (e) {
-        console.warn("Browser Notification instantiation failed:", e);
-      }
-    }
-  };
-
-  const markNotificationAsRead = (id: string) => {
-    setState((prev) => ({
-      ...prev,
-      notifications: prev.notifications.map(item => item.id === id ? { ...item, read: true } : item)
-    }));
-  };
-
-  const clearNotifications = () => {
-    setState((prev) => ({
-      ...prev,
-      notifications: []
-    }));
-  };
 
   return (
     <AppContext.Provider
@@ -574,15 +546,13 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         restoreScans,
         toggleBookmark,
         setLanguage,
-        updateNotificationPrefs,
         setTheme,
         setCameraPermission,
-        setNotificationsEnabled,
-        addNotification,
-        markNotificationAsRead,
-        clearNotifications,
         supabaseUserId,
         loadCloudScans,
+        loadSavedMythsContext,
+        saveMyth,
+        removeSavedMyth
       }}>
       
       {children}

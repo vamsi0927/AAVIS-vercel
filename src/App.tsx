@@ -57,7 +57,6 @@ import { NutritionGuide } from './pages/education/NutritionGuide';
 import { FSSAIGuidelines } from './pages/education/FSSAIGuidelines';
 import { Settings } from './pages/Settings';
 import { LanguageSettings } from './pages/settings/Language';
-import { NotificationPrefsSettings } from './pages/settings/NotificationPrefs';
 import { EditProfile } from './pages/settings/EditProfile';
 import { UpdateConditions } from './pages/settings/UpdateConditions';
 import { ApiSettings } from './pages/settings/ApiSettings';
@@ -75,7 +74,6 @@ import { FoodMyths } from './pages/education/FoodMyths';
 // Other
 import { Saved } from './pages/Saved';
 import { Search } from './pages/Search';
-import { Notifications } from './pages/Notifications';
 import { Help } from './pages/support/Help';
 import { Contact } from './pages/support/Contact';
 import { AboutAavis } from './pages/support/AboutAavis';
@@ -266,14 +264,7 @@ function AppContent() {
             </ProtectedRoute>
           } />
         
-        <Route
-          path="/notifications"
-          element={
-          <ProtectedRoute>
-              <Notifications />
-            </ProtectedRoute>
-          } />
-        
+
 
         {/* Education */}
         <Route
@@ -302,13 +293,7 @@ function AppContent() {
             </ProtectedRoute>
           } />
         
-        <Route
-          path="/settings/notifications"
-          element={
-          <ProtectedRoute>
-              <NotificationPrefsSettings />
-            </ProtectedRoute>
-          } />
+
         
         <Route
           path="/settings/edit-profile"

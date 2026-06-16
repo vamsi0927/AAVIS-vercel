@@ -1,12 +1,11 @@
-import { NotificationPrefs } from './types';
+
 
 export interface LocalPreferences {
   theme: 'dark' | 'light';
   language: 'en' | 'hi';
-  notificationPrefs: NotificationPrefs;
   cameraPermission: 'unknown' | 'granted' | 'denied';
-  notificationsEnabled: boolean;
   hasCompletedOnboarding: boolean; // Keep this local so device remembers onboarding state
+  mythsCompletedCount: number;
 }
 
 const PREFS_KEY = 'aavis_local_prefs';
@@ -14,17 +13,9 @@ const PREFS_KEY = 'aavis_local_prefs';
 const DEFAULT_PREFS: LocalPreferences = {
   theme: 'dark',
   language: 'en',
-  notificationPrefs: {
-    dailyTips: true,
-    scanReminders: true,
-    productAlerts: true,
-    weeklyReport: true,
-    mealReminders: true,
-    healthAlerts: true
-  },
   cameraPermission: 'unknown',
-  notificationsEnabled: false,
   hasCompletedOnboarding: false,
+  mythsCompletedCount: 0,
 };
 
 export function loadLocalPrefs(): LocalPreferences {

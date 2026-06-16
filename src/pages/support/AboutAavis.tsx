@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Shield, Leaf, Activity } from 'lucide-react';
+import logoImg from '../../assets/logo.png';
 
 export function AboutAavis() {
   const navigate = useNavigate();
@@ -25,11 +26,12 @@ export function AboutAavis() {
         
         {/* Logo / Hero */}
         <div className="flex flex-col items-center justify-center pt-4 pb-6">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center mb-4 shadow-xl shadow-brand-primary/20">
-            <span className="text-4xl">🥑</span>
+          <div className="w-28 h-28 flex items-center justify-center relative mb-6">
+            <div className="absolute inset-0 bg-brand-primary/20 rounded-full blur-xl animate-pulse" />
+            <img src={logoImg} alt="Aavis Logo" className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
           </div>
           <h2 className="text-3xl font-display font-black text-white tracking-tight">Aavis</h2>
-          <p className="text-content-secondary text-sm mt-1">Version 2.5.0</p>
+          <p className="text-content-secondary text-sm mt-1">Version 1.0.0 (Build 42)</p>
           <p className="text-center text-white/80 mt-4 leading-relaxed px-4">
             Aavis is your intelligent companion for navigating the complex world of food labels. 
             In India, reading and understanding ingredient labels isn't yet a common habit—but it needs to be. 

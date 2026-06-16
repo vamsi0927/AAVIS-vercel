@@ -96,34 +96,36 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-  if (apiKey && endpoint === '/api/analyze' && (body as any).text) {
+  if (apiKey && (endpoint === '/api/analyze' || endpoint === '/api/chat')) {
     // Bypass Render backend completely for Vercel previews
-    const text = (body as any).text;
-    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
-    const requestBody = {
-      contents: [{ parts: [{ text }] }],
-      generationConfig: { temperature: 0.1, topP: 0.8, maxOutputTokens: 4096 },
-    };
+    const text = (body as any).text || (body as any).message;
+    if (text) {
+      const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
+      const requestBody = {
+        contents: [{ parts: [{ text }] }],
+        generationConfig: { temperature: 0.1, topP: 0.8, maxOutputTokens: 4096 },
+      };
 
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-    });
+      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || 'Gemini API error');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || 'Gemini API error');
 
-    const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!textResponse) throw new Error('Empty response from Gemini');
+      const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!textResponse) throw new Error('Empty response from Gemini');
 
-    let cleaned = textResponse.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
-    try {
-      return JSON.parse(cleaned);
-    } catch (e) {
-      const match = cleaned.match(/\{[\s\S]*\}/);
-      if (match) return JSON.parse(match[0]);
-      throw new Error('Failed to parse JSON from AI response');
+      let cleaned = textResponse.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e) {
+        const match = cleaned.match(/\{[\s\S]*\}/);
+        if (match) return JSON.parse(match[0]);
+        throw new Error('Failed to parse JSON from AI response');
+      }
     }
   }
 
@@ -452,31 +454,75 @@ ${rawText}
 export interface FoodMythData {
   myth: string;
   fact: string;
+  explanation: string;
+  sources: { name: string; url: string; }[];
+  category: string;
 }
 
 export async function generateEducationalContent(): Promise<FoodMythData> {
   const prompt = `Generate a random, surprising food nutrition myth commonly believed (especially in India) and its reality.
+IMPORTANT: Generate a myth that has NOT appeared before.
+
 Return a strict JSON object with this exact format:
 {
   "myth": "A 1-sentence question asking about the myth (e.g. 'Is MSG actually bad for you?')",
-  "fact": "A highly concise 2 to 3 sentence explanation debunking it (under 50 words)."
+  "fact": "A highly concise 2 to 3 sentence explanation debunking it (under 50 words).",
+  "explanation": "A detailed but accessible 3-4 sentence scientific explanation of why the myth is false.",
+  "sources": [
+    { "name": "e.g. WHO, Mayo Clinic", "url": "https://..." }
+  ],
+  "category": "Must be exactly one of: Nutrition, Food Safety, Additives, Sugar, Processing, Organic Claims, Artificial Sweeteners, Cholesterol, Protein, Vitamins"
 }
 Do not include any other text, markdown formatting, or backticks. Return raw JSON.`;
 
-  const parsed = await callBackend('/api/chat', { message: prompt });
-  const text = parsed.reply || '';
   try {
+    const parsed = await callBackend('/api/chat', { message: prompt });
+    
+    // Level 1: parsed cleanly by callBackend
+    if (parsed && parsed.myth && parsed.fact && parsed.explanation && parsed.category && Array.isArray(parsed.sources)) {
+      return parsed;
+    }
+
+    const text = parsed?.reply || '';
+    
+    // Level 2: Try JSON extraction
     const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
-    return JSON.parse(cleaned);
-  } catch (e) {
-    // Regex parsing fallback
+    if (cleaned) {
+      try {
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const extracted = JSON.parse(jsonMatch[0]);
+          if (extracted.myth && extracted.fact && extracted.explanation) {
+            return extracted;
+          }
+        }
+      } catch (e) {
+        console.warn('[Gemini] JSON parse failed, trying regex', e);
+      }
+    }
+
+    // Level 3: Regex extraction
     const mythMatch = text.match(/"myth"\s*:\s*"([^"]+)"/i) || text.match(/myth["\s:]+([^]*?)(?=fact|})/i);
-    const factMatch = text.match(/"fact"\s*:\s*"([^"]+)"/i) || text.match(/fact["\s:]+([^]*?)$/i);
-    return {
-      myth: mythMatch ? mythMatch[1].trim() : "Does sea salt contain less sodium?",
-      fact: factMatch ? factMatch[1].trim() : "No, sea salt and table salt contain the same amount of sodium by weight. Table salt is just more refined."
-    };
+    const factMatch = text.match(/"fact"\s*:\s*"([^"]+)"/i) || text.match(/fact["\s:]+([^]*?)(?=explanation|})/i);
+    const explMatch = text.match(/"explanation"\s*:\s*"([^"]+)"/i);
+    
+    if (mythMatch && factMatch) {
+      return {
+        myth: mythMatch[1].trim(),
+        fact: factMatch[1].trim(),
+        explanation: explMatch ? explMatch[1].trim() : factMatch[1].trim(),
+        sources: [],
+        category: "Nutrition"
+      };
+    }
+  } catch (err) {
+    console.error('[Gemini] generation failed completely, using fallback:', err);
   }
+
+  // Level 4: Fallback to default database
+  const { DEFAULT_MYTHS } = await import('../data/defaultMyths');
+  const randomMyth = DEFAULT_MYTHS[Math.floor(Math.random() * DEFAULT_MYTHS.length)];
+  return randomMyth;
 }
 
 // ─── Error message mapping ────────────────────────────────────────

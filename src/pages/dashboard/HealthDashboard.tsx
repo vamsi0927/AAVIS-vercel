@@ -392,7 +392,7 @@ export function HealthDashboard() {
                               dataKey="day"
                               axisLine={{ stroke: theme === 'light' ? '#64748b' : '#475569', strokeWidth: 1.5 }}
                               tickLine={false}
-                              tick={{ fill: theme === 'light' ? '#334155' : '#e2e8f0', fontSize: 9, fontWeight: 700, ...(isMobile ? { angle: -45, textAnchor: 'end' } : {}) }}
+                              tick={{ fill: theme === 'light' ? '#334155' : '#e2e8f0', fontSize: isMobile ? 9 : 13, fontWeight: 700, ...(isMobile ? { angle: -45, textAnchor: 'end' } : {}) }}
                               dy={14}
                               interval={0}
                               height={45}

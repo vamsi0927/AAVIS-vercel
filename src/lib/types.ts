@@ -15,6 +15,16 @@ export type ProductCategory =
   | 'Plant-Based Alternative'
   | 'General Food';
 
+export type MythCategory = 
+  | 'Nutrition'
+  | 'Food Safety'
+  | 'Protein'
+  | 'Sugar'
+  | 'Diabetes'
+  | 'Vegan'
+  | 'Additives'
+  | 'General Health';
+
 export interface DimensionScore {
   score: number;
   justification: string;
@@ -128,22 +138,24 @@ export interface ScanResult {
   overallAssessment?: string;
 }
 
-export interface NotificationPrefs {
-  dailyTips: boolean;
-  scanReminders: boolean;
-  productAlerts: boolean;
-  weeklyReport: boolean;
-  mealReminders: boolean;
-  healthAlerts: boolean;
+
+export interface MythSource {
+  name: string;
+  url: string;
 }
 
-export interface AppNotification {
+export interface SavedMyth {
   id: string;
-  type: 'tip' | 'alert' | 'report' | 'warning';
-  title: string;
-  body: string;
-  time: string;
-  read: boolean;
+  user_id: string;
+  question: string;
+  correct_answer: string;
+  user_answer?: string;
+  is_correct?: boolean;
+  explanation: string;
+  sources: MythSource[];
+  category: MythCategory;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AppState {
@@ -155,9 +167,7 @@ export interface AppState {
   scanCount: number;
   hasRated: boolean;
   language: 'en' | 'hi';
-  notificationPrefs: NotificationPrefs;
   theme: 'dark' | 'light';
   cameraPermission: 'unknown' | 'granted' | 'denied';
-  notificationsEnabled: boolean;
-  notifications: AppNotification[];
+  savedMyths: SavedMyth[];
 }
