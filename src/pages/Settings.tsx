@@ -214,7 +214,7 @@ export function Settings() {
                 navigate('/login');
                 toast.success('Logged out successfully');
               }}
-              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors text-red-400">
+              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors text-brand-hazardous">
               <div className="flex items-center gap-4">
                 <LogOut className="w-5 h-5" />
                 <span className="font-bold text-[15px]">Sign Out</span>
