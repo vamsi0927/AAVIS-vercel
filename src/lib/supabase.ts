@@ -7,6 +7,20 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { Preferences } from '@capacitor/preferences';
+
+const capacitorStorage = {
+  getItem: async (key: string): Promise<string | null> => {
+    const { value } = await Preferences.get({ key });
+    return value;
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    await Preferences.set({ key, value });
+  },
+  removeItem: async (key: string): Promise<void> => {
+    await Preferences.remove({ key });
+  },
+};
 
 let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 let supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -27,8 +41,9 @@ export const supabase = createClient(
   supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmaG5sc25pdXViY3ZqcGp3bGRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODY1NTAsImV4cCI6MjA5NDE2MjU1MH0.yhY_JtKYOikbja4PNIXcq52iWANqYfvzOQF4gNMcuyM',
   {
     auth: {
-      persistSession: true,        // Keep session in localStorage
+      storage: capacitorStorage,    // Use Capacitor Preferences
       autoRefreshToken: true,       // Auto-refresh JWT
+      persistSession: true,         // Keep session
       detectSessionInUrl: true,     // Handle OAuth callbacks
       storageKey: 'aavis-auth',     // Custom storage key
     },

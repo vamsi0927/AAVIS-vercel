@@ -234,9 +234,11 @@ export function Result() {
         </button>
         <h1 className="font-display font-black text-lg text-white break-words whitespace-normal px-4">Health Report</h1>
         <div className="flex items-center gap-1">
-          <button onClick={handleReAnalyze} disabled={isReanalyzing} className={`p-2 rounded-xl transition-colors border border-transparent ${isReanalyzing ? 'opacity-50 text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5 hover:border-white/10'}`} title="Recalculate Score">
-            {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
-          </button>
+          {import.meta.env.DEV && (
+            <button onClick={handleReAnalyze} disabled={isReanalyzing} className={`p-2 rounded-xl transition-colors border border-transparent ${isReanalyzing ? 'opacity-50 text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5 hover:border-white/10'}`} title="Recalculate Score">
+              {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+            </button>
+          )}
           <button onClick={() => toggleBookmark(product.id)} className={`p-2 rounded-xl transition-colors ${isBookmarked ? 'text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5'}`}>
             <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>

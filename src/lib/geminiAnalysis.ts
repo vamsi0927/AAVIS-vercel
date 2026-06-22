@@ -91,8 +91,7 @@ export interface GeminiAnalysisResult {
 
 // ─── Helper: call backend ─────────────────────────────────────────
 async function callBackend(endpoint: string, body: object): Promise<any> {
-  console.log('[Analyze Request Payload]', body);
-  console.log('[Analyze Request JSON]', JSON.stringify(body));
+
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -101,8 +100,16 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
     const text = (body as any).text || (body as any).message;
     if (text) {
       const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
+      
+      const history = (body as any).history || [];
+      const contents = [];
+      for (const msg of history) {
+        contents.push({ role: msg.role === 'assistant' ? 'model' : 'user', parts: [{ text: msg.content }] });
+      }
+      contents.push({ role: 'user', parts: [{ text }] });
+
       const requestBody = {
-        contents: [{ parts: [{ text }] }],
+        contents,
         generationConfig: { temperature: 0.1, topP: 0.8, maxOutputTokens: 4096 },
       };
 
@@ -117,6 +124,10 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
 
       const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!textResponse) throw new Error('Empty response from Gemini');
+
+      if (endpoint === '/api/chat') {
+        return { reply: textResponse };
+      }
 
       let cleaned = textResponse.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
       try {
