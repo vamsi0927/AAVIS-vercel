@@ -13,8 +13,8 @@
   --navy-800: 17 19 36;     /* #111324 */
   --navy-700: 27 30 54;     /* #1b1e36 */
   --navy-600: 38 42 74;     /* #262a4a */
-  --content-primary: 244 245 251;   /* #f4f5fb */
-  --content-secondary: 156 163 184; /* #9ca3b8 */
+  --content-primary: 255 255 255;   /* Full White */
+  --content-secondary: 255 255 255; /* Full White */
   --brand-primary: 139 92 246;      /* #8b5cf6 - Neon Purple */
   --brand-secondary: 6 182 212;     /* #06b6d4 - Neon Blue */
   --brand-safe: 16 185 129;         /* #10b981 - Vibrant Emerald */
@@ -28,8 +28,8 @@
   --navy-800: 255 255 255;       /* Pure white for high-contrast cards: #ffffff */
   --navy-700: 170 180 200;       /* Much darker card border for high visibility */
   --navy-600: 150 160 180;       /* Focus/active borders */
-  --content-primary: 20 24 35;   /* Deep charcoal black for crisp text: #141823 */
-  --content-secondary: 90 100 120; /* Slate grey for metadata and secondary elements: #5a6478 */
+  --content-primary: 0 0 0;      /* Full Black */
+  --content-secondary: 0 0 0;    /* Full Black */
 }
 
 /* Add heavy shadow and solid border to all standard cards in light mode */
