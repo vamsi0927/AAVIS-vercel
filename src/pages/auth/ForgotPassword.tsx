@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { supabase } from '../../lib/supabase';
+import { getApiUrl } from '../../lib/apiConfig';
 import logoImg from '../../assets/logo.png';
 
 export function ForgotPassword() {
@@ -21,7 +21,7 @@ export function ForgotPassword() {
 
     setIsSending(true);
     try {
-      const res = await fetch('/api/auth/forgot-password', {
+      const res = await fetch(getApiUrl('/api/auth/forgot-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
@@ -30,12 +30,15 @@ export function ForgotPassword() {
       const data = await res.json();
       
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to send reset link');
+        const msg = data.error || 'Failed to send reset link';
+        // Sanitize raw JSON from being shown to user
+        throw new Error(msg.startsWith('{') ? 'Failed to send reset link. Please try again.' : msg);
       }
       
       toast.success(data.message || 'Password reset link sent to your email!');
     } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+      const msg = err.message || 'An error occurred';
+      toast.error(msg.startsWith('{') || msg.startsWith('[') ? 'An error occurred. Please try again.' : msg);
     } finally {
       setIsSending(false);
     }
@@ -76,7 +79,7 @@ export function ForgotPassword() {
               <input
                 type="email"
                 required
-                placeholder="Enter your email"
+                placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
@@ -89,13 +92,9 @@ export function ForgotPassword() {
               className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
             >
               {isSending ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" /> Sending...
-                </>
+                <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
               ) : (
-                <>
-                  Send Link <ArrowRight className="w-4 h-4" />
-                </>
+                <>Send Reset Link <ArrowRight className="w-4 h-4" /></>
               )}
             </button>
           </form>

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, Loader2, KeyRound } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { getOrCreateUser } from '../../lib/supabaseService';
+import { getApiUrl } from '../../lib/apiConfig';
 import logoImg from '../../assets/logo.png';
 
 export function Register() {
@@ -18,6 +19,8 @@ export function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +39,7 @@ export function Register() {
     setIsLoading(true);
     
     try {
-      // Hit our custom backend endpoint which bypasses Supabase free-tier email limits
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(getApiUrl('/api/auth/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -55,17 +57,22 @@ export function Register() {
         throw new Error(data.error || 'Failed to sign up');
       }
 
-      toast.success('Registration successful! Check your email for the verification link.');
+      toast.success('Account created! Check your email for the verification link.');
       setStep('verify');
     } catch (err: any) {
-      toast.error(err.message || 'Registration failed. Please try again.');
+      // Show clean user-facing message, not raw JSON
+      const msg = err.message || '';
+      if (msg.includes('failed to send verification email')) {
+        toast.error('Account created, but we could not send the verification email. Please contact support.');
+      } else if (msg.startsWith('{') || msg.startsWith('[')) {
+        toast.error('Registration failed. Please try again.');
+      } else {
+        toast.error(msg || 'Registration failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
-  // handleVerify is no longer needed since verification happens via email link clicking.
-  // We can just keep the 'verify' UI as a message telling them to check their email.
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,6 +144,7 @@ export function Register() {
                 onSubmit={handleRegister} 
                 className="space-y-4"
               >
+                {/* Full Name */}
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
                   <input
@@ -149,40 +157,59 @@ export function Register() {
                   />
                 </div>
 
+                {/* Email */}
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
                   <input
                     type="email"
                     required
-                    placeholder="Email"
+                    placeholder="Email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
                   />
                 </div>
 
+                {/* Password with eye toggle */}
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
-                    placeholder="Password"
+                    placeholder="Password (min. 6 characters)"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
 
+                {/* Confirm Password with eye toggle */}
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
                   <input
-                    type="password"
+                    type={showConfirmPassword ? 'text' : 'password'}
                     required
-                    placeholder="Confirm Password"
+                    placeholder="Confirm password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                    className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
 
                 <button

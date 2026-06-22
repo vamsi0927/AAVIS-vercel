@@ -1,9 +1,9 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Lock, Loader2, ArrowRight, Check, X } from 'lucide-react';
+import { ArrowLeft, Lock, Loader2, ArrowRight, Check, X, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
+import { getApiUrl } from '../../lib/apiConfig';
 import logoImg from '../../assets/logo.png';
 
 export function ResetPassword() {
@@ -12,6 +12,8 @@ export function ResetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const token = searchParams.get('token');
   const uid = searchParams.get('uid');
@@ -47,7 +49,7 @@ export function ResetPassword() {
     setIsUpdating(true);
     
     try {
-      const res = await fetch('/api/auth/reset-password', {
+      const res = await fetch(getApiUrl('/api/auth/reset-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -60,13 +62,15 @@ export function ResetPassword() {
       const data = await res.json();
       
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to reset password');
+        const msg = data.error || 'Failed to reset password';
+        throw new Error(msg.startsWith('{') ? 'Failed to reset password. Please try again.' : msg);
       }
       
       toast.success(data.message || 'Password updated successfully! Please sign in.');
       navigate('/login', { replace: true });
     } catch (err: any) {
-      toast.error(err.message || 'An error occurred during password reset');
+      const msg = err.message || 'An error occurred during password reset';
+      toast.error(msg.startsWith('{') || msg.startsWith('[') ? 'An error occurred. Please try again.' : msg);
     } finally {
       setIsUpdating(false);
     }
@@ -95,35 +99,53 @@ export function ResetPassword() {
               <div className="absolute inset-0 bg-brand-primary/20 rounded-full blur-md animate-pulse" />
               <img src={logoImg} alt="Aavis Logo" className="w-16 h-16 object-contain relative z-10" />
             </div>
-            <h1 className="text-2xl font-display font-black tracking-tight text-white mb-1">Reset Password</h1>
+            <h1 className="text-2xl font-display font-black tracking-tight text-white mb-1">New Password</h1>
             <p className="text-content-secondary text-sm">
               Create a new strong password for your account.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* New password with eye toggle */}
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="New Password"
+                placeholder="New password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
 
+            {/* Confirm password with eye toggle */}
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
               <input
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 required
-                placeholder="Confirm Password"
+                placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-4 text-white text-sm placeholder:text-content-secondary"
+                className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
 
             {/* Validation Checklist */}
@@ -143,13 +165,9 @@ export function ResetPassword() {
               className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
             >
               {isUpdating ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" /> Updating...
-                </>
+                <><Loader2 className="w-5 h-5 animate-spin" /> Updating...</>
               ) : (
-                <>
-                  Reset Password <ArrowRight className="w-4 h-4" />
-                </>
+                <>Reset Password <ArrowRight className="w-4 h-4" /></>
               )}
             </button>
           </form>
