@@ -221,6 +221,10 @@ export function Profile() {
   };
 
   const handleSave = () => {
+    if (editData.age !== '' && Number(editData.age) < 13) {
+      toast.error('You must be at least 13 years old to use Aavis.');
+      return;
+    }
     updateProfile(editData);
     setIsEditing(false);
     clearDraft();

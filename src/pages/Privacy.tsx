@@ -23,140 +23,111 @@ export function Privacy() {
         <p className="text-xs text-content-secondary font-bold uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-full inline-block">
           Last updated: June 2026
         </p>
+        <p>Welcome to Aavis! This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and website (the "Service"). Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application.</p>
 
         <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">1. Introduction</h3>
-          <p>
-            AAVIS values your privacy and is committed to protecting your personal information. This Privacy Policy explains what information we collect, how we use it, and how it is protected.
-          </p>
-          <p>
-            By using AAVIS, you agree to the practices described in this Privacy Policy.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h3 className="text-white font-display font-black text-base">2. Information We Collect</h3>
-          <p>Depending on how you use AAVIS, we may collect:</p>
-          
-          <h4 className="text-white font-bold text-sm mt-2">Account Information</h4>
+          <h3 className="text-white font-display font-black text-base">1. Information We Collect</h3>
+          <p>We collect information that you voluntarily provide to us when you register on the Service, express an interest in obtaining information about us or our products, or otherwise contact us.</p>
+          <h4 className="text-white font-bold text-sm mt-4">A. Personal Information</h4>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Name</li>
-            <li>Email address</li>
-            <li>Profile preferences</li>
+            <li><strong>Account Data:</strong> When you create an account, we collect your email address and authentication credentials managed via our database provider (Supabase).</li>
+            <li><strong>Health and Dietary Profile:</strong> To provide personalized nutrition advice, you may voluntarily provide your name, dietary preferences (e.g., Vegetarian, Vegan), specific allergies, and health conditions (e.g., Diabetes, Gout).</li>
           </ul>
-
-          <h4 className="text-white font-bold text-sm mt-4">User Preferences</h4>
+          <h4 className="text-white font-bold text-sm mt-4">B. Usage and Application Data</h4>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Dietary preferences</li>
-            <li>Allergies</li>
-            <li>Health conditions</li>
-            <li>Language settings</li>
+            <li><strong>Scanned Products:</strong> We collect data regarding the food products you scan, including barcodes, product names, and nutritional information, to build your scan history and health insights.</li>
+            <li><strong>Images:</strong> Images used for food label scanning may be temporarily processed and stored in cloud storage to support OCR, analysis, and scan history features. Users may remove scan history and associated images through the application.</li>
+            <li><strong>Chat History:</strong> Conversations you have with the "Aavis AI" nutritionist feature are collected to provide contextual responses.</li>
           </ul>
-
-          <h4 className="text-white font-bold text-sm mt-4">Scan Data</h4>
+          <h4 className="text-white font-bold text-sm mt-4">C. Device Data</h4>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Product names</li>
-            <li>Ingredient lists</li>
-            <li>Nutritional information</li>
-            <li>AI analysis results</li>
-            <li>Scan history</li>
-            <li>Saved products</li>
-          </ul>
-
-          <h4 className="text-white font-bold text-sm mt-4">Images</h4>
-          <p>
-            Images uploaded for OCR analysis may be processed to extract product information and generate nutritional insights.
-          </p>
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">3. How We Use Your Information</h3>
-          <p>Your information is used to:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Provide ingredient and nutritional analysis.</li>
-            <li>Personalize recommendations and health scores.</li>
-            <li>Maintain scan history and saved products.</li>
-            <li>Synchronize data across devices.</li>
-            <li>Improve the quality and reliability of AAVIS.</li>
-            <li>Respond to support requests.</li>
+            <li>We may collect device information such as your mobile device ID, model, manufacturer, and operating system version (via Capacitor) to ensure the app functions correctly across platforms.</li>
           </ul>
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">4. Artificial Intelligence Processing</h3>
-          <p>
-            AAVIS uses artificial intelligence services to analyze ingredients and generate nutritional insights.
-          </p>
-          <p>
-            AI-generated analyses are intended for informational purposes only and may not always be complete or perfectly accurate.
-          </p>
-          <p>
-            Users should independently verify information and consult healthcare professionals when necessary.
-          </p>
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">5. Third-Party Services</h3>
-          <p>AAVIS relies on trusted third-party providers, including:</p>
+          <h3 className="text-white font-display font-black text-base">2. How We Use Your Information</h3>
+          <p>Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Service to:</p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Supabase (authentication and database services)</li>
-            <li>Google Gemini AI (AI analysis)</li>
-            <li>Resend (email delivery)</li>
-            <li>Vercel (hosting and serverless functions)</li>
-          </ul>
-          <p>These providers may process limited information necessary to deliver their services.</p>
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">6. Data Security</h3>
-          <p>AAVIS employs reasonable technical and organizational measures to help protect user information. These measures include:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Secure authentication</li>
-            <li>Encrypted communication (HTTPS)</li>
-            <li>Row Level Security (RLS)</li>
-            <li>Restricted API access</li>
-          </ul>
-          <p>However, no method of electronic transmission or storage can guarantee absolute security.</p>
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">7. User Rights</h3>
-          <p>Users may:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Update their profile information.</li>
-            <li>Delete individual scan records.</li>
-            <li>Delete scan history.</li>
-            <li>Contact us regarding account-related concerns.</li>
+            <li>Create and manage your account.</li>
+            <li>Analyze food labels against your specific dietary restrictions and medical conditions to generate personalized health verdicts (Safe, Caution, Hazardous).</li>
+            <li>Compile your scanning history, calculate health streaks, and generate weekly dietary reports.</li>
+            <li>Communicate with you regarding updates, security alerts, and support messages.</li>
           </ul>
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">8. Children's Privacy</h3>
-          <p>AAVIS is not intended for children under the age of 13.</p>
-          <p>We do not knowingly collect personal information from children under 13 years of age.</p>
+          <h3 className="text-white font-display font-black text-base">3. Third-Party Data Processing</h3>
+          <p>To provide our core features, we share necessary data with trusted third-party service providers in accordance with their respective privacy policies and standard data processing agreements:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Supabase:</strong> We use Supabase for secure backend infrastructure, database management, user authentication, and image storage. Your profile data and scan history are stored here.</li>
+            <li><strong>Google (Gemini API):</strong> We utilize the Gemini AI model to analyze complex ingredient lists, extract text from your photos via OCR, and power the AI Nutritionist. When you scan a product or chat, the text/images are transmitted to Google's API solely for processing the analysis.</li>
+          </ul>
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">9. Data Retention</h3>
-          <p>Information is retained only for as long as necessary to provide the functionality of AAVIS or comply with applicable legal obligations.</p>
-          <p>Users may remove certain data through features provided within the application.</p>
+          <h3 className="text-white font-display font-black text-base">4. Data Security</h3>
+          <p>We implement reasonable administrative and technical safeguards designed to protect your information. Data in transit and at rest is protected using industry-standard encryption protocols provided by our infrastructure partners. Local data on your mobile device is stored using native platform preferences provided by the underlying platform. However, please be aware that no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.</p>
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">10. Cookies and Local Storage</h3>
-          <p>AAVIS may use browser storage or similar technologies to maintain sessions and improve user experience.</p>
-          <p>These technologies are used solely to support the application's functionality.</p>
+          <h3 className="text-white font-display font-black text-base">5. Data Retention</h3>
+          <p>We retain your information for as long as your account remains active or as necessary to provide the Service and comply with applicable legal obligations.</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Scan Images:</strong> Uploaded images of labels may be retained in cloud storage to support scan history and related features.</li>
+            <li>You can delete specific items from your scan history directly within the app, which removes them from our servers.</li>
+          </ul>
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-white font-display font-black text-base">11. Changes to This Privacy Policy</h3>
-          <p>This Privacy Policy may be updated periodically as AAVIS evolves.</p>
-          <p>We will make reasonable efforts to communicate significant changes whenever possible.</p>
-          <p>Continued use of AAVIS following such updates constitutes acceptance of the revised policy.</p>
+          <h3 className="text-white font-display font-black text-base">6. International Data Transfers</h3>
+          <p>Your information may be processed and stored using cloud infrastructure operated by third-party providers located in different jurisdictions. By using the Service, you acknowledge that such processing may occur in accordance with applicable laws and the privacy practices of those providers.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-white font-display font-black text-base">7. Your Privacy Rights</h3>
+          <p>Depending on your location, you may have the right to:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Access the personal data we hold about you.</li>
+            <li>Request the correction of inaccurate personal data.</li>
+            <li>Request the deletion of your personal data (Right to be Forgotten).</li>
+            <li>Opt-out of certain data processing.</li>
+          </ul>
+          <p>You may request the deletion of your account and associated personal data at any time by using the account deletion feature available within the application or by contacting our support team. Subject to legal and technical limitations, we will take reasonable steps to remove the requested information from our systems.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-white font-display font-black text-base">8. Third-Party Links</h3>
+          <p>The Service may contain links to third-party websites, products, or services. We are not responsible for the privacy practices or content of third-party services and encourage users to review their respective privacy policies.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-white font-display font-black text-base">9. Medical Disclaimer</h3>
+          <p>Aavis is intended for informational and educational purposes only. Health scores, AI-generated nutritional insights, allergen warnings, and recommendations provided by the Service do not constitute professional medical advice, diagnosis, or treatment. Users should consult qualified healthcare professionals regarding dietary restrictions, allergies, or medical conditions.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-white font-display font-black text-base">10. AI and OCR Limitations</h3>
+          <p>Aavis uses artificial intelligence and optical character recognition (OCR) technologies to analyze food labels and provide nutritional insights. These technologies may occasionally generate inaccurate, incomplete, or incorrect results. Users should exercise independent judgment and should not rely solely on AI-generated outputs when making health-related decisions. Users should independently verify ingredient lists and allergen information, especially when dealing with severe allergies or medical conditions.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-white font-display font-black text-base">11. Accuracy of Information</h3>
+          <p>While we strive to provide accurate nutritional analysis and educational insights, Aavis does not guarantee the completeness, reliability, or accuracy of AI-generated responses, OCR results, health scores, or recommendations.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-white font-display font-black text-base">12. Children's Privacy</h3>
+          <p>The Service is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13 years of age. If we become aware that such information has been collected, we will take reasonable steps to delete it.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-white font-display font-black text-base">13. Changes to This Privacy Policy</h3>
+          <p>We may update this Privacy Policy from time to time. Changes will be reflected by updating the "Last Updated" date above. Continued use of the Service after such changes become effective constitutes acceptance of the revised Privacy Policy.</p>
         </section>
 
         <div className="mt-8 p-5 glass-card border border-white/5 rounded-3xl text-center space-y-1">
-          <h3 className="text-white font-display font-black text-base">12. Contact Information</h3>
+          <h3 className="text-white font-display font-black text-base">14. Contact Information</h3>
           <p>For questions or concerns regarding this Privacy Policy, please contact:</p>
           <p className="pt-2">
             <a href="mailto:aavis.support@gmail.com" className="text-brand-primary font-bold hover:underline text-base">📧 aavis.support@gmail.com</a>

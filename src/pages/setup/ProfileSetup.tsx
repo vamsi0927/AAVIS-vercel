@@ -60,8 +60,12 @@ export function ProfileSetup() {
   };
 
   const isStepValid = () => {
-    if (step === 0) return setupData.name.trim().length > 0 && setupData.age !== '';
-    if (step === 1) return true; // diet & gender optional
+    if (step === 0) {
+      return setupData.name.trim().length > 0 && 
+             setupData.age !== '' && 
+             Number(setupData.age) >= 13;
+    }
+    if (step === 1) return true; // diet optional
     return true; // others optional
   };
 
@@ -121,6 +125,9 @@ export function ProfileSetup() {
                       placeholder="e.g. 28"
                       className="w-full bg-navy-800 border border-navy-700 rounded-2xl py-4 px-5 text-white placeholder:text-content-secondary focus:border-brand-primary focus:outline-none transition-colors"
                     />
+                    {setupData.age !== '' && Number(setupData.age) < 13 && (
+                      <p className="text-red-400 text-xs mt-2 font-medium">You must be at least 13 years old to use Aavis.</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Height (cm)</label>
