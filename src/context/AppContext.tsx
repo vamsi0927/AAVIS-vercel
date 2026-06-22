@@ -301,9 +301,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     if (!userId || !isSupabaseConfigured()) return;
 
     try {
-      console.log('[AppContext] Loading saved myths for user:', userId);
       const dbMyths = await getSavedMyths(userId);
-      console.log('[AppContext] Successfully loaded', dbMyths.length, 'myths from cloud.');
       setState(prev => ({
         ...prev,
         savedMyths: dbMyths
@@ -315,29 +313,22 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
 
   const saveMyth = async (mythData: Omit<import('../lib/types').SavedMyth, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
     if (!supabaseUserId) {
-      console.log('[AppContext] Save Myth aborted: No Supabase User ID');
       return null;
     }
 
-    console.log('[AppContext] Checking duplicates for myth:', mythData.question);
     const isDuplicate = state.savedMyths.some(
       m => m.question === mythData.question && m.correct_answer === mythData.correct_answer
     );
     if (isDuplicate) {
-      console.log('[AppContext] Myth is already saved in state (duplicate check passed)');
       return null;
     }
 
-    console.log('[AppContext] Calling saveMythToCloud...');
     const newMyth = await saveMythToCloud(supabaseUserId, mythData);
     if (newMyth) {
-      console.log('[AppContext] Successfully saved to cloud. Updating local state.');
       setState(prev => ({
         ...prev,
         savedMyths: [newMyth, ...prev.savedMyths]
       }));
-    } else {
-      console.log('[AppContext] saveMythToCloud returned null.');
     }
     return newMyth;
   };

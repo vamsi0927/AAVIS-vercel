@@ -18,55 +18,63 @@ export function AdditivesList() {
     return matchesSearch && matchesFilter;
   });
   return (
-    <div className="flex flex-col h-full bg-navy-900 pb-safe">
-      <header className="pt-safe pt-8 px-6 pb-4 sticky top-0 bg-navy-900/90 backdrop-blur-md z-10">
-        <div className="flex items-center mb-6">
+    <div className="flex flex-col h-full bg-navy-900 relative overflow-y-auto no-scrollbar pb-24">
+      {/* Ambient backgrounds */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-96 bg-gradient-to-b from-brand-primary/10 to-transparent pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] bg-brand-primary/20 rounded-full blur-[100px] pointer-events-none" />
+
+      <header className="pt-safe pt-6 px-4 pb-4 flex flex-col relative z-10 md:max-w-3xl md:mx-auto md:w-full">
+        <div className="flex items-center">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 -ml-2 text-content-secondary hover:text-white">
-            
-            <ChevronLeft className="w-6 h-6" />
+            className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-display font-bold ml-2">
-            E-Numbers Guide
-          </h1>
+          <h1 className="font-display font-black text-lg ml-3 text-white">Additives & E-Nos</h1>
         </div>
+        <p className="mt-4 text-content-secondary text-sm">
+          A comprehensive database of common food additives, artificial sweeteners, colorings, and preservatives.
+        </p>
+      </header>
 
+      <div className="flex-1 px-4 space-y-6 md:max-w-3xl md:mx-auto md:w-full relative z-10">
         <div className="space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
             <input
               type="text"
               placeholder="Search by E-number or name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 pl-10 pr-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary transition-colors" />
-            
+              className="w-full bg-navy-800 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-sm text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary transition-colors" />
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {(['all', 'safe', 'mild', 'moderate', 'caution', 'hazardous'] as const).map((f) =>
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize whitespace-nowrap transition-colors ${filter === f ? 'bg-brand-primary text-white' : 'bg-navy-800 text-content-secondary border border-navy-700'}`}>
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold capitalize whitespace-nowrap transition-colors ${
+                  filter === f ? 'bg-brand-primary text-white font-bold' : 'bg-navy-800 text-content-secondary border border-white/5 hover:text-content-primary'
+                }`}
+              >
                 {f}
               </button>
             )}
           </div>
         </div>
-      </header>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar px-6 space-y-3 pb-6">
-        {filtered.length === 0 ?
-        <div className="text-center py-12 text-content-secondary">
-            No additives found matching your search.
-          </div> :
-
-        filtered.map((additive) => (
-          <AdditiveCard key={additive.code} additive={additive} />
-        ))
-        }
+        <div className="space-y-3 pb-6">
+          {filtered.length === 0 ? (
+            <div className="text-center py-12 text-content-secondary text-sm">
+              No additives found matching your search.
+            </div>
+          ) : (
+            filtered.map((additive) => (
+              <AdditiveCard key={additive.code} additive={additive} />
+            ))
+          )}
+        </div>
       </div>
-    </div>);
-
+    </div>
+  );
 }

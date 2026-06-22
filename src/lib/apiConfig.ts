@@ -16,7 +16,6 @@ const STORAGE_KEYS = {
 const _GEMINI_KEY = (() => {
   try {
     const key = import.meta.env?.VITE_GEMINI_API_KEY || '';
-    console.log('[apiConfig] Gemini Key loaded:', key ? 'Found' : 'Not Found');
     return key;
   } catch {
     return '';

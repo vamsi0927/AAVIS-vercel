@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ChevronRight, User, Activity, Settings as SettingsIcon, Edit3, Save, X, Camera } from 'lucide-react';
+import { LogOut, ChevronRight, User, Activity, Settings as SettingsIcon, Edit3, Save, X, Camera, Bookmark, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { PersonalizedInsights } from '../components/PersonalizedInsights';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 
 const DIET_OPTIONS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
@@ -13,7 +14,7 @@ const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Hear
 
 export function Profile() {
   const navigate = useNavigate();
-  const { profile, updateProfile, logout } = useAppContext();
+  const { profile, updateProfile, logout, bookmarkedProductIds = [], scans = [], toggleBookmark } = useAppContext();
   
   const [isEditing, setIsEditing] = useState(() => {
     const ts = sessionStorage.getItem('profile_draftTimestamp');
@@ -28,6 +29,23 @@ export function Profile() {
     const saved = sessionStorage.getItem('profile_editData');
     return saved ? JSON.parse(saved) : profile;
   });
+
+  // Saved products logic
+  const savedProducts = React.useMemo(() => {
+    const list: any[] = [];
+    bookmarkedProductIds.forEach(id => {
+      const sample = SAMPLE_PRODUCTS.find(p => p.id === id);
+      if (sample) {
+        list.push(sample);
+      } else {
+        const scan = scans.find(s => s.productId === id || s.id === id);
+        if (scan?.product) {
+          list.push(scan.product);
+        }
+      }
+    });
+    return list;
+  }, [bookmarkedProductIds, scans]);
   
   // Avatar state
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -276,7 +294,7 @@ export function Profile() {
                 <div className="md:grid md:grid-cols-12 md:gap-8">
           
           {/* Left Column: ID Card */}
-          <div className="md:col-span-4 lg:col-span-4 mb-6 md:mb-0">
+          <div className="md:col-span-4 lg:col-span-4 mb-6 md:mb-0 flex flex-col">
             <div className="glass-card rounded-3xl p-8 border border-white/5 relative overflow-hidden shadow-2xl flex flex-col items-center text-center">
               {/* Avatar */}
               <div 
@@ -345,6 +363,8 @@ export function Profile() {
                 </button>
               )}
             </div>
+            
+
           </div>
 
           {/* Right Column: Health Profile & Insights */}
@@ -355,7 +375,7 @@ export function Profile() {
               
               {/* Card 1: Body Profile */}
               <div className="glass-card rounded-3xl p-6 border border-white/5 shadow-lg">
-                <h3 className="text-[10px] font-bold text-content-secondary uppercase tracking-widest mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-bold text-content-secondary/80 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Activity className="w-4 h-4 text-brand-primary" /> Body Profile
                 </h3>
                 
@@ -363,11 +383,11 @@ export function Profile() {
                   <div className="space-y-4">
                     <div className="flex gap-4">
                       <div className="flex-1">
-                        <label className="text-[10px] font-bold text-content-secondary uppercase tracking-wider mb-1 block">Age</label>
+                        <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Age</label>
                         <input type="number" value={editData.age || ''} onChange={(e) => setEditData({...editData, age: parseInt(e.target.value) || ''})} placeholder="Years" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
                       </div>
                       <div className="flex-1">
-                        <label className="text-[10px] font-bold text-content-secondary uppercase tracking-wider mb-1 block">Gender</label>
+                        <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Gender</label>
                         <select value={editData.gender || ''} onChange={(e) => setEditData({...editData, gender: e.target.value})} className="w-full glass-input rounded-xl px-3 py-2 text-white text-sm bg-navy-800 border border-white/10 outline-none">
                           <option value="">Select</option>
                           <option value="Male">Male</option>
@@ -378,16 +398,16 @@ export function Profile() {
                     </div>
                     <div className="flex gap-4">
                       <div className="flex-1">
-                        <label className="text-[10px] font-bold text-content-secondary uppercase tracking-wider mb-1 block">Height (cm)</label>
+                        <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Height (cm)</label>
                         <input type="number" value={editData.height || ''} onChange={(e) => setEditData({...editData, height: parseInt(e.target.value) || ''})} placeholder="cm" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
                       </div>
                       <div className="flex-1">
-                        <label className="text-[10px] font-bold text-content-secondary uppercase tracking-wider mb-1 block">Weight (kg)</label>
+                        <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Weight (kg)</label>
                         <input type="number" value={editData.weight || ''} onChange={(e) => setEditData({...editData, weight: parseInt(e.target.value) || ''})} placeholder="kg" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
                       </div>
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-content-secondary uppercase tracking-wider mb-1 block">Activity Level</label>
+                      <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Activity Level</label>
                       <select value={editData.activityLevel || ''} onChange={(e) => setEditData({...editData, activityLevel: e.target.value})} className="w-full glass-input rounded-xl px-3 py-2 text-white text-sm bg-navy-800 border border-white/10 outline-none">
                         <option value="">Select Level</option>
                         <option value="Sedentary">Sedentary</option>
@@ -400,11 +420,11 @@ export function Profile() {
                 ) : (
                   <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                     <div>
-                      <p className="text-[10px] text-content-secondary uppercase tracking-widest font-bold mb-0.5">Age & Gender</p>
+                      <p className="text-xs text-content-secondary/70 uppercase tracking-wider font-bold mb-0.5">Age & Gender</p>
                       <p className="font-bold text-white text-sm">{profile.age ? `${profile.age} years` : '--'}, {profile.gender || '--'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-content-secondary uppercase tracking-widest font-bold mb-0.5">BMI</p>
+                      <p className="text-xs text-content-secondary/70 uppercase tracking-wider font-bold mb-0.5">BMI</p>
                       <p className="font-bold text-white text-sm">
                         {profile.weight && profile.height 
                           ? (Number(profile.weight) / ((Number(profile.height)/100) * (Number(profile.height)/100))).toFixed(1)
@@ -412,11 +432,11 @@ export function Profile() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-content-secondary uppercase tracking-widest font-bold mb-0.5">Height & Weight</p>
+                      <p className="text-xs text-content-secondary/70 uppercase tracking-wider font-bold mb-0.5">Height & Weight</p>
                       <p className="font-bold text-white text-sm">{profile.height ? `${profile.height} cm` : '--'} / {profile.weight ? `${profile.weight} kg` : '--'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-content-secondary uppercase tracking-widest font-bold mb-0.5">Activity</p>
+                      <p className="text-xs text-content-secondary/70 uppercase tracking-wider font-bold mb-0.5">Activity</p>
                       <p className="font-bold text-white text-sm">{profile.activityLevel || '--'}</p>
                     </div>
                   </div>
@@ -425,7 +445,7 @@ export function Profile() {
 
               {/* Card 2: Dietary Preferences */}
               <div className="glass-card rounded-3xl p-6 border border-white/5 shadow-lg flex flex-col">
-                <h3 className="text-[10px] font-bold text-content-secondary uppercase tracking-widest mb-4">Dietary Preference</h3>
+                <h3 className="text-xs font-bold text-content-secondary/80 uppercase tracking-wider mb-4">Dietary Preference</h3>
                 
                 {isEditing ? (
                   <div className="flex flex-wrap gap-2 flex-1 content-start">
@@ -445,14 +465,14 @@ export function Profile() {
                   <div className="flex-1 flex flex-col justify-center items-center text-center p-4 bg-navy-900/50 rounded-2xl border border-white/5">
                     <span className="text-4xl mb-3">{profile.diet === 'Vegetarian' || profile.diet === 'Vegan' || profile.diet === 'Jain' ? '🥗' : profile.diet === 'Keto' || profile.diet === 'Paleo' || profile.diet === 'Non-Vegetarian' ? '🥩' : '🍽️'}</span>
                     <p className="font-black text-white text-lg">{profile.diet || 'None'}</p>
-                    <p className="text-[10px] text-content-secondary uppercase tracking-widest font-bold mt-1">Active Diet</p>
+                    <p className="text-xs text-content-secondary/70 uppercase tracking-wider font-bold mt-1">Active Diet</p>
                   </div>
                 )}
               </div>
 
               {/* Card 3: Conditions & Allergies */}
               <div className="sm:col-span-2 glass-card rounded-3xl p-6 border border-white/5 shadow-lg">
-                <h3 className="text-[10px] font-bold text-content-secondary uppercase tracking-widest mb-4">Conditions & Allergies</h3>
+                <h3 className="text-xs font-bold text-content-secondary/80 uppercase tracking-wider mb-4">Conditions & Allergies</h3>
                 
                 {isEditing ? (
                   <div className="space-y-5">
@@ -508,6 +528,8 @@ export function Profile() {
                 <PersonalizedInsights />
               </div>
             )}
+
+
 
           </div>
         </div>

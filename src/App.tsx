@@ -70,6 +70,19 @@ import { CompareProducts } from './pages/product/CompareProducts';
 import { ProductAlternatives } from './pages/product/ProductAlternatives';
 // Education
 import { FoodMyths } from './pages/education/FoodMyths';
+import { EducationHub } from './pages/education/EducationHub';
+import { LabelGuide } from './pages/education/LabelGuide';
+import { PackagingGuide } from './pages/education/PackagingGuide';
+import { HiddenSugarsGuide } from './pages/education/HiddenSugarsGuide';
+import { FoodClaimsGuide } from './pages/education/FoodClaimsGuide';
+import { PortionGuide } from './pages/education/PortionGuide';
+import { NutritionBoardsHub } from './pages/education/NutritionBoardsHub';
+import { SugarBoard } from './pages/education/boards/SugarBoard';
+import { SaltBoard } from './pages/education/boards/SaltBoard';
+import { FatBoard } from './pages/education/boards/FatBoard';
+import { AdditivesBoard } from './pages/education/boards/AdditivesBoard';
+import { KidsBoard } from './pages/education/boards/KidsBoard';
+
 
 // Other
 import { Saved } from './pages/Saved';
@@ -130,7 +143,8 @@ function AppContent() {
   '/history',
   '/profile',
   '/dashboard',
-  '/saved'].
+  '/saved',
+  '/education'].
   includes(location.pathname);
   
   const hideSidebar = ['/', '/login', '/register', '/onboarding', '/setup'].includes(location.pathname);
@@ -267,6 +281,90 @@ function AppContent() {
 
 
         {/* Education */}
+        <Route
+          path="/education"
+          element={
+            <ProtectedRoute>
+              <EducationHub />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/label-guide"
+          element={
+            <ProtectedRoute>
+              <LabelGuide />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/packaging-guide"
+          element={
+            <ProtectedRoute>
+              <PackagingGuide />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/hidden-sugars"
+          element={
+            <ProtectedRoute>
+              <HiddenSugarsGuide />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/food-claims"
+          element={
+            <ProtectedRoute>
+              <FoodClaimsGuide />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/portion-guide"
+          element={
+            <ProtectedRoute>
+              <PortionGuide />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/boards"
+          element={
+            <ProtectedRoute>
+              <NutritionBoardsHub />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/boards/sugar"
+          element={
+            <ProtectedRoute>
+              <SugarBoard />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/boards/salt"
+          element={
+            <ProtectedRoute>
+              <SaltBoard />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/boards/fat"
+          element={
+            <ProtectedRoute>
+              <FatBoard />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/boards/additives"
+          element={
+            <ProtectedRoute>
+              <AdditivesBoard />
+            </ProtectedRoute>
+          } />
+        <Route
+          path="/education/boards/kids"
+          element={
+            <ProtectedRoute>
+              <KidsBoard />
+            </ProtectedRoute>
+          } />
         <Route
           path="/education/additives"
           element={

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Trash2, History as HistoryIcon, Cloud, Loader2, Image as ImageIcon, X } from 'lucide-react';
+import { Search, Trash2, History as HistoryIcon, Cloud, Loader2, Image as ImageIcon, X, Bookmark, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { EmptyState } from '../components/EmptyState';
@@ -129,13 +129,25 @@ export function History() {
           </div>
         </div>
 
-        {/* Cloud sync indicator */}
-        {supabaseUserId && scans.length > 0 && (
-          <div className="flex items-center gap-1.5 mb-4 text-brand-safe/70">
-            <Cloud className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">Cloud synced</span>
-          </div>
-        )}
+        {/* Meta row containing Cloud sync status and Saved Products link */}
+        <div className="flex justify-between items-center mb-4">
+          {supabaseUserId && scans.length > 0 ? (
+            <div className="flex items-center gap-1.5 text-brand-safe/70">
+              <Cloud className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Cloud synced</span>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          <button
+            onClick={() => navigate('/saved')}
+            className="flex items-center gap-1.5 text-brand-primary/80 hover:text-brand-primary transition-colors text-[10px] font-bold uppercase tracking-wider ml-auto"
+          >
+            <Bookmark className="w-3.5 h-3.5" />
+            <span>Saved Products</span>
+          </button>
+        </div>
 
         {/* Search & Filter Toolbar */}
         {scans.length > 0 &&

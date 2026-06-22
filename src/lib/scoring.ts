@@ -82,8 +82,6 @@ function normalizeProduct(product: Product, warnings: string[]): { normalized: P
     carbs: scale(n.carbs)
   };
 
-  console.log(`\n[NORMALIZATION]\nRaw Values: ${JSON.stringify(n)}\nServing Size: ${product.servingSize || 'Unknown'}\nNormalized Values: ${JSON.stringify(normalizedNutrients)}\n`);
-
   return {
     normalized: {
       ...product,

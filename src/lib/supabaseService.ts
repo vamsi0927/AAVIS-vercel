@@ -733,8 +733,6 @@ export async function saveMythToCloud(
       sources: mythData.sources,
       category: mythData.category
     };
-    console.log('[SupabaseService] Inserting myth payload:', payload);
-
     const { data, error } = await supabase
       .from('saved_myths')
       .insert(payload)
@@ -742,16 +740,12 @@ export async function saveMythToCloud(
       .single();
 
     if (error) {
-      if (error.code === '23505') {
-        // Unique violation
-        console.log('[SupabaseService] Myth already saved by this user.');
-      } else {
+      if (error.code !== '23505') {
         console.error('[SupabaseService] Error saving myth to DB:', error);
       }
       return null;
     }
     
-    console.log('[SupabaseService] Insert successful. Returned data:', data);
     return data as import('./types').SavedMyth;
   } catch (e) {
     console.error('[SupabaseService] Error in saveMythToCloud:', e);

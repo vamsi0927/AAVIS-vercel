@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Home, History, User, Scan, Activity, Bookmark, Settings, LogOut, Moon, Sun } from 'lucide-react';
+import { Home, History, User, Scan, Activity, Bookmark, Settings, LogOut, Moon, Sun, BookOpen } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import logoImg from '../assets/logo.png';
 import { toast } from 'sonner';
@@ -27,7 +27,7 @@ export function Sidebar({ className = '' }: { className?: string }) {
     { to: '/dashboard', icon: Activity, label: 'Health' },
     { to: '/scan', icon: Scan, label: 'Scan Label' },
     { to: '/history', icon: History, label: 'History' },
-    { to: '/saved', icon: Bookmark, label: 'Saved Products' },
+    { to: '/education', icon: BookOpen, label: 'Education Hub' },
     { to: '/profile', icon: User, label: 'Profile' },
     { to: '/settings', icon: Settings, label: 'Settings' },
   ];
@@ -123,7 +123,7 @@ export function Sidebar({ className = '' }: { className?: string }) {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 w-full text-left"
+          className="flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium text-[#fc2828] hover:text-[#fc2828]/80 hover:bg-red-500/10 transition-all duration-200 w-full text-left"
         >
           <LogOut className="w-5 h-5" />
           <span>Sign Out</span>
