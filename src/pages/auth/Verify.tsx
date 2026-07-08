@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { getApiUrl } from '../../lib/apiConfig';
 import { toast } from 'sonner';
 
 export function Verify() {
@@ -45,7 +46,7 @@ export function Verify() {
         }
 
         // Call our backend to manually extract the session from the action_link
-        const res = await fetch('/api/auth/verifyLink', {
+        const res = await fetch(getApiUrl('/api/auth/verifyLink'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ link })
