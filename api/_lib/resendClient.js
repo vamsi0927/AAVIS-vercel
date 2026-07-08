@@ -1,14 +1,32 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
-const resendApiKey = process.env.RESEND_API_KEY;
+export const SENDER_EMAIL = 'aavis.support@gmail.com';
 
-if (!resendApiKey) {
-  throw new Error('Missing RESEND_API_KEY environment variable.');
-}
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'aavis.support@gmail.com',
+    pass: 'buienjgnkksbvcbk' // App password without spaces
+  }
+});
 
-export const resend = new Resend(resendApiKey);
-
-// Domain verified in Resend (e.g. noreply@aavis.app). 
-// For testing without a verified domain, Resend requires you to use 'onboarding@resend.dev'
-// and you can ONLY send emails to the email address registered with your Resend account.
-export const SENDER_EMAIL = process.env.RESEND_SENDER_EMAIL || 'onboarding@resend.dev';
+// We keep the object named 'resend' so we don't have to rewrite all the other files.
+// This mocks the Resend SDK interface but uses Nodemailer + Gmail behind the scenes.
+export const resend = {
+  emails: {
+    send: async ({ from, to, subject, html, text }) => {
+      try {
+        const info = await transporter.sendMail({
+          from: from || `AAVIS <${SENDER_EMAIL}>`,
+          to: Array.isArray(to) ? to.join(', ') : to,
+          subject,
+          html,
+          text
+        });
+        return { data: info, error: null };
+      } catch (error) {
+        return { data: null, error };
+      }
+    }
+  }
+};
