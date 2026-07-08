@@ -1,31 +1,87 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CheckCircle, Loader2 } from 'lucide-react';
-import { useAppContext } from '../../context/AppContext';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { toast } from 'sonner';
 
 export function Verify() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAppContext();
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [searchParams] = useSearchParams();
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
+  const verifyAttempted = useRef(false);
 
   useEffect(() => {
-    // When the user lands here from the email link, Supabase intercepts the URL hash
-    // and automatically logs them in. We just wait a moment to show a nice success state.
-    
-    // We show loading for at least 1.5s for UX
-    const timer1 = setTimeout(() => {
-      setStatus('success');
-      
-      // After showing success, redirect to onboarding
-      const timer2 = setTimeout(() => {
-        navigate('/onboarding', { replace: true });
-      }, 2000);
-      
-      return () => clearTimeout(timer2);
-    }, 1500);
+    // Only attempt verification once
+    if (verifyAttempted.current) return;
+    verifyAttempted.current = true;
 
-    return () => clearTimeout(timer1);
-  }, [navigate]);
+    const tokenHash = searchParams.get('token_hash');
+    const type = searchParams.get('type') as any || 'magiclink';
+
+    if (!tokenHash) {
+      // If there's no token_hash, maybe Supabase auto-logged us in via hash fragment,
+      // or the link is invalid. Check session quickly.
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate('/onboarding', { replace: true });
+        } else {
+          setStatus('error');
+          setErrorMsg('Invalid verification link.');
+        }
+      });
+      return;
+    }
+
+    // Start a timer: if verification takes > 500ms, we show the loader UI
+    const loaderTimer = setTimeout(() => setShowLoader(true), 500);
+
+    const verify = async () => {
+      try {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: type,
+        });
+
+        clearTimeout(loaderTimer);
+
+        if (error) {
+          throw error;
+        }
+
+        // Verification successful, session established
+        setStatus('success');
+        
+        // If we showed the loader, give a brief 1-second success state before redirecting
+        // If we were faster than 500ms, redirect immediately
+        if (showLoader) {
+          setTimeout(() => navigate('/onboarding', { replace: true }), 1000);
+        } else {
+          navigate('/onboarding', { replace: true });
+        }
+        
+      } catch (err: any) {
+        clearTimeout(loaderTimer);
+        setStatus('error');
+        setErrorMsg(err.message || 'Verification failed. Please try again.');
+        toast.error('Verification failed');
+      }
+    };
+
+    verify();
+
+    return () => clearTimeout(loaderTimer);
+  }, [navigate, searchParams, showLoader]);
+
+  // If it's fast (<500ms), we just show nothing or a tiny spinner until redirect happens
+  if (!showLoader && status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-navy-900">
+         <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-navy-900">
@@ -35,27 +91,36 @@ export function Verify() {
         <div className="glass-card p-8 rounded-[2rem] border border-white/10 shadow-2xl flex flex-col items-center text-center">
           
           <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
-            {status === 'loading' ? (
-              <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />
-            ) : (
-              <CheckCircle className="w-10 h-10 text-brand-primary animate-bounce-soft" />
-            )}
+            {status === 'loading' && <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />}
+            {status === 'success' && <CheckCircle className="w-10 h-10 text-brand-primary animate-bounce-soft" />}
+            {status === 'error' && <XCircle className="w-10 h-10 text-red-500 animate-bounce-soft" />}
           </div>
 
           <h2 className="text-2xl font-display font-black text-white mb-2">
-            {status === 'loading' ? 'Verifying...' : 'Email Verified!'}
+            {status === 'loading' && 'Verifying...'}
+            {status === 'success' && 'Email Verified!'}
+            {status === 'error' && 'Verification Failed'}
           </h2>
           
           <p className="text-content-secondary mb-2">
-            {status === 'loading' 
-              ? 'Please wait while we confirm your email address.' 
-              : 'Your account has been successfully verified.'}
+            {status === 'loading' && 'Please wait while we confirm your email address.'}
+            {status === 'success' && 'Your account has been successfully verified.'}
+            {status === 'error' && errorMsg}
           </p>
 
           {status === 'success' && (
             <p className="text-sm font-bold text-brand-primary animate-pulse mt-4">
               Taking you to the app...
             </p>
+          )}
+
+          {status === 'error' && (
+            <button
+              onClick={() => navigate('/login')}
+              className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+            >
+              Go to Login
+            </button>
           )}
 
         </div>

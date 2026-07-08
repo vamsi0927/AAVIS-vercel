@@ -83,12 +83,16 @@ export default async function handler(req, res) {
 
     let verificationLink = linkData.properties.action_link;
     
-    // Supabase generates the link using the "Site URL" configured in its dashboard (often localhost).
-    // We rewrite the origin of the link to match wherever this API is actually running.
     try {
+      // Parse the token from Supabase's action_link
+      // Example: https://xxx.supabase.co/auth/v1/verify?token=1acb267...&type=magiclink&...
       const parsedLink = new URL(verificationLink);
+      const tokenHash = parsedLink.searchParams.get('token');
+      const type = parsedLink.searchParams.get('type') || 'magiclink';
+      
       const currentOrigin = `${protocol}://${host}`;
-      verificationLink = verificationLink.replace(parsedLink.origin, currentOrigin);
+      // Construct a direct link to our frontend React app
+      verificationLink = `${currentOrigin}/verify?token_hash=${tokenHash}&type=${type}`;
     } catch (e) {
       console.error('Failed to parse link URL', e);
     }
