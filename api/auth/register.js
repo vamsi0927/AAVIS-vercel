@@ -131,7 +131,7 @@ export default async function handler(req, res) {
     
     // Check if it's the "already registered" error
     if (error.message && error.message.toLowerCase().includes('already')) {
-        return res.status(400).json({ error: 'User already registered. Please check your email for the verification link or try logging in.' });
+        return res.status(400).json({ error: 'Account is already registered. Please sign in.' });
     }
     
     return res.status(500).json({ error: 'Internal server error' });
