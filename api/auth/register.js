@@ -49,6 +49,13 @@ export default async function handler(req, res) {
 
     if (createError) {
       if (createError.message.toLowerCase().includes('already')) {
+        // Check if the user has completed setup by seeing if they have an age in their profile
+        const { data: existingProfile } = await supabaseAdmin.from('profiles').select('age').eq('email', email).single();
+        
+        if (existingProfile && existingProfile.age !== null) {
+          return res.status(400).json({ error: 'Account is already registered. Please sign in.' });
+        }
+        
         linkType = 'magiclink';
       } else {
         return res.status(400).json({ error: createError.message });
