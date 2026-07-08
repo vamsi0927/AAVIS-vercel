@@ -17,11 +17,10 @@ export function Verify() {
     if (verifyAttempted.current) return;
     verifyAttempted.current = true;
 
-    const tokenHash = searchParams.get('token_hash');
-    const type = searchParams.get('type') as any || 'magiclink';
+    const link = searchParams.get('link');
 
-    if (!tokenHash) {
-      // If there's no token_hash, maybe Supabase auto-logged us in via hash fragment,
+    if (!link) {
+      // If there's no link, maybe Supabase auto-logged us in via hash fragment,
       // or the link is invalid. Check session quickly.
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
@@ -39,16 +38,33 @@ export function Verify() {
 
     const verify = async () => {
       try {
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
-          type: type,
+        const link = searchParams.get('link');
+        
+        if (!link) {
+          throw new Error('Invalid verification link format.');
+        }
+
+        // Call our backend to manually extract the session from the action_link
+        const res = await fetch('/api/auth/verifyLink', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ link })
         });
 
+        const data = await res.json();
         clearTimeout(loaderTimer);
 
-        if (error) {
-          throw error;
+        if (!res.ok || !data.session) {
+          throw new Error(data.error || 'Verification failed');
         }
+
+        // Establish the session locally
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token
+        });
+
+        if (sessionError) throw sessionError;
 
         // Verification successful, session established
         setStatus('success');

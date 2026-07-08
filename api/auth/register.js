@@ -91,15 +91,8 @@ export default async function handler(req, res) {
     let verificationLink = linkData.properties.action_link;
     
     try {
-      // Parse the token from Supabase's action_link
-      // Example: https://xxx.supabase.co/auth/v1/verify?token=1acb267...&type=magiclink&...
-      const parsedLink = new URL(verificationLink);
-      const tokenHash = parsedLink.searchParams.get('token');
-      const type = parsedLink.searchParams.get('type') || 'magiclink';
-      
       const currentOrigin = `${protocol}://${host}`;
-      // Construct a direct link to our frontend React app
-      verificationLink = `${currentOrigin}/verify?token_hash=${tokenHash}&type=${type}`;
+      verificationLink = `${currentOrigin}/verify?link=${encodeURIComponent(verificationLink)}`;
     } catch (e) {
       console.error('Failed to parse link URL', e);
     }
