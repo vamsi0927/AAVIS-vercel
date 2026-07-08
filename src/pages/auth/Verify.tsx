@@ -36,9 +36,9 @@ export function Verify() {
     // Start a timer: if verification takes > 500ms, we show the loader UI
     const loaderTimer = setTimeout(() => setShowLoader(true), 500);
 
-    const verify = async () => {
+    const verify = async (linkParam: string) => {
       try {
-        const link = searchParams.get('link');
+        const link = linkParam;
         
         if (!link) {
           throw new Error('Invalid verification link format.');
@@ -85,7 +85,29 @@ export function Verify() {
       }
     };
 
-    verify();
+    // Deep link redirect for mobile users
+    const isMobileBrowser = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // We only want to redirect if they are actually in a web browser, not already inside the Capacitor app
+    import('@capacitor/core').then(({ Capacitor }) => {
+      if (!Capacitor.isNativePlatform() && isMobileBrowser) {
+        // Attempt to open the native app
+        const appLink = `aavis://verify?link=${encodeURIComponent(link)}`;
+        
+        // Show a helpful message in the UI while we try to redirect
+        setStatus('error');
+        setErrorMsg('Redirecting you to the Aavis app...');
+        
+        // Use a short timeout before setting the window location to allow the UI to update
+        setTimeout(() => {
+          window.location.href = appLink;
+        }, 500);
+        return; // Don't proceed with web verification
+      }
+      
+      // Proceed with web verification if not mobile or already inside the app
+      verify(link);
+    });
 
     return () => clearTimeout(loaderTimer);
   }, [navigate, searchParams, showLoader]);

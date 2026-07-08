@@ -127,8 +127,21 @@ function AppContent() {
       }
     });
 
+    // Handle deep links (e.g. aavis://verify?link=...)
+    const handleAppUrlOpen = CapacitorApp.addListener('appUrlOpen', (data) => {
+      if (data.url.startsWith('aavis://verify')) {
+        // Extract the full link from the custom URL scheme
+        const urlParams = new URL(data.url);
+        const link = urlParams.searchParams.get('link');
+        if (link) {
+          navigate(`/verify?link=${encodeURIComponent(link)}`);
+        }
+      }
+    });
+
     return () => {
       handleBackButton.then(listener => listener.remove());
+      handleAppUrlOpen.then(listener => listener.remove());
     };
   }, [navigate]);
 
