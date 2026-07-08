@@ -94,15 +94,23 @@ export default async function handler(req, res) {
 
     if (resendError) {
       console.error('Resend Error:', resendError);
-      // Depending on strictness, we might want to delete the user if email failed, but for now we'll just return success 
-      // and maybe log it. We'll return 500 to let frontend know.
-      return res.status(500).json({ error: 'Account created, but failed to send verification email' });
+      
+      // CRITICAL: Delete the user if email fails so they aren't stuck in "already registered" state
+      await supabaseAdmin.auth.admin.deleteUser(userId);
+      
+      return res.status(500).json({ error: 'Failed to send verification email. Please try again.' });
     }
 
     return res.status(200).json({ message: 'Registration successful. Verification email sent.' });
 
   } catch (error) {
     console.error('Registration API Error:', error);
+    
+    // Check if it's the "already registered" error
+    if (error.message && error.message.includes('already registered')) {
+        return res.status(400).json({ error: 'User already registered. Please check your email for the verification link or try logging in.' });
+    }
+    
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
