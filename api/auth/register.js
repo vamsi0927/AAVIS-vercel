@@ -35,6 +35,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    let linkType = 'signup';
+
     // 1. Create User in Supabase Auth (Unverified)
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -43,25 +45,36 @@ export default async function handler(req, res) {
       user_metadata: { name }
     });
 
-    if (createError) {
-      return res.status(400).json({ error: createError.message });
-    }
+    let userId;
 
-    const userId = userData.user.id;
+    if (createError) {
+      if (createError.message.includes('already registered')) {
+        linkType = 'magiclink';
+      } else {
+        return res.status(400).json({ error: createError.message });
+      }
+    } else {
+      userId = userData.user.id;
+    }
 
     // 3. Generate a magic link using Supabase Admin API
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
     const host = req.headers.host;
     
-    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'signup',
+    const generateLinkOptions = {
+      type: linkType,
       email: email,
-      password: password,
       options: {
         data: { name },
         redirectTo: `${protocol}://${host}/verify`
       }
-    });
+    };
+    
+    if (linkType === 'signup') {
+      generateLinkOptions.password = password;
+    }
+
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink(generateLinkOptions);
 
     if (linkError) {
       console.error('Generate Link Error:', linkError);
@@ -99,7 +112,10 @@ export default async function handler(req, res) {
       console.error('Resend Error:', resendError);
       
       // CRITICAL: Delete the user if email fails so they aren't stuck in "already registered" state
-      await supabaseAdmin.auth.admin.deleteUser(userId);
+      // Only delete if we just created them (userId is defined)
+      if (userId) {
+        await supabaseAdmin.auth.admin.deleteUser(userId);
+      }
       
       return res.status(500).json({ error: `Email failed: ${resendError.message || 'Please try again.'}` });
     }
