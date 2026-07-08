@@ -486,6 +486,7 @@ export function App() {
           <Toaster
             position="top-center"
             theme="dark"
+            offset="60px"
             toastOptions={{
               style: {
                 background: '#1f2335',

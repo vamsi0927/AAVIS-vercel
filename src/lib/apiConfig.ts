@@ -69,13 +69,11 @@ export function isEmailJSConfigured(): boolean {
   return !!config;
 }
 
+import { Capacitor } from '@capacitor/core';
+
 export function getApiUrl(path: string): string {
-  // If we are running natively under Capacitor (capacitor:// or localhost without port), point to Vercel
-  const isCapacitor = 
-    window.location.origin.startsWith('capacitor://') || 
-    window.location.origin.startsWith('http://localhost') && !window.location.port;
-  
-  if (isCapacitor) {
+  // If we are running natively under Capacitor (iOS/Android), point to Vercel
+  if (Capacitor.isNativePlatform()) {
     return `https://aavis.vercel.app${path}`;
   }
   return path;
