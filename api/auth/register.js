@@ -98,7 +98,7 @@ export default async function handler(req, res) {
       // CRITICAL: Delete the user if email fails so they aren't stuck in "already registered" state
       await supabaseAdmin.auth.admin.deleteUser(userId);
       
-      return res.status(500).json({ error: 'Failed to send verification email. Please try again.' });
+      return res.status(500).json({ error: `Email failed: ${resendError.message || 'Please try again.'}` });
     }
 
     return res.status(200).json({ message: 'Registration successful. Verification email sent.' });
