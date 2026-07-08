@@ -9,7 +9,7 @@ const getConditionOptions = (gender: string) => {
   const base = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'Thyroid Issues'];
   if (gender === 'Female') return [...base, 'PCOS', 'Endometriosis'];
   if (gender === 'Male') return [...base, 'Prostate Issues'];
-  return [...base, 'PCOS', 'Endometriosis', 'Prostate Issues'];
+  return base;
 };
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
 
@@ -68,7 +68,8 @@ export function ProfileSetup() {
     if (step === 0) {
       return setupData.name.trim().length > 0 && 
              setupData.age !== '' && 
-             Number(setupData.age) >= 13;
+             Number(setupData.age) >= 13 &&
+             setupData.gender !== '';
     }
     if (step === 1) return true; // diet optional
     return true; // others optional

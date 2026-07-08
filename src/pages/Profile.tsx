@@ -14,7 +14,7 @@ const getConditionOptions = (gender: string) => {
   const base = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'Thyroid Issues'];
   if (gender === 'Female') return [...base, 'PCOS', 'Endometriosis'];
   if (gender === 'Male') return [...base, 'Prostate Issues'];
-  return [...base, 'PCOS', 'Endometriosis', 'Prostate Issues'];
+  return base;
 };
 
 export function Profile() {
