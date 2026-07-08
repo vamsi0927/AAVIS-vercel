@@ -11,7 +11,7 @@ export interface LocalPreferences {
 const PREFS_KEY = 'aavis_local_prefs';
 
 const DEFAULT_PREFS: LocalPreferences = {
-  theme: 'dark',
+  theme: 'light',
   language: 'en',
   cameraPermission: 'unknown',
   hasCompletedOnboarding: false,
