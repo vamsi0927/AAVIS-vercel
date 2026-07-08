@@ -9,7 +9,7 @@ import logoImg from '../../assets/logo.png';
 
 export function Login() {
   const navigate = useNavigate();
-  const { login } = useAppContext();
+  const { login, hasCompletedOnboarding } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,11 @@ export function Login() {
           name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User' 
         });
         
-        navigate('/home', { replace: true });
+        if (!hasCompletedOnboarding) {
+          navigate('/onboarding', { replace: true });
+        } else {
+          navigate('/home', { replace: true });
+        }
       }
     } catch (err: any) {
       toast.error('Login failed. Please try again.');
