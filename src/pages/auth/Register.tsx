@@ -242,6 +242,9 @@ export function Register() {
                 <p className="text-brand-safe text-xs font-medium bg-brand-safe/10 py-2 px-3 rounded-lg mt-4 inline-block">
                   Note: If you don't see the email, please check your spam or junk folder.
                 </p>
+                <p className="text-content-secondary text-xs mt-4">
+                  Once you have verified your email, you can safely close this screen.
+                </p>
 
                 <button
                   type="button"

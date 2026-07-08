@@ -31,7 +31,7 @@ const SLIDES = [
   {
     id: 'solution',
     icon: ShieldAlert,
-    title: 'Aavis AI decodes it all.',
+    title: 'Aavis decodes it all.',
     description: 'Instantly scan any label. Aavis AI translates confusing chemicals into clear, personalized health warnings.',
     color: 'from-brand-primary/20 to-transparent',
     iconColor: 'text-brand-primary'

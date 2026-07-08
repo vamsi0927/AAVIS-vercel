@@ -10,7 +10,12 @@ import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 
 const DIET_OPTIONS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
-const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'PCOS', 'Thyroid Issues'];
+const getConditionOptions = (gender: string) => {
+  const base = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'Thyroid Issues'];
+  if (gender === 'Female') return [...base, 'PCOS', 'Endometriosis'];
+  if (gender === 'Male') return [...base, 'Prostate Issues'];
+  return [...base, 'PCOS', 'Endometriosis', 'Prostate Issues'];
+};
 
 export function Profile() {
   const navigate = useNavigate();
@@ -495,7 +500,7 @@ export function Profile() {
                     <div>
                       <p className="text-[10px] text-white/70 uppercase tracking-wider font-bold mb-2">Health Conditions</p>
                       <div className="flex flex-wrap gap-2">
-                        {CONDITION_OPTIONS.map(condition => (
+                        {getConditionOptions(editData.gender).map(condition => (
                           <button
                             key={condition}
                             onClick={() => toggleArrayItem('conditions', condition)}
