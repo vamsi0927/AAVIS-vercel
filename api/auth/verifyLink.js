@@ -1,3 +1,7 @@
+import https from 'https';
+import http from 'http';
+import { URL } from 'url';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -10,55 +14,59 @@ export default async function handler(req, res) {
   }
 
   try {
-    // We fetch the action_link manually with redirect: 'manual'
-    // This allows us to intercept the redirect Location header from Supabase
-    // Because the Location header contains the access_token in the URL fragment!
-    const response = await fetch(link, {
-      method: 'GET',
-      redirect: 'manual'
-    });
+    const parsedUrl = new URL(link);
+    const client = parsedUrl.protocol === 'https:' ? https : http;
 
-    // Supabase will respond with 302 Found if the link is valid (or even if it's invalid, it redirects with an error)
-    if (response.status === 302 || response.status === 301) {
-      const location = response.headers.get('location');
-      
-      if (!location) {
-        return res.status(400).json({ error: 'Verification failed: No redirect location found.' });
-      }
-
-      // Check if Supabase returned an error in the redirect URL
-      if (location.includes('error=')) {
-        const errorDesc = new URL(location).searchParams.get('error_description') || 'Verification link expired or invalid.';
-        return res.status(400).json({ error: errorDesc });
-      }
-
-      // Extract the access_token and refresh_token from the fragment (#)
-      // Example: http://localhost:3000/#access_token=xyz&refresh_token=abc&...
-      const fragment = location.split('#')[1];
-      if (!fragment) {
-        return res.status(400).json({ error: 'Verification failed: No tokens found in redirect.' });
-      }
-
-      const params = new URLSearchParams(fragment);
-      const access_token = params.get('access_token');
-      const refresh_token = params.get('refresh_token');
-
-      if (!access_token || !refresh_token) {
-        return res.status(400).json({ error: 'Verification failed: Missing session tokens.' });
-      }
-
-      // Success! Return the tokens to the frontend so it can establish the session
-      return res.status(200).json({
-        session: {
-          access_token,
-          refresh_token
+    // Use core http/https module to guarantee we intercept the redirect
+    // fetch() behavior with redirect: 'manual' can be inconsistent across runtimes
+    const location = await new Promise((resolve, reject) => {
+      const request = client.get(link, (response) => {
+        if (response.statusCode >= 300 && response.statusCode < 400) {
+          resolve(response.headers.location);
+        } else {
+          // If it didn't redirect, maybe it returned 200? Or 400?
+          let body = '';
+          response.on('data', chunk => body += chunk);
+          response.on('end', () => {
+             reject(new Error(`Unexpected status ${response.statusCode}: ${body}`));
+          });
         }
       });
+      request.on('error', reject);
+    });
+
+    if (!location) {
+      return res.status(400).json({ error: 'Verification failed: No redirect location found.' });
     }
 
-    return res.status(400).json({ error: 'Verification failed: Unexpected response from auth server.' });
+    if (location.includes('error=')) {
+      const errorUrl = new URL(location.startsWith('/') ? `http://localhost${location}` : location);
+      const errorDesc = errorUrl.searchParams.get('error_description') || 'Verification link expired or invalid.';
+      return res.status(400).json({ error: errorDesc });
+    }
+
+    const fragment = location.split('#')[1];
+    if (!fragment) {
+      return res.status(400).json({ error: 'Verification failed: No tokens found in redirect.' });
+    }
+
+    const params = new URLSearchParams(fragment);
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+
+    if (!access_token || !refresh_token) {
+      return res.status(400).json({ error: 'Verification failed: Missing session tokens.' });
+    }
+
+    return res.status(200).json({
+      session: {
+        access_token,
+        refresh_token
+      }
+    });
+
   } catch (error) {
     console.error('Verify Link Error:', error);
-    return res.status(500).json({ error: 'Internal server error during verification.' });
+    return res.status(400).json({ error: error.message || 'Internal server error during verification.' });
   }
 }
