@@ -72,6 +72,16 @@ CRITICAL INSTRUCTIONS:
 7. Treat "Vegetable Oil (Edible Vegetable Oil, Palm Oil, Palmolein)" as "harmful" due to saturated fats and processing.
 8. Identify UPF (Ultra Processed Food) markers.
 9. Match against profile: {PROFILE_CONTEXT}. Warn strongly if allergens or conditions are triggered!
+   IMPORTANT MAPPING: Do not just check the condition name; MAP conditions to specific ingredients! For example:
+   - Diabetes -> Check for added sugar, total sugar, glycemic impact, refined carbs.
+   - Hypertension -> Check for sodium, sodium-based additives.
+   - High Cholesterol -> Check for saturated fat, trans fat.
+   - Kidney Disease (CKD) -> Check for sodium, potassium, phosphorus.
+   - Celiac Disease -> Check for gluten-containing ingredients.
+   - Gout -> Check for high-purine ingredients and sugary beverages.
+   - Lactose Intolerance -> Check for milk, whey, casein, lactose.
+   - Sesame Allergy -> Check for sesame, sesame oil, tahini.
+   Apply this level of deep ingredient mapping to ALL conditions and allergens the user has!
 10. AI SCORING (CRITICAL): Analyze the product across the 7 dimensions. Return a score (0-100) for each dimension and a justification.
 11. COMPLETENESS (CRITICAL): You MUST provide an entry in \`ingredientDetails\` for EVERY SINGLE item in the \`ingredients\` array. You MUST provide an entry in \`additiveDetails\` for EVERY SINGLE additive found. For \`additiveDetails\`, the JSON key MUST be the exact E-code (e.g. "E440") that is present in the \`additives\` array. Do not leave any item unexplained.
 12. RETURN ONLY VALID JSON.`;

@@ -5,7 +5,12 @@ import { ChevronLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 const DIET_OPTIONS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean'];
-const CONDITION_OPTIONS = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'PCOS', 'Thyroid Issues'];
+const getConditionOptions = (gender: string) => {
+  const base = ['Diabetes', 'Hypertension', 'High Cholesterol', 'Heart Disease', 'Kidney Disease', 'Fatty Liver', 'IBS', 'Celiac Disease', 'Thyroid Issues'];
+  if (gender === 'Female') return [...base, 'PCOS', 'Endometriosis'];
+  if (gender === 'Male') return [...base, 'Prostate Issues'];
+  return [...base, 'PCOS', 'Endometriosis', 'Prostate Issues'];
+};
 const ALLERGEN_OPTIONS = ['Peanuts', 'Tree Nuts', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Gluten', 'Fish', 'Shellfish'];
 
 export function ProfileSetup() {
@@ -130,6 +135,19 @@ export function ProfileSetup() {
                     )}
                   </div>
                   <div>
+                    <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Gender</label>
+                    <select
+                      value={setupData.gender}
+                      onChange={(e) => setSetupData({...setupData, gender: e.target.value})}
+                      className="w-full bg-navy-800 border border-navy-700 rounded-2xl py-4 px-5 text-white focus:border-brand-primary focus:outline-none transition-colors"
+                    >
+                      <option value="" disabled>Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Height (cm)</label>
                     <input
                       type="number"
@@ -148,6 +166,20 @@ export function ProfileSetup() {
                       placeholder="e.g. 70"
                       className="w-full bg-navy-800 border border-navy-700 rounded-2xl py-4 px-5 text-white placeholder:text-content-secondary focus:border-brand-primary focus:outline-none transition-colors"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Activity Level</label>
+                    <select
+                      value={setupData.activityLevel}
+                      onChange={(e) => setSetupData({...setupData, activityLevel: e.target.value})}
+                      className="w-full bg-navy-800 border border-navy-700 rounded-2xl py-4 px-5 text-white focus:border-brand-primary focus:outline-none transition-colors"
+                    >
+                      <option value="Sedentary">Sedentary</option>
+                      <option value="Lightly Active">Lightly Active</option>
+                      <option value="Moderately Active">Moderately Active</option>
+                      <option value="Very Active">Very Active</option>
+                      <option value="Extra Active">Extra Active</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -184,7 +216,7 @@ export function ProfileSetup() {
                 <p className="text-content-secondary mb-8">We will flag foods that conflict with your conditions.</p>
                 
                 <div className="flex flex-wrap gap-3">
-                  {CONDITION_OPTIONS.map(condition => (
+                  {getConditionOptions(setupData.gender).map(condition => (
                     <button
                       key={condition}
                       onClick={() => toggleArrayItem('conditions', condition)}
