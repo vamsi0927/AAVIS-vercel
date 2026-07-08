@@ -187,6 +187,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           profile: {
             ...prev.profile,
             name: dbUser.name || prev.profile.name || name,
+            email: email,
             avatarUrl: dbUser.avatar_url || prev.profile.avatarUrl || undefined,
             age: dbUser.age || prev.profile.age || '',
             gender: dbUser.gender || prev.profile.gender || 'Prefer not to say',
@@ -351,6 +352,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       profile: {
         ...prev.profile,
         name: userData.name || userData.username,
+        email: userData.username,
       }
     }));
   };
