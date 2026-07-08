@@ -49,35 +49,28 @@ export default async function handler(req, res) {
 
     const userId = userData.user.id;
 
-    // 2. Generate secure token
-    const token = crypto.randomBytes(32).toString('hex');
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-    
-    // Token expires in 24 hours
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
-
-    // 3. Store hashed token in DB
-    const { error: dbError } = await supabaseAdmin
-      .from('verification_tokens')
-      .insert({
-        user_id: userId,
-        hashed_token: hashedToken,
-        expires_at: expiresAt.toISOString()
-      });
-
-    if (dbError) {
-      console.error('DB Error saving token:', dbError);
-      return res.status(500).json({ error: 'Failed to generate verification token' });
-    }
-
-    // 4. Send Verification Email via Resend
-    // Construct the verification link containing the RAW token (not hashed)
-    // We pass the email to identify the user later, or we could pass user_id. Let's pass user_id.
+    // 3. Generate a magic link using Supabase Admin API
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
     const host = req.headers.host;
-    const verifyLink = `${protocol}://${host}/api/auth/verify-email?token=${token}&uid=${userId}`;
+    
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'signup',
+      email: email,
+      password: password,
+      options: {
+        data: { name },
+        redirectTo: `${protocol}://${host}/verify`
+      }
+    });
 
+    if (linkError) {
+      console.error('Generate Link Error:', linkError);
+      return res.status(500).json({ error: 'Failed to generate verification link.' });
+    }
+
+    const verificationLink = linkData.properties.action_link;
+
+    // 4. Send Verification Email via Resend
     const { error: resendError } = await resend.emails.send({
       from: `AAVIS <${SENDER_EMAIL}>`,
       to: [email],
@@ -86,7 +79,7 @@ export default async function handler(req, res) {
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2>Welcome to AAVIS, ${escapeHtml(name)}!</h2>
           <p>Please click the button below to verify your email address and activate your account.</p>
-          <a href="${verifyLink}" style="display: inline-block; background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px;">Verify Email</a>
+          <a href="${verificationLink}" style="display: inline-block; background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px;">Verify Email</a>
           <p style="margin-top: 30px; font-size: 12px; color: #666;">If you didn't create this account, you can safely ignore this email.</p>
         </div>
       `,

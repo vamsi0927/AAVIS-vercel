@@ -28,6 +28,7 @@ import { Terms } from './pages/Terms';
 // Auth
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
+import { Verify } from './pages/auth/Verify';
 import { ForgotPassword } from './pages/auth/ForgotPassword';
 import { VerifyOTP } from './pages/auth/VerifyOTP';
 import { ResetPassword } from './pages/auth/ResetPassword';
@@ -159,6 +160,7 @@ function AppContent() {
         <Route path="/" element={<Splash />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/verify" element={<Verify />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
