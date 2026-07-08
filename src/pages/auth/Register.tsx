@@ -239,6 +239,9 @@ export function Register() {
                 <p className="text-content-secondary text-sm">
                   We've sent a verification link to <span className="text-white font-medium">{email}</span>. Please click the link to activate your account.
                 </p>
+                <p className="text-brand-safe text-xs font-medium bg-brand-safe/10 py-2 px-3 rounded-lg mt-4 inline-block">
+                  Note: If you don't see the email, please check your spam or junk folder.
+                </p>
 
                 <button
                   type="button"
