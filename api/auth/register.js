@@ -68,7 +68,17 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to generate verification link.' });
     }
 
-    const verificationLink = linkData.properties.action_link;
+    let verificationLink = linkData.properties.action_link;
+    
+    // Supabase generates the link using the "Site URL" configured in its dashboard (often localhost).
+    // We rewrite the origin of the link to match wherever this API is actually running.
+    try {
+      const parsedLink = new URL(verificationLink);
+      const currentOrigin = `${protocol}://${host}`;
+      verificationLink = verificationLink.replace(parsedLink.origin, currentOrigin);
+    } catch (e) {
+      console.error('Failed to parse link URL', e);
+    }
 
     // 4. Send Verification Email via Resend
     const { error: resendError } = await resend.emails.send({
