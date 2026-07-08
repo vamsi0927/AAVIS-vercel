@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     let userId;
 
     if (createError) {
-      if (createError.message.includes('already registered')) {
+      if (createError.message.toLowerCase().includes('already')) {
         linkType = 'magiclink';
       } else {
         return res.status(400).json({ error: createError.message });
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
     console.error('Registration API Error:', error);
     
     // Check if it's the "already registered" error
-    if (error.message && error.message.includes('already registered')) {
+    if (error.message && error.message.toLowerCase().includes('already')) {
         return res.status(400).json({ error: 'User already registered. Please check your email for the verification link or try logging in.' });
     }
     
