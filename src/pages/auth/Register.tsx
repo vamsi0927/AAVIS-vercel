@@ -57,7 +57,6 @@ export function Register() {
         throw new Error(data.error || 'Failed to sign up');
       }
 
-      toast.success('Account created! Check your email for the verification link.');
       setStep('verify');
     } catch (err: any) {
       // Show clean user-facing message, not raw JSON
@@ -232,10 +231,9 @@ export function Register() {
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-6 text-center py-4"
               >
-                <div className="w-16 h-16 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-4">
+                <div className="w-16 h-16 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-6">
                   <Mail className="w-8 h-8 text-brand-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Check your email</h3>
                 <p className="text-content-secondary text-sm">
                   We've sent a verification link to <span className="text-white font-medium">{email}</span>. Please click the link to activate your account.
                 </p>
