@@ -30,7 +30,7 @@ export function Login() {
       if (error) {
         let msg = error.message || 'Invalid email or password';
         if (msg === 'Invalid login credentials') {
-          msg = 'Invalid email or password. Please check for typos. If you recently signed up, you may need to confirm your email first.';
+          msg = "Account not found or incorrect password. If you don't have an account, please Sign Up first.";
         }
         toast.error(msg);
         setIsLoading(false);
