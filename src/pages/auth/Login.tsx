@@ -117,7 +117,7 @@ export function Login() {
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
                 tabIndex={-1}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
             </div>
 
