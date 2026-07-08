@@ -69,11 +69,6 @@ export function Sidebar({ className = '' }: { className?: string }) {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-white break-words whitespace-normal leading-tight">{profile.name}</p>
-              {profile.email && (
-                <p className="text-xs text-navy-200 truncate mt-0.5" title={profile.email}>
-                  {profile.email}
-                </p>
-              )}
               <p className="text-[10px] text-brand-primary uppercase tracking-widest font-bold mt-1.5">
                 {profile.diet || 'Standard Diet'}
               </p>

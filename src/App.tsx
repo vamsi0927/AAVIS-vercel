@@ -105,7 +105,8 @@ function ProtectedRoute({ children }: {children: React.ReactNode;}) {
   }
   
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    const currentPath = window.location.pathname;
+    return <Navigate to={`/login?next=${currentPath}`} replace />;
   }
   
   return <>{children}</>;

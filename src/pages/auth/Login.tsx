@@ -51,11 +51,9 @@ export function Login() {
           name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User' 
         });
         
-        if (!hasCompletedOnboarding) {
-          navigate('/onboarding', { replace: true });
-        } else {
-          navigate('/home', { replace: true });
-        }
+        const searchParams = new URLSearchParams(window.location.search);
+        const next = searchParams.get('next') || '/home';
+        navigate(next, { replace: true });
       }
     } catch (err: any) {
       toast.error('Login failed. Please try again.');

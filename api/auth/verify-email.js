@@ -67,9 +67,9 @@ export default async function handler(req, res) {
       `,
     });
 
-    // 7. Redirect to login page on frontend with success message
+    // 7. Redirect to onboarding page on frontend
     res.writeHead(302, {
-      Location: '/login?verified=true'
+      Location: '/onboarding?verified=true'
     });
     res.end();
 
