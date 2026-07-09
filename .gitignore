@@ -29,3 +29,6 @@ dist-ssr
 *.sw?
 
 .vercel
+
+selenium/reports/
+selenium-debug-profile.png

@@ -25,7 +25,11 @@ describe('Authentication Flow', function() {
   
   it('should show error on invalid credentials', async () => {
     await authPage.login('invalid@example.com', 'wrongpassword123');
-    const errorMsg = await driver.wait(until.elementLocated(By.css('[data-sonner-toast], li[data-type="error"]')), 10000);
+    const errorMsg = await driver.wait(until.elementLocated(By.css('[data-sonner-toast] [data-title], [data-sonner-toast]')), 10000);
+    await driver.wait(async () => {
+      const text = await errorMsg.getText();
+      return text.length > 0;
+    }, 5000);
     const text = await errorMsg.getText();
     expect(text).to.not.be.empty;
   });

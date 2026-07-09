@@ -10,6 +10,11 @@ describe('Onboarding Flow (Suite 2)', function() {
   before(async () => {
     driver = await DriverFactory.build();
     onboardingPage = new OnboardingPage(driver);
+    const AuthPage = require('../pages/AuthPage');
+    const authPage = new AuthPage(driver);
+    await authPage.login('selenium-test-2@gmail.com', 'TestPassword123!');
+    await onboardingPage.wait.waitUntilUrlContains('/home');
+    await onboardingPage.navigate('/onboarding');
   });
 
   after(async () => {
@@ -18,6 +23,7 @@ describe('Onboarding Flow (Suite 2)', function() {
 
   it('should complete the entire onboarding wizard', async () => {
     await onboardingPage.navigate('/onboarding');
+    await onboardingPage.skipSplash();
     
     // Step 1
     await onboardingPage.fillBasicInfo('Test User', '25', 'Male');

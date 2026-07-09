@@ -76,7 +76,7 @@ export function KidsBoard() {
       <div className="flex-1 px-4 mt-2 space-y-6 md:max-w-3xl md:mx-auto md:w-full relative z-10">
         
         {KIDS_PRODUCTS.map((item, idx) => (
-          <div key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
+          <div data-testid={`card-kids-${idx}`} key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
             <div className={`absolute -right-10 -top-10 w-40 h-40 ${item.color} opacity-10 rounded-full blur-3xl`} />
             
             <div className="flex justify-between items-start mb-4 relative z-10">

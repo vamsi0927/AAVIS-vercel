@@ -4,7 +4,7 @@ const BasePage = require('./BasePage');
 class DashboardPage extends BasePage {
   constructor(driver) {
     super(driver);
-    this.healthScoreCard = By.css('[data-testid="btn-healthdashboard-1"]');
+    this.healthScoreCard = By.css('[data-testid="btn-home-1"]');
     this.waterTrackerBtn = By.css('[data-testid="btn-watertracker-1"]');
     this.scanNav = By.css('nav a[href="/scan"]');
   }

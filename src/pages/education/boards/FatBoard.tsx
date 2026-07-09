@@ -146,7 +146,7 @@ export function FatBoard() {
           </div>
         ) : (
           displayedItems.map((item, idx) => (
-            <div key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
+            <div data-testid={`card-fat-${idx}`} key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
               <div className={`absolute -right-10 -top-10 w-40 h-40 ${item.color} opacity-10 rounded-full blur-3xl`} />
               
               <h3 className="font-display font-black text-xl text-white mb-4 relative z-10">{item.name}</h3>

@@ -142,7 +142,7 @@ export function AdditivesBoard() {
           </div>
         ) : activeTab === 'examples' ? (
           ADDITIVE_EXAMPLES.map((item, idx) => (
-            <div key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
+            <div data-testid={`card-additives-example-${idx}`} key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
               <div className={`absolute -right-10 -top-10 w-40 h-40 ${item.color} opacity-10 rounded-full blur-3xl`} />
               
               <div className="flex justify-between items-start mb-4 relative z-10">
@@ -174,7 +174,7 @@ export function AdditivesBoard() {
           ))
         ) : (
           scannedProductsWithAdditives.map((item, idx) => (
-            <div key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
+            <div data-testid={`card-additives-scan-${idx}`} key={idx} className={`glass-card rounded-3xl p-5 border ${item.border} relative overflow-hidden`}>
               <div className={`absolute -right-10 -top-10 w-40 h-40 ${item.color} opacity-10 rounded-full blur-3xl`} />
               
               <div className="flex justify-between items-start mb-4 relative z-10">

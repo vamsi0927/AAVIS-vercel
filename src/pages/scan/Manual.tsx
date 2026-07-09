@@ -144,7 +144,7 @@ export function ScanManual() {
             <label className="block text-xs font-bold uppercase tracking-wider text-content-secondary mb-2">
               Ingredients <span className="text-brand-hazardous font-black">*</span>
             </label>
-            <textarea
+            <textarea data-testid='textarea-manual-1'
               value={ingredients}
               onChange={(e) => setIngredients(e.target.value)}
               disabled={isAnalyzing}

@@ -41,6 +41,7 @@ export function EducationHub() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Label Literacy Card */}
             <div 
+              data-testid="card-educationhub-label-guide"
               onClick={() => handleCardClick('/education/label-guide')}
               className="group glass-card border border-white/10 rounded-3xl p-5 hover:bg-white/5 transition-all duration-300 cursor-pointer overflow-hidden relative"
             >
@@ -54,6 +55,7 @@ export function EducationHub() {
 
             {/* Packaging Guide Card */}
             <div 
+              data-testid="card-educationhub-packaging-guide"
               onClick={() => handleCardClick('/education/packaging-guide')}
               className="group glass-card border border-white/10 rounded-3xl p-5 hover:bg-white/5 transition-all duration-300 cursor-pointer overflow-hidden relative"
             >
@@ -77,22 +79,22 @@ export function EducationHub() {
           </div>
           
           <div className="grid grid-cols-2 gap-3">
-            <div onClick={() => handleCardClick('/education/hidden-sugars')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
+            <div data-testid="card-educationhub-hidden-sugars" onClick={() => handleCardClick('/education/hidden-sugars')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
               <Droplets className="w-6 h-6 text-emerald-400 mb-2" />
               <span className="font-bold text-white text-sm">Hidden Sugars</span>
             </div>
             
-            <div onClick={() => handleCardClick('/education/food-claims')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
+            <div data-testid="card-educationhub-food-claims" onClick={() => handleCardClick('/education/food-claims')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
               <ShieldCheck className="w-6 h-6 text-brand-primary mb-2" />
               <span className="font-bold text-white text-sm">Food Claims</span>
             </div>
             
-            <div onClick={() => handleCardClick('/education/additives')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
+            <div data-testid="card-educationhub-additives" onClick={() => handleCardClick('/education/additives')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
               <AlertTriangle className="w-6 h-6 text-amber-400 mb-2" />
               <span className="font-bold text-white text-sm">Additives & E-Nos</span>
             </div>
 
-            <div onClick={() => handleCardClick('/education/portion-guide')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
+            <div data-testid="card-educationhub-portion-guide" onClick={() => handleCardClick('/education/portion-guide')} className="glass-card border border-white/5 rounded-2xl p-4 flex flex-col items-center text-center hover:bg-white/5 cursor-pointer transition-colors">
               <PieChart className="w-6 h-6 text-brand-secondary mb-2" />
               <span className="font-bold text-white text-sm">Portion Sizes</span>
             </div>
@@ -111,6 +113,7 @@ export function EducationHub() {
           </div>
           
           <div 
+             data-testid="card-educationhub-boards"
              onClick={() => handleCardClick('/education/boards')}
              className="glass-card border border-brand-hazardous/30 rounded-3xl p-5 bg-gradient-to-br from-navy-800 to-navy-900 cursor-pointer hover:border-brand-hazardous/50 transition-colors relative overflow-hidden"
           >

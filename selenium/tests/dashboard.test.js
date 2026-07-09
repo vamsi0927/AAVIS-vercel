@@ -12,7 +12,7 @@ describe('Dashboard Flow (Suite 3)', function() {
     dashboardPage = new DashboardPage(driver);
     const AuthPage = require('../pages/AuthPage');
     const authPage = new AuthPage(driver);
-    await authPage.login('test@aavis.app', 'TestPassword123!');
+    await authPage.login('selenium-test-2@gmail.com', 'TestPassword123!');
     await dashboardPage.wait.waitUntilUrlContains('/home');
   });
 
