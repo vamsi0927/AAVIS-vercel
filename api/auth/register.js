@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email, password, name } = req.body;
+  const { email, password, name, source = 'web' } = req.body;
 
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -96,7 +96,7 @@ export default async function handler(req, res) {
     
     try {
       const currentOrigin = `${protocol}://${host}`;
-      verificationLink = `${currentOrigin}/verify?link=${encodeURIComponent(verificationLink)}`;
+      verificationLink = `${currentOrigin}/verify?source=${source}&link=${encodeURIComponent(verificationLink)}`;
     } catch (e) {
       console.error('Failed to parse link URL', e);
     }

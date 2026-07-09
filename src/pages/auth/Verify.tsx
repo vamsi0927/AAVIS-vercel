@@ -86,27 +86,28 @@ export function Verify() {
       }
     };
 
+    // Check where the user originally initiated the signup process
+    const source = searchParams.get('source') || 'web';
+
     // Deep link redirect for mobile users
     const isMobileBrowser = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    // We only want to redirect if they are actually in a web browser, not already inside the Capacitor app
     import('@capacitor/core').then(({ Capacitor }) => {
-      if (!Capacitor.isNativePlatform() && isMobileBrowser) {
-        // Attempt to open the native app
+      // ONLY redirect if the user explicitly started signup on the Native App
+      if (source === 'app' && !Capacitor.isNativePlatform() && isMobileBrowser) {
+        // Open the native app via deep link
         const appLink = `aavis://verify?link=${encodeURIComponent(link)}`;
         
-        // Show a helpful message in the UI while we try to redirect
-        setStatus('error');
-        setErrorMsg('Redirecting you to the Aavis app...');
+        setStatus('loading');
         
-        // Use a short timeout before setting the window location to allow the UI to update
-        setTimeout(() => {
-          window.location.href = appLink;
-        }, 500);
-        return; // Don't proceed with web verification
+        // Directly trigger the app launch. No timer fallback as per requirements.
+        // We assume they have the app since they signed up from it.
+        window.location.href = appLink;
+        
+        return;
       }
       
-      // Proceed with web verification if not mobile or already inside the app
+      // If source === 'web' (or desktop browser), proceed strictly with web verification
       verify(link);
     });
 

@@ -39,6 +39,17 @@ export function Register() {
     setIsLoading(true);
     
     try {
+      // Determine signup source
+      let source = 'web';
+      try {
+        const { Capacitor } = await import('@capacitor/core');
+        if (Capacitor.isNativePlatform()) {
+          source = 'app';
+        }
+      } catch(e) {
+        console.warn('Could not determine Capacitor platform, defaulting to web.');
+      }
+
       const res = await fetch(getApiUrl('/api/auth/register'), {
         method: 'POST',
         headers: {
@@ -47,7 +58,8 @@ export function Register() {
         body: JSON.stringify({
           email: email.trim(),
           password,
-          name
+          name,
+          source
         })
       });
 
