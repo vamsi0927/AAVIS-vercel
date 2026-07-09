@@ -19,22 +19,36 @@ export default async function handler(req, res) {
 
   try {
     const parsedUrl = new URL(link);
-    const client = parsedUrl.protocol === 'https:' ? https : http;
+    
+    // Strict SSRF Protection
+    if (parsedUrl.protocol !== 'https:') {
+      return res.status(400).json({ error: 'Verification link must use HTTPS.' });
+    }
+    
+    // Basic protection against obvious internal IP attacks
+    const hostname = parsedUrl.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('169.254.') || hostname.startsWith('10.') || hostname.startsWith('192.168.')) {
+      return res.status(400).json({ error: 'Invalid verification domain.' });
+    }
 
-    // Use core http/https module to guarantee we intercept the redirect
-    // fetch() behavior with redirect: 'manual' can be inconsistent across runtimes
+    const client = https;
+
+    // Use core https module to guarantee we intercept the redirect
     const location = await new Promise((resolve, reject) => {
       const request = client.get(link, (response) => {
         if (response.statusCode >= 300 && response.statusCode < 400) {
           resolve(response.headers.location);
         } else {
-          // If it didn't redirect, maybe it returned 200? Or 400?
-          let body = '';
-          response.on('data', chunk => body += chunk);
+          // SSRF Protection: Do NOT leak the response body in the error message
+          response.resume(); // consume data to free memory
           response.on('end', () => {
-             reject(new Error(`Unexpected status ${response.statusCode}: ${body}`));
+             reject(new Error(`Verification failed with status: ${response.statusCode}. Please ensure the link is valid.`));
           });
         }
+      });
+      request.setTimeout(5000, () => {
+         request.destroy();
+         reject(new Error('Request timeout.'));
       });
       request.on('error', reject);
     });
