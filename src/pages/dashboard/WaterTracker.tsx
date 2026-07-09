@@ -20,7 +20,7 @@ export function WaterTracker() {
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800">
-        <button
+        <button data-testid='btn-watertracker-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white"
         >
@@ -68,7 +68,7 @@ export function WaterTracker() {
 
         {/* Controls */}
         <div className="flex items-center gap-6 mb-12">
-          <button
+          <button data-testid='btn-watertracker-2'
             onClick={handleRemove}
             disabled={glasses === 0}
             className="w-14 h-14 rounded-full bg-navy-800 border border-navy-700 flex items-center justify-center text-white disabled:opacity-50 disabled:active:scale-100 transition-transform active:scale-95"
@@ -84,7 +84,7 @@ export function WaterTracker() {
             <Plus className="w-8 h-8" />
           </motion.button>
 
-          <button
+          <button data-testid='btn-watertracker-3'
             onClick={() => setGlasses(goal)}
             className="w-14 h-14 rounded-full bg-navy-800 border border-navy-700 flex items-center justify-center text-blue-400 hover:bg-navy-700 transition-transform active:scale-95"
           >

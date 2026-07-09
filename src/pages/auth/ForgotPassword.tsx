@@ -50,7 +50,7 @@ export function ForgotPassword() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-brand-primary/10 rounded-full blur-[80px]" />
       
       <header className="absolute top-safe pt-4 left-6 z-20">
-        <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-white/5 border border-white/5 text-content-secondary hover:text-white transition-colors">
+        <button data-testid='btn-forgotpassword-1' onClick={() => navigate(-1)} className="p-2 rounded-full bg-white/5 border border-white/5 text-content-secondary hover:text-white transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
       </header>
@@ -76,7 +76,7 @@ export function ForgotPassword() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
+              <input data-testid='input-forgotpassword-1'
                 type="email"
                 required
                 placeholder="Enter your email address"
@@ -86,7 +86,7 @@ export function ForgotPassword() {
               />
             </div>
 
-            <button
+            <button data-testid='btn-forgotpassword-2'
               type="submit"
               disabled={isSending}
               className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"

@@ -34,7 +34,7 @@ export function Help() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800">
-        <button
+        <button data-testid='btn-help-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
           
@@ -51,7 +51,7 @@ export function Help() {
               key={idx}
               className="bg-navy-800 border border-navy-700 rounded-2xl overflow-hidden">
               
-              <button
+              <button data-testid='btn-help-2'
                 onClick={() => setOpenIdx(isOpen ? null : idx)}
                 className="w-full flex items-center justify-between p-4 text-left hover:bg-navy-700/50">
                 

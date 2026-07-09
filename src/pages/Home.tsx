@@ -94,14 +94,14 @@ export function Home() {
             </div>
             
             <div className="flex items-center gap-2">
-              <button
+              <button data-testid='btn-home-1'
                 onClick={() => navigate('/search')}
                 aria-label="Search"
                 className="p-2.5 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
                 <SearchIcon className="w-4 h-4" />
               </button>
 
-              <button
+              <button data-testid='btn-home-2'
                 onClick={() => navigate('/settings')}
                 aria-label="Settings"
                 className="p-2.5 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
@@ -210,7 +210,7 @@ export function Home() {
             <div className="px-6 md:px-0">
               <h3 className="text-lg font-display font-bold mb-4 hidden md:block">Quick Tools</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3">
-                <button 
+                <button data-testid='btn-home-3' 
                   onClick={() => navigate('/education/myths')}
                   className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
                 >
@@ -222,7 +222,7 @@ export function Home() {
                   <ChevronRight className="w-5 h-5 text-content-secondary ml-auto shrink-0" />
                 </button>
 
-                <button 
+                <button data-testid='btn-home-4' 
                   onClick={() => navigate('/dashboard/water')}
                   className="w-full glass-card glass-card-hover rounded-2xl p-4 flex items-center gap-3 text-left transition-all"
                 >
@@ -244,7 +244,7 @@ export function Home() {
               <div className="flex justify-between items-end mb-4">
                 <h3 className="text-lg font-display font-bold">Recent Scans</h3>
                 {scans.length > 0 &&
-                <button
+                <button data-testid='btn-home-5'
                   onClick={() => navigate('/history')}
                   className="text-sm text-brand-primary font-medium flex items-center">
                   
@@ -274,7 +274,7 @@ export function Home() {
                     day: 'numeric'
                   });
                   return (
-                    <button
+                    <button data-testid='btn-home-6'
                       key={scan.id}
                       onClick={() => navigate(`/result/${scan.id}`)}
                       className="w-full bg-navy-800 hover:bg-navy-700 transition-colors rounded-2xl p-4 border border-navy-700 flex items-center gap-4 text-left">

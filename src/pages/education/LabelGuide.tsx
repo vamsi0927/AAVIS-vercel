@@ -13,7 +13,7 @@ export function LabelGuide() {
 
       <header className="pt-safe pt-6 px-4 pb-4 flex flex-col relative z-10 md:max-w-3xl md:mx-auto md:w-full">
         <div className="flex items-center">
-          <button
+          <button data-testid='btn-labelguide-1'
             onClick={() => navigate(-1)}
             className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
             <ChevronLeft className="w-5 h-5" />

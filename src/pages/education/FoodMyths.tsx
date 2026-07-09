@@ -125,7 +125,7 @@ export function FoodMyths() {
 
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center justify-between border-b border-white/5 sticky top-0 bg-navy-900/90 backdrop-blur-md z-20">
         <div className="flex items-center">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-content-secondary hover:text-white transition-colors">
+          <button data-testid='btn-foodmyths-1' onClick={() => navigate(-1)} className="p-2 -ml-2 text-content-secondary hover:text-white transition-colors">
             <ChevronLeft className="w-6 h-6" />
           </button>
           <h1 className="font-display font-bold text-lg ml-2 text-white">Myths vs Facts</h1>
@@ -152,7 +152,7 @@ export function FoodMyths() {
               <span className="text-white">{accuracy}%</span>
             </div>
           </div>
-          <button 
+          <button data-testid='btn-foodmyths-2' 
             onClick={handleResetSession}
             className="p-2 text-content-secondary hover:text-white transition-colors"
             title="Reset Session"
@@ -179,7 +179,7 @@ export function FoodMyths() {
                   <p className="text-content-secondary mb-8 leading-relaxed">
                     You've answered the questions. We'll come back with more myths and facts soon. Great job building your nutrition knowledge!
                   </p>
-                  <button 
+                  <button data-testid='btn-foodmyths-3' 
                     onClick={() => navigate(-1)}
                     className="w-full sm:w-auto bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl px-8 py-4 font-bold inline-flex items-center justify-center transition-all active:scale-[0.97]"
                   >
@@ -219,7 +219,7 @@ export function FoodMyths() {
                         <BookOpen className="w-3.5 h-3.5" /> Fact Check
                       </span>
                       {guess && (
-                        <button onClick={handleShare} className="p-2 text-content-secondary hover:text-white transition-colors bg-white/5 rounded-full" aria-label="Share">
+                        <button data-testid='btn-foodmyths-4' onClick={handleShare} className="p-2 text-content-secondary hover:text-white transition-colors bg-white/5 rounded-full" aria-label="Share">
                           <Share2 className="w-4 h-4" />
                         </button>
                       )}
@@ -240,14 +240,14 @@ export function FoodMyths() {
                       >
                         <p className="text-sm text-content-secondary font-medium text-center mb-4">What's your answer?</p>
                         <div className="flex flex-col sm:flex-row gap-4">
-                          <button 
+                          <button data-testid='btn-foodmyths-5' 
                             onClick={() => handleGuess('fact')}
                             className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl py-4 font-bold flex flex-row items-center justify-center gap-3 transition-all active:scale-[0.97]"
                           >
                             <span className="text-xl">✅</span>
                             Yes
                           </button>
-                          <button 
+                          <button data-testid='btn-foodmyths-6' 
                             onClick={() => handleGuess('fiction')}
                             className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl py-4 font-bold flex flex-row items-center justify-center gap-3 transition-all active:scale-[0.97]"
                           >
@@ -329,7 +329,7 @@ export function FoodMyths() {
                         </div>
                         
                         <div className="mt-8 flex flex-col gap-3">
-                          <button 
+                          <button data-testid='btn-foodmyths-7' 
                             onClick={fetchFact}
                             disabled={isLoading}
                             className={`w-full text-white rounded-xl px-6 py-4 font-bold flex items-center justify-center gap-2.5 shadow-lg transition-all active:scale-[0.97]

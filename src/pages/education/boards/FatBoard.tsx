@@ -84,7 +84,7 @@ export function FatBoard() {
       <header className="pt-safe pt-6 px-4 pb-4 flex flex-col relative z-10 md:max-w-3xl md:mx-auto md:w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <button
+            <button data-testid='btn-fatboard-1'
               onClick={() => navigate(-1)}
               className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
               <ChevronLeft className="w-5 h-5" />
@@ -109,13 +109,13 @@ export function FatBoard() {
       {/* Tabs Selector */}
       <div className="px-4 mb-4 md:max-w-3xl md:mx-auto md:w-full relative z-10">
         <div className="flex bg-navy-800 p-1 rounded-xl border border-white/5">
-          <button
+          <button data-testid='btn-fatboard-2'
             onClick={() => setActiveTab('examples')}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === 'examples' ? 'bg-brand-primary text-white' : 'text-content-secondary hover:text-white'}`}
           >
             Standard Examples
           </button>
-          <button
+          <button data-testid='btn-fatboard-3'
             onClick={() => setActiveTab('scans')}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === 'scans' ? 'bg-brand-primary text-white' : 'text-content-secondary hover:text-white'}`}
           >
@@ -138,7 +138,7 @@ export function FatBoard() {
             <p className="text-xs text-content-secondary max-w-xs mb-4">
               None of your scanned products have recorded saturated fat contents, or you haven't scanned anything yet.
             </p>
-            <button
+            <button data-testid='btn-fatboard-4'
               onClick={() => navigate('/scan')}
               className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold text-xs py-2 px-4 rounded-xl transition-colors">
               Scan a Product

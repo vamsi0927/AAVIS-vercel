@@ -36,7 +36,7 @@ export function Saved() {
       <header className="pt-safe pt-8 px-6 pb-4 bg-navy-900/95 backdrop-blur-md sticky top-0 z-20 md:max-w-3xl md:mx-auto md:w-full md:px-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-display font-bold">Saved</h1>
-          <button className="p-2 text-content-secondary hover:text-white rounded-full bg-navy-800">
+          <button data-testid='btn-saved-1' className="p-2 text-content-secondary hover:text-white rounded-full bg-navy-800">
             <SlidersHorizontal className="w-5 h-5" />
           </button>
         </div>
@@ -45,7 +45,7 @@ export function Saved() {
         {bookmarkedProductIds.length > 0 && (
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary" />
-            <input
+            <input data-testid='input-saved-1'
               type="text"
               placeholder="Search saved products..."
               value={searchQuery}
@@ -69,7 +69,7 @@ export function Saved() {
             <p className="text-content-secondary text-sm max-w-xs mb-6">
               Bookmark products after scanning to keep track of your favorites or items to avoid.
             </p>
-            <button
+            <button data-testid='btn-saved-2'
               onClick={() => navigate('/scan')}
               className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold py-3 px-6 rounded-xl transition-all active:scale-[0.98]"
             >
@@ -84,7 +84,7 @@ export function Saved() {
               
               return (
                 <div key={product.id} className="bg-navy-800 border border-navy-700 hover:border-navy-600 transition-colors rounded-2xl p-4 flex flex-col relative group cursor-pointer" onClick={() => navigate(`/result/${product.id}`)}>
-                  <button 
+                  <button data-testid='btn-saved-3' 
                     className="absolute top-3 right-3 text-brand-primary z-10 p-1"
                     onClick={(e) => { e.stopPropagation(); toggleBookmark(product.id); }}
                   >
@@ -131,7 +131,7 @@ export function Saved() {
           className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
           onClick={() => setSelectedImageProduct(null)}
         >
-          <button 
+          <button data-testid='btn-saved-4' 
             className="absolute top-4 right-4 md:top-6 md:right-6 p-2 bg-black/50 hover:bg-black text-white rounded-full transition-colors z-10"
             onClick={() => setSelectedImageProduct(null)}
           >

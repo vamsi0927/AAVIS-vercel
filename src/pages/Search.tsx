@@ -95,14 +95,14 @@ export function Search() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center gap-2 border-b border-navy-800 md:max-w-3xl md:mx-auto md:w-full md:px-8">
-        <button
+        <button data-testid='btn-search-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
           <ChevronLeft className="w-6 h-6" />
         </button>
         <div className="flex-1 relative">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary" />
-          <input
+          <input data-testid='input-search-1'
             type="text"
             autoFocus
             value={query}
@@ -122,7 +122,7 @@ export function Search() {
             </h3>
             <div className="flex flex-wrap gap-2 mb-6">
               {SUGGESTED_CHIPS.map((term) => (
-                <button
+                <button data-testid='btn-search-2'
                   key={term}
                   onClick={() => handleAskAI(term)}
                   className="px-4 py-2 bg-navy-800 border border-navy-700 rounded-full text-sm text-content-secondary hover:text-content-primary hover:bg-navy-700 transition-colors"
@@ -140,7 +140,7 @@ export function Search() {
                 </h3>
                 <div className="space-y-2">
                   {recentSearches.map((item, idx) => (
-                    <button
+                    <button data-testid='btn-search-3'
                       key={idx}
                       onClick={() => handleAskAI(item.query)}
                       className="w-full bg-navy-800 border border-navy-700 rounded-xl px-4 py-3 text-left flex items-center gap-3 hover:bg-navy-700 transition-colors"
@@ -165,7 +165,7 @@ export function Search() {
             
             {/* Ask AI Action Button */}
             {!isSearching && !aiResult && (
-              <button 
+              <button data-testid='btn-search-4' 
                 onClick={() => handleAskAI(query)}
                 className="w-full bg-gradient-to-r from-brand-primary to-purple-600 hover:opacity-90 text-white rounded-2xl p-4 flex items-center justify-center gap-2 font-bold shadow-lg shadow-purple-500/25 transition-all">
                 <Sparkles className="w-5 h-5" />
@@ -189,7 +189,7 @@ export function Search() {
                   <AlertCircle className="w-5 h-5 text-brand-hazardous flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-brand-hazardous/90">{error}</p>
                 </div>
-                <button
+                <button data-testid='btn-search-5'
                   onClick={() => handleAskAI(query)}
                   className="w-full bg-brand-hazardous/20 text-brand-hazardous text-sm font-medium py-2 rounded-xl hover:bg-brand-hazardous/30 transition-colors"
                 >
@@ -221,7 +221,7 @@ export function Search() {
                 </div>
 
                 {/* Search again */}
-                <button
+                <button data-testid='btn-search-6'
                   onClick={() => { setAiResult(null); setIsCached(false); }}
                   className="mt-4 text-xs text-content-secondary hover:text-white underline"
                 >
@@ -238,7 +238,7 @@ export function Search() {
                 </h3>
                 <div className="space-y-3">
                   {results.map((p) => (
-                    <button
+                    <button data-testid='btn-search-7'
                       key={p.id}
                       onClick={() => navigate('/scan')}
                       className="w-full bg-navy-800 hover:bg-navy-700 rounded-2xl p-4 border border-navy-700 flex items-center gap-4 text-left">

@@ -66,7 +66,7 @@ export function ResultShare() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800">
-        <button
+        <button data-testid='btn-share-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
           
@@ -134,14 +134,14 @@ export function ResultShare() {
 
         <div className="w-full mt-6 space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <button
+            <button data-testid='btn-share-2'
               onClick={handleShare}
               className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl py-4 font-semibold flex items-center justify-center gap-2">
               
               <Share2 className="w-5 h-5" />
               Share
             </button>
-            <button
+            <button data-testid='btn-share-3'
               onClick={handleDownload}
               className="w-full bg-navy-800 border border-navy-700 hover:bg-navy-700 text-white rounded-2xl py-4 font-semibold flex items-center justify-center gap-2">
               
@@ -149,7 +149,7 @@ export function ResultShare() {
               Download
             </button>
           </div>
-          <button
+          <button data-testid='btn-share-4'
             onClick={() => {
               navigator.clipboard.writeText(
                 `${product.name} — ${verdictLabel} — Aavis`

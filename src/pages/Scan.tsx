@@ -430,7 +430,7 @@ export function Scan() {
             <h1 className="text-3xl font-display font-black text-white">Analysis Hub</h1>
             <p className="text-xs text-content-secondary mt-1">Upload a food label for AI analysis and health recommendations.</p>
           </div>
-          <button 
+          <button data-testid='btn-scan-1' 
             onClick={() => navigate('/home')} 
             className="px-4 py-2 bg-white/5 border border-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all"
           >
@@ -476,7 +476,7 @@ export function Scan() {
                   <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">
                     {previewMode === 'ingredients' ? '📋 Adjust Ingredients Crop Area' : previewMode === 'barcode' ? '📷 Adjust Barcode Crop Area' : '📊 Adjust Nutrition Crop Area'}
                   </span>
-                  <button 
+                  <button data-testid='btn-scan-2' 
                     onClick={cancelPreview} 
                     className="p-1.5 hover:bg-white/5 rounded-lg text-content-secondary hover:text-white"
                   >
@@ -499,13 +499,13 @@ export function Scan() {
                   </ReactCrop>
                 </div>
                 <div className="mt-4 flex gap-4">
-                  <button
+                  <button data-testid='btn-scan-3'
                     onClick={cancelPreview}
                     className="flex-1 py-3 bg-navy-800 text-white rounded-xl font-bold text-sm border border-navy-700 hover:bg-navy-700 transition-all"
                   >
                     Select Different File
                   </button>
-                  <button
+                  <button data-testid='btn-scan-4'
                     onClick={handleCropAndContinue}
                     className="flex-1 py-3 bg-brand-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-brand-primary/20 hover:opacity-90 transition-all"
                   >
@@ -543,7 +543,7 @@ export function Scan() {
                 <AlertTriangle className="w-14 h-14 text-brand-hazardous mb-4" />
                 <h3 className="text-lg font-bold text-white mb-2">Scan Failed</h3>
                 <p className="text-sm text-content-secondary max-w-sm mb-6">{scanError}</p>
-                <button 
+                <button data-testid='btn-scan-5' 
                   onClick={() => { setScanError(null); setScanStep('ingredients'); }}
                   className="bg-brand-primary text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-all"
                 >
@@ -611,13 +611,13 @@ export function Scan() {
                     />
                   </div>
                   <div className="flex gap-3">
-                    <button
+                    <button data-testid='btn-scan-6'
                       onClick={() => setReviewingText(null)}
                       className="flex-1 py-2.5 bg-white/5 border border-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all"
                     >
                       Reset
                     </button>
-                    <button
+                    <button data-testid='btn-scan-7'
                       onClick={() => {
                         const confirmedText = reviewingText.text;
                         const type = reviewingText.type;
@@ -646,13 +646,13 @@ export function Scan() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2 pt-2">
-                    <button
+                    <button data-testid='btn-scan-8'
                       onClick={() => fileInputRef.current?.click()}
                       className="w-full py-3 bg-brand-primary/20 text-brand-primary border border-brand-primary/30 rounded-xl text-xs font-bold hover:bg-brand-primary/30 transition-all"
                     >
                       Upload Nutrition Label Image
                     </button>
-                    <button
+                    <button data-testid='btn-scan-9'
                       onClick={skipNutrition}
                       className="w-full py-3 bg-navy-900 border border-navy-700 hover:bg-navy-800 text-white rounded-xl text-xs font-bold transition-all"
                     >
@@ -680,7 +680,7 @@ export function Scan() {
                   <span className="text-[10px] font-bold text-content-secondary uppercase tracking-widest block">Quick Demo Products</span>
                   <div className="grid grid-cols-5 gap-2">
                     {SAMPLE_PRODUCTS.slice(0, 5).map(p => (
-                      <button
+                      <button data-testid='btn-scan-10'
                         key={p.id}
                         onClick={() => {
                           setIngredientsText(p.ingredients.join(', '));
@@ -702,8 +702,8 @@ export function Scan() {
           </div>
         </div>
 
-        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-        <input type="file" accept="image/*" ref={barcodeInputRef} onChange={handleBarcodeUpload} className="hidden" />
+        <input data-testid='input-scan-1' type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+        <input data-testid='input-scan-2' type="file" accept="image/*" ref={barcodeInputRef} onChange={handleBarcodeUpload} className="hidden" />
       </div>
     );
   };
@@ -717,7 +717,7 @@ export function Scan() {
       {/* 1. Header & Progress */}
       <div className="absolute top-safe pt-4 left-0 right-0 px-4 flex flex-col gap-4 z-30">
         <div className="flex justify-between items-center">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 bg-black/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/10">
+          <button data-testid='btn-scan-11' onClick={() => navigate(-1)} className="w-10 h-10 bg-black/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/10">
             <ArrowLeft className="w-6 h-6" />
           </button>
           
@@ -832,7 +832,7 @@ export function Scan() {
               >
                 <AlertTriangle className="w-12 h-12 text-brand-hazardous mb-3" />
                 <p className="text-white text-sm font-medium mb-4">{scanError}</p>
-                <button 
+                <button data-testid='btn-scan-12' 
                   onClick={() => { setScanError(null); setScanStep('ingredients'); }}
                   className="bg-brand-primary text-white px-6 py-2 rounded-xl text-xs font-bold"
                 >
@@ -854,7 +854,7 @@ export function Scan() {
           >
             {/* Preview Header */}
             <div className="pt-safe pt-4 px-4 pb-3 flex items-center justify-between">
-              <button onClick={cancelPreview} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+              <button data-testid='btn-scan-13' onClick={cancelPreview} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                 <X className="w-5 h-5 text-white" />
               </button>
               <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
@@ -889,13 +889,13 @@ export function Scan() {
 
             {/* Preview Actions */}
             <div className="pb-safe pb-8 px-6 flex gap-3">
-              <button
+              <button data-testid='btn-scan-14'
                 onClick={cancelPreview}
                 className="flex-1 bg-navy-800 text-white py-4 rounded-2xl font-bold text-sm border border-navy-700 flex items-center justify-center gap-2 active:scale-95 transition-transform"
               >
                 <RotateCcw className="w-4 h-4" /> Retake
               </button>
-              <button
+              <button data-testid='btn-scan-15'
                 onClick={handleCropAndContinue}
                 className="flex-1 bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-brand-primary/30 flex items-center justify-center gap-2 active:scale-95 transition-transform"
               >
@@ -944,13 +944,13 @@ export function Scan() {
               </div>
 
               <div className="flex gap-3 text-center">
-                <button
+                <button data-testid='btn-scan-16'
                   onClick={() => setReviewingText(null)}
                   className="flex-1 py-3.5 bg-white/5 border border-white/5 text-content-secondary hover:text-white rounded-2xl font-bold text-sm transition-all"
                 >
                   Cancel
                 </button>
-                <button
+                <button data-testid='btn-scan-17'
                   onClick={() => {
                     const confirmedText = reviewingText.text;
                     const type = reviewingText.type;
@@ -1037,7 +1037,7 @@ export function Scan() {
         {/* Secondary Actions Row */}
         {!isScanning && previewMode === 'none' && (
           <div className="flex items-center justify-center gap-6 w-full">
-            <button
+            <button data-testid='btn-scan-18'
               onClick={() => fileInputRef.current?.click()}
               className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
             >
@@ -1048,7 +1048,7 @@ export function Scan() {
             </button>
 
             {scanStep === 'nutrition_scan' ? (
-              <button
+              <button data-testid='btn-scan-19'
                 onClick={skipNutrition}
                 className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
               >
@@ -1059,7 +1059,7 @@ export function Scan() {
               </button>
             ) : (
               <>
-                <button
+                <button data-testid='btn-scan-20'
                   onClick={() => setShowCamera(!showCamera)}
                   className="md:hidden flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
                 >
@@ -1069,7 +1069,7 @@ export function Scan() {
                   <span className={`text-[9px] font-bold uppercase tracking-wider ${showCamera ? 'text-brand-primary' : 'text-content-secondary'}`}>Camera</span>
                 </button>
 
-                <button
+                <button data-testid='btn-scan-21'
                   onClick={() => navigate('/scan/manual')}
                   className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
                 >
@@ -1085,7 +1085,7 @@ export function Scan() {
 
         {/* Demo Products */}
         {!isScanning && scanStep === 'ingredients' && previewMode === 'none' && (
-          <button 
+          <button data-testid='btn-scan-22' 
             onClick={() => setShowSamples(!showSamples)}
             className="flex items-center gap-2 text-[11px] font-bold text-white/40 uppercase tracking-widest hover:text-white/60 transition-colors"
           >
@@ -1101,7 +1101,7 @@ export function Scan() {
               className="flex gap-3 overflow-x-auto no-scrollbar w-full px-2"
             >
               {SAMPLE_PRODUCTS.slice(0, 5).map(p => (
-                <button
+                <button data-testid='btn-scan-23'
                   key={p.id}
                   onClick={() => {
                     setIngredientsText(p.ingredients.join(', '));
@@ -1119,8 +1119,8 @@ export function Scan() {
 
       </div>
 
-      <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-      <input type="file" accept="image/*" ref={barcodeInputRef} onChange={handleBarcodeUpload} className="hidden" />
+      <input data-testid='input-scan-3' type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+      <input data-testid='input-scan-4' type="file" accept="image/*" ref={barcodeInputRef} onChange={handleBarcodeUpload} className="hidden" />
     </div>
   );
 }

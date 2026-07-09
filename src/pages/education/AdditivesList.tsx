@@ -25,7 +25,7 @@ export function AdditivesList() {
 
       <header className="pt-safe pt-6 px-4 pb-4 flex flex-col relative z-10 md:max-w-3xl md:mx-auto md:w-full">
         <div className="flex items-center">
-          <button
+          <button data-testid='btn-additiveslist-1'
             onClick={() => navigate(-1)}
             className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
             <ChevronLeft className="w-5 h-5" />
@@ -41,7 +41,7 @@ export function AdditivesList() {
         <div className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-            <input
+            <input data-testid='input-additiveslist-1'
               type="text"
               placeholder="Search by E-number or name..."
               value={search}
@@ -50,7 +50,7 @@ export function AdditivesList() {
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {(['all', 'safe', 'mild', 'moderate', 'caution', 'hazardous'] as const).map((f) =>
-              <button
+              <button data-testid='btn-additiveslist-2'
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold capitalize whitespace-nowrap transition-colors ${

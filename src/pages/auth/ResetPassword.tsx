@@ -82,7 +82,7 @@ export function ResetPassword() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-brand-primary/10 rounded-full blur-[80px]" />
 
       <header className="absolute top-safe pt-4 left-6 z-20">
-        <button onClick={() => navigate('/login')} className="p-2 rounded-full bg-white/5 border border-white/5 text-content-secondary hover:text-white transition-colors">
+        <button data-testid='btn-resetpassword-1' onClick={() => navigate('/login')} className="p-2 rounded-full bg-white/5 border border-white/5 text-content-secondary hover:text-white transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
       </header>
@@ -109,7 +109,7 @@ export function ResetPassword() {
             {/* New password with eye toggle */}
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
+              <input data-testid='input-resetpassword-1'
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="New password"
@@ -117,7 +117,7 @@ export function ResetPassword() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
               />
-              <button
+              <button data-testid='btn-resetpassword-2'
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
@@ -130,7 +130,7 @@ export function ResetPassword() {
             {/* Confirm password with eye toggle */}
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
+              <input data-testid='input-resetpassword-2'
                 type={showConfirmPassword ? 'text' : 'password'}
                 required
                 placeholder="Confirm new password"
@@ -138,7 +138,7 @@ export function ResetPassword() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
               />
-              <button
+              <button data-testid='btn-resetpassword-3'
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
@@ -159,7 +159,7 @@ export function ResetPassword() {
               <ValidationItem satisfied={password === confirmPassword && password.length > 0} label="Passwords match" />
             </div>
 
-            <button
+            <button data-testid='btn-resetpassword-4'
               type="submit"
               disabled={!isValid || isUpdating}
               className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"

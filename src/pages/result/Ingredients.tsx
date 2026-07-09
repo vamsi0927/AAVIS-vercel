@@ -21,7 +21,7 @@ export function ResultIngredients() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800">
-        <button
+        <button data-testid='btn-ingredients-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
           
@@ -35,7 +35,7 @@ export function ResultIngredients() {
       <div className="px-6 py-4 border-b border-navy-800">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary" />
-          <input
+          <input data-testid='input-ingredients-1'
             type="text"
             placeholder="Search ingredients..."
             value={search}

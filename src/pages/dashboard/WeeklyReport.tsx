@@ -9,7 +9,7 @@ export function WeeklyReport() {
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800 bg-navy-900/90 backdrop-blur-md sticky top-0 z-20">
-        <button
+        <button data-testid='btn-weeklyreport-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white"
         >
@@ -89,7 +89,7 @@ export function WeeklyReport() {
           ))}
         </div>
 
-        <button className="w-full bg-navy-800 hover:bg-navy-700 text-white rounded-xl py-4 font-medium border border-navy-700 transition-colors">
+        <button data-testid='btn-weeklyreport-2' className="w-full bg-navy-800 hover:bg-navy-700 text-white rounded-xl py-4 font-medium border border-navy-700 transition-colors">
           Share Report
         </button>
       </div>

@@ -82,7 +82,7 @@ export function Contact() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800">
-        <button
+        <button data-testid='btn-contact-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
           <ChevronLeft className="w-6 h-6" />
@@ -102,7 +102,7 @@ export function Contact() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
+          <input data-testid='input-contact-1'
             type="text"
             required
             placeholder="Your name"
@@ -110,7 +110,7 @@ export function Contact() {
             onChange={(e) => setName(e.target.value)}
             className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary" />
           
-          <input
+          <input data-testid='input-contact-2'
             type="email"
             required
             placeholder="Your email"
@@ -139,7 +139,7 @@ export function Contact() {
           </div>
 
           {category === 'Other' && (
-            <input
+            <input data-testid='input-contact-3'
               type="text"
               required
               placeholder="Please specify subject"
@@ -157,7 +157,7 @@ export function Contact() {
             onChange={(e) => setMessage(e.target.value)}
             className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary resize-none" />
           
-          <button
+          <button data-testid='btn-contact-2'
             type="submit"
             disabled={isSubmitting}
             className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-4 font-semibold flex items-center justify-center gap-2 transition-all">

@@ -74,7 +74,7 @@ export function Settings() {
       <div className="absolute bottom-20 right-0 w-72 h-72 bg-brand-secondary/5 rounded-full blur-[100px] pointer-events-none z-0" />
 
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center bg-navy-900/90 backdrop-blur-md sticky top-0 z-20 border-b border-white/5 md:max-w-7xl md:mx-auto md:w-full md:px-8">
-        <button
+        <button data-testid='btn-settings-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
           <ChevronLeft className="w-5 h-5" />
@@ -91,7 +91,7 @@ export function Settings() {
           </h3>
           <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
 
-            <button
+            <button data-testid='btn-settings-2'
               onClick={toggleTheme}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
               <div className="flex items-center gap-4">
@@ -102,7 +102,7 @@ export function Settings() {
                 {theme} <ChevronRight className="w-5 h-5" />
               </span>
             </button>
-            <button
+            <button data-testid='btn-settings-3'
               onClick={requestCameraPermission}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-4">
@@ -122,7 +122,7 @@ export function Settings() {
             Data & Privacy
           </h3>
           <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
-            <button
+            <button data-testid='btn-settings-4'
               onClick={handleClearHistory}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
               <div className="flex items-center gap-4">
@@ -135,7 +135,7 @@ export function Settings() {
                 </div>
               </div>
             </button>
-            <button
+            <button data-testid='btn-settings-5'
               onClick={() => navigate('/privacy')}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
               <div className="flex items-center gap-4">
@@ -144,7 +144,7 @@ export function Settings() {
               </div>
               <ChevronRight className="w-5 h-5 text-content-secondary" />
             </button>
-            <button
+            <button data-testid='btn-settings-6'
               onClick={() => navigate('/terms')}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-4">
@@ -163,7 +163,7 @@ export function Settings() {
           </h3>
 
           <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
-            <button
+            <button data-testid='btn-settings-7'
               onClick={() => navigate('/help')}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
               <div className="flex items-center gap-4">
@@ -172,7 +172,7 @@ export function Settings() {
               </div>
               <ChevronRight className="w-5 h-5 text-content-secondary" />
             </button>
-            <button
+            <button data-testid='btn-settings-8'
               onClick={() => navigate('/contact')}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
               <div className="flex items-center gap-4">
@@ -181,7 +181,7 @@ export function Settings() {
               </div>
               <ChevronRight className="w-5 h-5 text-content-secondary" />
             </button>
-            <button
+            <button data-testid='btn-settings-9'
               onClick={() => navigate('/about')}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-4">
@@ -199,7 +199,7 @@ export function Settings() {
             Account
           </h3>
           <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
-            <button
+            <button data-testid='btn-settings-10'
               onClick={() => {
                 logout();
                 navigate('/login');

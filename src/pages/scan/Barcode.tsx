@@ -66,7 +66,7 @@ export function ScanBarcode() {
   return (
     <div className="flex flex-col h-full bg-navy-900 relative overflow-hidden">
       <div className="absolute top-safe pt-4 left-0 right-0 px-4 flex justify-between items-center z-20">
-        <button
+        <button data-testid='btn-barcode-1'
           onClick={() => navigate(-1)}
           className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white">
           
@@ -75,7 +75,7 @@ export function ScanBarcode() {
         <div className="bg-black/40 backdrop-blur-md px-4 py-2 rounded-full">
           <span className="text-sm font-medium text-white">Barcode Scan</span>
         </div>
-        <button
+        <button data-testid='btn-barcode-2'
           onClick={() => navigate('/scan/manual')}
           className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white">
           
@@ -112,7 +112,7 @@ export function ScanBarcode() {
       </p>
 
       <div className="pb-safe pb-8 px-6 flex justify-center">
-        <button
+        <button data-testid='btn-barcode-3'
           onClick={handleCapture}
           disabled={isScanning}
           className="bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-2 shadow-[0_0_30px_rgba(99,102,241,0.3)] disabled:opacity-50">

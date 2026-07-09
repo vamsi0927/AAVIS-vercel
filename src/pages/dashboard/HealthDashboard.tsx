@@ -242,7 +242,7 @@ export function HealthDashboard() {
 
                 {/* View Toggle + Present button */}
                 <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
-                  <button
+                  <button data-testid='btn-healthdashboard-1'
                     onClick={handlePrev}
                     disabled={!canGoBack}
                     title="Previous"
@@ -254,7 +254,7 @@ export function HealthDashboard() {
                   >
                     &lt;
                   </button>
-                  <button
+                  <button data-testid='btn-healthdashboard-2'
                     onClick={handleNext}
                     disabled={!canGoForward}
                     title="Next"
@@ -266,7 +266,7 @@ export function HealthDashboard() {
                   >
                     &gt;
                   </button>
-                  <button
+                  <button data-testid='btn-healthdashboard-3'
                     onClick={handlePresent}
                     disabled={!canGoForward}
                     title="Present"
@@ -279,7 +279,7 @@ export function HealthDashboard() {
                     Present ▶
                   </button>
                   <div className="flex bg-black/20 p-1 rounded-xl border border-white/5">
-                    <button
+                    <button data-testid='btn-healthdashboard-4'
                       onClick={() => setTimeRange('week')}
                       className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
                         timeRange === 'week'
@@ -289,7 +289,7 @@ export function HealthDashboard() {
                     >
                       Week
                     </button>
-                    <button
+                    <button data-testid='btn-healthdashboard-5'
                       onClick={() => setTimeRange('month')}
                       className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${
                         timeRange === 'month'
@@ -466,7 +466,7 @@ export function HealthDashboard() {
           </div>
 
           {/* Ask AI Navigation */}
-          <button
+          <button data-testid='btn-healthdashboard-6'
             onClick={() => navigate('/dashboard/chat')}
             className="bg-navy-800 rounded-2xl p-4 flex items-center justify-center text-center gap-3 hover:bg-navy-700 transition-colors shadow-lg shadow-black/20"
           >
@@ -571,7 +571,7 @@ export function HealthDashboard() {
                   const product = scan.product || SAMPLE_PRODUCTS.find(p => p.id === scan.productId);
                   if (!product) return null;
                   return (
-                    <button
+                    <button data-testid='btn-healthdashboard-7'
                       key={scan.id}
                       onClick={() => navigate(`/result/${scan.id}`)}
                       className="w-full bg-navy-800 hover:bg-navy-700 transition-colors rounded-2xl p-4 border border-brand-hazardous/30 flex items-center gap-4 text-left"

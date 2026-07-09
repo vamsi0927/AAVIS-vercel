@@ -276,15 +276,15 @@ export function Profile() {
         <div className="flex items-center gap-2">
           {isEditing ? (
             <>
-              <button onClick={handleCancel} disabled={isSaving} className="p-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors disabled:opacity-50">
+              <button data-testid='btn-profile-1' onClick={handleCancel} disabled={isSaving} className="p-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors disabled:opacity-50">
                 <X className="w-5 h-5" />
               </button>
-              <button onClick={handleSave} disabled={isSaving} className="p-2 text-white bg-gradient-to-r from-brand-primary to-brand-secondary rounded-xl shadow-lg shadow-brand-primary/30 transition-transform active:scale-95 disabled:opacity-50">
+              <button data-testid='btn-profile-2' onClick={handleSave} disabled={isSaving} className="p-2 text-white bg-gradient-to-r from-brand-primary to-brand-secondary rounded-xl shadow-lg shadow-brand-primary/30 transition-transform active:scale-95 disabled:opacity-50">
                 <Save className="w-5 h-5" />
               </button>
             </>
           ) : (
-            <button
+            <button data-testid='btn-profile-3'
               onClick={() => navigate('/settings')}
               className="p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-content-secondary hover:text-white transition-colors"
             >
@@ -329,7 +329,7 @@ export function Profile() {
                     <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <Camera className="w-8 h-8 text-white" />
                     </div>
-                    <input 
+                    <input data-testid='input-profile-1' 
                       type="file" 
                       ref={fileInputRef} 
                       className="hidden" 
@@ -343,7 +343,7 @@ export function Profile() {
               {/* Identity Info */}
               <div className="w-full mb-8">
                 {isEditing ? (
-                  <input
+                  <input data-testid='input-profile-2'
                     type="text"
                     value={editData.name}
                     onChange={(e) => setEditData({...editData, name: e.target.value})}
@@ -360,7 +360,7 @@ export function Profile() {
 
               {/* Edit Button */}
               {!isEditing && (
-                <button
+                <button data-testid='btn-profile-4'
                   onClick={() => setIsEditing(true)}
                   className="w-full py-4 bg-brand-primary hover:bg-brand-primary/90 text-white font-bold rounded-2xl shadow-lg shadow-brand-primary/30 transition-all flex justify-center items-center gap-2 active:scale-95"
                 >
@@ -389,7 +389,7 @@ export function Profile() {
                     <div className="flex gap-4">
                       <div className="flex-1">
                         <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Age</label>
-                        <input type="number" value={editData.age || ''} onChange={(e) => setEditData({...editData, age: parseInt(e.target.value) || ''})} placeholder="Years" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
+                        <input data-testid='input-profile-3' type="number" value={editData.age || ''} onChange={(e) => setEditData({...editData, age: parseInt(e.target.value) || ''})} placeholder="Years" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
                       </div>
                       <div className="flex-1">
                         <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Gender</label>
@@ -404,11 +404,11 @@ export function Profile() {
                     <div className="flex gap-4">
                       <div className="flex-1">
                         <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Height (cm)</label>
-                        <input type="number" value={editData.height || ''} onChange={(e) => setEditData({...editData, height: parseInt(e.target.value) || ''})} placeholder="cm" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
+                        <input data-testid='input-profile-4' type="number" value={editData.height || ''} onChange={(e) => setEditData({...editData, height: parseInt(e.target.value) || ''})} placeholder="cm" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
                       </div>
                       <div className="flex-1">
                         <label className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-1 block">Weight (kg)</label>
-                        <input type="number" value={editData.weight || ''} onChange={(e) => setEditData({...editData, weight: parseInt(e.target.value) || ''})} placeholder="kg" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
+                        <input data-testid='input-profile-5' type="number" value={editData.weight || ''} onChange={(e) => setEditData({...editData, weight: parseInt(e.target.value) || ''})} placeholder="kg" className="w-full glass-input rounded-xl px-4 py-2 text-white text-sm" />
                       </div>
                     </div>
                     <div>
@@ -455,7 +455,7 @@ export function Profile() {
                 {isEditing ? (
                   <div className="flex flex-wrap gap-2 flex-1 content-start">
                     {DIET_OPTIONS.map(diet => (
-                      <button
+                      <button data-testid='btn-profile-5'
                         key={diet}
                         onClick={() => setEditData({...editData, diet})}
                         className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center ${
@@ -485,7 +485,7 @@ export function Profile() {
                       <p className="text-[10px] text-white/70 uppercase tracking-wider font-bold mb-2">Allergies</p>
                       <div className="flex flex-wrap gap-2">
                         {ALLERGEN_OPTIONS.map(allergen => (
-                          <button
+                          <button data-testid='btn-profile-6'
                             key={allergen}
                             onClick={() => toggleArrayItem('allergens', allergen)}
                             className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center ${
@@ -501,7 +501,7 @@ export function Profile() {
                       <p className="text-[10px] text-white/70 uppercase tracking-wider font-bold mb-2">Health Conditions</p>
                       <div className="flex flex-wrap gap-2">
                         {getConditionOptions(editData.gender).map(condition => (
-                          <button
+                          <button data-testid='btn-profile-7'
                             key={condition}
                             onClick={() => toggleArrayItem('conditions', condition)}
                             className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all text-center ${
@@ -550,21 +550,21 @@ export function Profile() {
               className="bg-navy-800 w-full sm:w-96 rounded-3xl p-6 border border-white/10 shadow-2xl flex flex-col gap-3"
             >
               <h3 className="text-lg font-bold text-white text-center mb-2">Profile Picture</h3>
-              <button
+              <button data-testid='btn-profile-8'
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-colors"
               >
                 Change Photo
               </button>
               {profile.avatarUrl && (
-                <button
+                <button data-testid='btn-profile-9'
                   onClick={() => { setIsActionMenuOpen(false); setShowRemoveConfirm(true); }}
                   className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-bold transition-colors"
                 >
                   Remove Photo
                 </button>
               )}
-              <button
+              <button data-testid='btn-profile-10'
                 onClick={() => setIsActionMenuOpen(false)}
                 className="w-full py-3 mt-2 text-content-secondary hover:text-white rounded-xl font-bold transition-colors"
               >
@@ -593,7 +593,7 @@ export function Profile() {
               </p>
 
               <div className="flex flex-col gap-3 w-full">
-                <button
+                <button data-testid='btn-profile-11'
                   onClick={handleSaveAvatar}
                   disabled={isSaving}
                   className="w-full py-3.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-xl font-bold shadow-lg shadow-brand-primary/30 transition-transform active:scale-95 disabled:opacity-50 flex justify-center items-center gap-2"
@@ -605,7 +605,7 @@ export function Profile() {
                     </>
                   ) : 'Save Photo'}
                 </button>
-                <button
+                <button data-testid='btn-profile-12'
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isSaving}
                   className="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-colors disabled:opacity-50"
@@ -613,7 +613,7 @@ export function Profile() {
                   Choose Another Photo
                 </button>
                 {profile.avatarUrl && (
-                  <button
+                  <button data-testid='btn-profile-13'
                     onClick={() => { setShowPreviewModal(false); setShowRemoveConfirm(true); }}
                     disabled={isSaving}
                     className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-bold transition-colors disabled:opacity-50"
@@ -621,7 +621,7 @@ export function Profile() {
                     Remove Current Photo
                   </button>
                 )}
-                <button
+                <button data-testid='btn-profile-14'
                   onClick={() => {
                     setShowPreviewModal(false);
                     setSelectedFileUrl(null);
@@ -653,14 +653,14 @@ export function Profile() {
                 </p>
               </div>
               <div className="flex gap-3">
-                <button
+                <button data-testid='btn-profile-15'
                   onClick={() => setShowRemoveConfirm(false)}
                   disabled={isSaving}
                   className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
-                <button
+                <button data-testid='btn-profile-16'
                   onClick={handleRemovePhoto}
                   disabled={isSaving}
                   className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-colors disabled:opacity-50 flex justify-center items-center"

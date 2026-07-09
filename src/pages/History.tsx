@@ -118,7 +118,7 @@ export function History() {
               </div>
             )}
             {scans.length > 0 &&
-              <button
+              <button data-testid='btn-history-1'
                 onClick={clearHistory}
                 className="text-brand-hazardous p-2 hover:bg-brand-hazardous/10 rounded-full transition-colors"
                 title="Delete All History"
@@ -140,7 +140,7 @@ export function History() {
             <div />
           )}
 
-          <button
+          <button data-testid='btn-history-2'
             onClick={() => navigate('/saved')}
             className="flex items-center gap-1.5 text-brand-primary/80 hover:text-brand-primary transition-colors text-[10px] font-bold uppercase tracking-wider ml-auto"
           >
@@ -154,7 +154,7 @@ export function History() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-navy-800/40 p-4 rounded-2xl border border-white/5">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
+              <input data-testid='input-history-1'
                 type="text"
                 placeholder="Search scans by name or brand..."
                 value={search}
@@ -164,7 +164,7 @@ export function History() {
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex bg-navy-900 p-1 rounded-xl border border-white/5">
                 {(['all', 'safe', 'caution', 'hazardous'] as const).map((f) =>
-                  <button
+                  <button data-testid='btn-history-3'
                     key={f}
                     onClick={() => setFilter(f)}
                     className={`px-3 py-1 rounded-lg text-xs font-medium capitalize transition-colors ${filter === f ? 'bg-brand-primary text-white font-bold' : 'text-content-secondary hover:text-content-primary'}`}>
@@ -197,7 +197,7 @@ export function History() {
             title="No Scans Yet"
             description="Your scan history will appear here. Start scanning products to build your history."
             action={
-              <button
+              <button data-testid='btn-history-4'
                 onClick={() => navigate('/scan')}
                 className="mt-4 bg-brand-primary px-6 py-3 rounded-xl font-medium text-white">
                 Scan a Product
@@ -222,7 +222,7 @@ export function History() {
                 const scoreEmoji = scan.verdict === 'safe' ? '🟢' : scan.verdict === 'caution' ? '🟡' : '🔴';
                 
                 return (
-                  <button
+                  <button data-testid='btn-history-5'
                     key={scan.id}
                     onClick={() => navigate(`/result/${scan.id}`)}
                     className="w-full bg-navy-800 hover:bg-navy-700 transition-colors rounded-2xl p-4 border border-navy-700 flex items-center gap-4 text-left group">
@@ -291,14 +291,14 @@ export function History() {
               This action will permanently remove the scan from your history.
             </p>
             <div className="flex items-center gap-3">
-              <button
+              <button data-testid='btn-history-6'
                 onClick={() => setScanToDelete(null)}
                 disabled={isDeleting}
                 className="flex-1 py-3 px-4 rounded-xl font-bold text-content-secondary bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
-              <button
+              <button data-testid='btn-history-7'
                 onClick={confirmDelete}
                 disabled={isDeleting}
                 className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-brand-hazardous hover:bg-brand-hazardous/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
@@ -317,7 +317,7 @@ export function History() {
           className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
           onClick={() => setSelectedImageScan(null)}
         >
-          <button 
+          <button data-testid='btn-history-8' 
             className="absolute top-4 right-4 md:top-6 md:right-6 p-2 bg-black/50 hover:bg-black text-white rounded-full transition-colors z-10"
             onClick={() => setSelectedImageScan(null)}
           >

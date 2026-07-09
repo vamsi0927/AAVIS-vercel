@@ -25,7 +25,7 @@ export function ReportData() {
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
       <header className="pt-safe pt-8 px-6 pb-4 flex items-center gap-4 border-b border-navy-800">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
+        <button data-testid='btn-reportdata-1' onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-xl font-display font-bold">Report Incorrect Data</h1>
@@ -69,7 +69,7 @@ export function ReportData() {
             />
           </div>
 
-          <button
+          <button data-testid='btn-reportdata-2'
             type="submit"
             className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl py-4 font-bold text-lg shadow-lg transition-colors mt-8"
           >

@@ -63,7 +63,7 @@ export function ApiSettings() {
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
       <header className="pt-safe pt-8 px-6 pb-4 flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
+        <button data-testid='btn-apisettings-1' onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-xl font-display font-bold">API Keys</h1>
@@ -117,7 +117,7 @@ export function ApiSettings() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <button
+          <button data-testid='btn-apisettings-2'
             onClick={() => setActiveSection(activeSection === 'emailjs' ? null : 'emailjs')}
             className="w-full bg-navy-800 border border-navy-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-navy-700/50 transition-colors"
           >
@@ -152,21 +152,21 @@ export function ApiSettings() {
                     Without EmailJS, OTP works in <span className="text-amber-400 font-medium">demo mode</span> — the code is shown on screen instead of emailed.
                   </p>
 
-                  <input
+                  <input data-testid='input-apisettings-1'
                     type="text"
                     value={emailServiceId}
                     onChange={(e) => setEmailServiceId(e.target.value)}
                     placeholder="Service ID (e.g., service_xxx)"
                     className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-sm text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary transition-colors"
                   />
-                  <input
+                  <input data-testid='input-apisettings-2'
                     type="text"
                     value={emailTemplateId}
                     onChange={(e) => setEmailTemplateId(e.target.value)}
                     placeholder="Template ID (e.g., template_xxx)"
                     className="w-full bg-navy-800 border border-navy-700 rounded-xl py-3 px-4 text-sm text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary transition-colors"
                   />
-                  <input
+                  <input data-testid='input-apisettings-3'
                     type="text"
                     value={emailPublicKey}
                     onChange={(e) => setEmailPublicKey(e.target.value)}
@@ -175,14 +175,14 @@ export function ApiSettings() {
                   />
 
                   <div className="flex gap-2">
-                    <button
+                    <button data-testid='btn-apisettings-3'
                       onClick={handleSaveEmailJS}
                       className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white py-2.5 rounded-xl text-sm font-semibold transition-colors"
                     >
                       Save Config
                     </button>
                     {emailConfigured && (
-                      <button
+                      <button data-testid='btn-apisettings-4'
                         onClick={handleRemoveEmailJS}
                         className="px-4 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-xl text-sm font-semibold transition-colors"
                       >

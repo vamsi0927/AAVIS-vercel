@@ -101,7 +101,7 @@ export function VerifyOTP() {
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
       <header className="pt-safe pt-8 px-6 pb-4 flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
+        <button data-testid='btn-verifyotp-1' onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
           <ArrowLeft className="w-6 h-6" />
         </button>
       </header>
@@ -127,7 +127,7 @@ export function VerifyOTP() {
         <form onSubmit={(e) => handleSubmit(e)} className="space-y-8 flex-1 flex flex-col">
           <div className="flex justify-between max-w-[320px] mx-auto w-full gap-2" onPaste={handlePaste}>
             {otp.map((digit, index) => (
-              <input
+              <input data-testid='input-verifyotp-1'
                 key={index}
                 ref={(el) => (inputRefs.current[index] = el)}
                 type="text"
@@ -148,7 +148,7 @@ export function VerifyOTP() {
                 Resend in {resendTimer}s
               </p>
             ) : (
-              <button
+              <button data-testid='btn-verifyotp-2'
                 type="button"
                 onClick={handleResend}
                 className="text-sm text-brand-primary font-medium hover:underline"
@@ -159,7 +159,7 @@ export function VerifyOTP() {
           </div>
 
           <div className="mt-auto pt-8">
-            <button
+            <button data-testid='btn-verifyotp-3'
               type="submit"
               disabled={isLoading || otp.join('').length < 6}
               className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-50 text-white rounded-xl py-4 font-bold text-lg shadow-lg transition-colors flex items-center justify-center gap-2"

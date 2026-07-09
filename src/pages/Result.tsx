@@ -87,7 +87,7 @@ export function Result() {
         <p className="text-content-secondary mb-6">
           This scan might have been deleted or doesn't exist.
         </p>
-        <button
+        <button data-testid='btn-result-1'
           onClick={() => navigate('/home')}
           className="bg-brand-primary px-6 py-3 rounded-xl font-medium">
           Go Home
@@ -229,20 +229,20 @@ export function Result() {
 
       {/* ── Header ── */}
       <div className="sticky top-0 z-30 bg-navy-900/90 backdrop-blur-md pt-safe px-4 pb-4 flex justify-between items-center border-b border-white/5">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
+        <button data-testid='btn-result-2' onClick={() => navigate(-1)} className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
           <ChevronLeft className="w-5 h-5" />
         </button>
         <h1 className="font-display font-black text-lg text-white break-words whitespace-normal px-4">Health Report</h1>
         <div className="flex items-center gap-1">
           {import.meta.env.DEV && (
-            <button onClick={handleReAnalyze} disabled={isReanalyzing} className={`p-2 rounded-xl transition-colors border border-transparent ${isReanalyzing ? 'opacity-50 text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5 hover:border-white/10'}`} title="Recalculate Score">
+            <button data-testid='btn-result-3' onClick={handleReAnalyze} disabled={isReanalyzing} className={`p-2 rounded-xl transition-colors border border-transparent ${isReanalyzing ? 'opacity-50 text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5 hover:border-white/10'}`} title="Recalculate Score">
               {isReanalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
             </button>
           )}
-          <button onClick={() => toggleBookmark(product.id)} className={`p-2 rounded-xl transition-colors ${isBookmarked ? 'text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5'}`}>
+          <button data-testid='btn-result-4' onClick={() => toggleBookmark(product.id)} className={`p-2 rounded-xl transition-colors ${isBookmarked ? 'text-brand-primary bg-brand-primary/10' : 'text-content-secondary hover:text-white bg-white/5'}`}>
             <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>
-          <button onClick={handleShare} className="p-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
+          <button data-testid='btn-result-5' onClick={handleShare} className="p-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
             <Share2 className="w-4 h-4" />
           </button>
         </div>
@@ -585,7 +585,7 @@ export function Result() {
                   })()}
                 </div>
                 {product.ingredients.length > 12 && (
-                  <button
+                  <button data-testid='btn-result-6'
                     onClick={() => setShowAllIngredients(!showAllIngredients)}
                     className="w-full mt-4 py-2.5 text-xs font-bold text-brand-primary bg-brand-primary/5 rounded-2xl border border-brand-primary/10 hover:bg-brand-primary/10 transition-colors"
                   >
@@ -832,7 +832,7 @@ export function Result() {
           className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
           onClick={() => setShowImageModal(null)}
         >
-          <button 
+          <button data-testid='btn-result-7' 
             className="absolute top-4 right-4 md:top-6 md:right-6 p-2 bg-black/50 hover:bg-black text-white rounded-full transition-colors z-10"
             onClick={() => setShowImageModal(null)}
           >

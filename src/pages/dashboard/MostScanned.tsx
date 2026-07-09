@@ -9,7 +9,7 @@ export function MostScanned() {
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24">
       <header className="pt-safe pt-8 px-6 pb-4 flex items-center gap-4 border-b border-navy-800">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
+        <button data-testid='btn-mostscanned-1' onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-navy-800 transition-colors">
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-xl font-display font-bold">Most Scanned</h1>

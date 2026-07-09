@@ -19,7 +19,7 @@ export function ProductAlternatives() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800 bg-navy-900/90 backdrop-blur-md sticky top-0 z-20">
-        <button
+        <button data-testid='btn-productalternatives-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white"
         >
@@ -75,13 +75,13 @@ export function ProductAlternatives() {
               </div>
 
               <div className="border-t border-navy-700 pt-4 flex gap-3 mt-1">
-                <button 
+                <button data-testid='btn-productalternatives-2' 
                   onClick={() => navigate('/scan')} // Mock nav
                   className="flex-1 bg-navy-700 hover:bg-navy-600 text-white text-xs font-semibold py-2.5 rounded-xl transition-colors"
                 >
                   View Details
                 </button>
-                <button className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white text-xs font-semibold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-1">
+                <button data-testid='btn-productalternatives-3' className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white text-xs font-semibold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-1">
                   Compare <ArrowRight className="w-3 h-3" />
                 </button>
               </div>

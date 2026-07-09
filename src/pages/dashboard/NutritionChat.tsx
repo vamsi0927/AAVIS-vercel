@@ -52,7 +52,7 @@ export function NutritionChat() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800 bg-navy-900/90 backdrop-blur-md sticky top-0 z-20 shadow-sm">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-content-secondary hover:text-white">
+        <button data-testid='btn-nutritionchat-1' onClick={() => navigate(-1)} className="p-2 -ml-2 text-content-secondary hover:text-white">
           <ChevronLeft className="w-6 h-6" />
         </button>
         <div className="flex items-center gap-2 ml-2">
@@ -111,7 +111,7 @@ export function NutritionChat() {
 
       <div className="p-4 bg-navy-900 border-t border-navy-800 pb-safe">
         <div className="flex gap-2">
-          <input
+          <input data-testid='input-nutritionchat-1'
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -119,7 +119,7 @@ export function NutritionChat() {
             placeholder="Ask about ingredients, diets, myths..."
             className="flex-1 bg-navy-800 border border-navy-700 rounded-full px-5 py-3.5 text-sm text-white placeholder:text-content-secondary focus:outline-none focus:border-brand-primary"
           />
-          <button 
+          <button data-testid='btn-nutritionchat-2' 
             onClick={handleSend}
             disabled={!input.trim() || isTyping}
             className="w-12 h-12 rounded-full bg-brand-primary disabled:opacity-50 flex items-center justify-center text-white transition-transform active:scale-95 flex-shrink-0"

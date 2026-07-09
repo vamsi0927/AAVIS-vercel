@@ -106,7 +106,7 @@ export function ScanManual() {
       <div className="absolute bottom-20 left-0 w-72 h-72 bg-brand-secondary/5 rounded-full blur-[100px]" />
 
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-white/5 relative z-10">
-        <button
+        <button data-testid='btn-manual-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors"
         >
@@ -130,7 +130,7 @@ export function ScanManual() {
             <label className="block text-xs font-bold uppercase tracking-wider text-content-secondary mb-2">
               Product name (optional)
             </label>
-            <input
+            <input data-testid='input-manual-1'
               type="text"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
@@ -160,7 +160,7 @@ export function ScanManual() {
       </div>
 
       <div className="pb-safe pb-6 px-6 border-t border-white/5 pt-4 relative z-10">
-        <button
+        <button data-testid='btn-manual-2'
           onClick={handleAnalyze}
           disabled={!ingredients.trim() || isAnalyzing}
           className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white hover:opacity-95 disabled:opacity-50 rounded-2xl py-4 font-bold text-base flex items-center justify-center gap-2 transition-transform active:scale-[0.98] shadow-lg shadow-brand-primary/20"

@@ -154,7 +154,7 @@ export function Verify() {
           )}
 
           {status === 'error' && (
-            <button
+            <button data-testid='btn-verify-1'
               onClick={() => navigate('/login')}
               className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
             >

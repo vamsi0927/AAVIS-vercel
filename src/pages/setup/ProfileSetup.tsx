@@ -82,7 +82,7 @@ export function ProfileSetup() {
 
       {/* Header */}
       <div className="pt-safe pt-6 px-6 flex items-center justify-between relative z-10">
-        <button
+        <button data-testid='btn-profilesetup-1'
           onClick={() => step > 0 ? setStep(step - 1) : navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white rounded-full transition-colors">
           <ChevronLeft className="w-6 h-6" />
@@ -114,7 +114,7 @@ export function ProfileSetup() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">What should we call you?</label>
-                    <input
+                    <input data-testid='input-profilesetup-1'
                       type="text"
                       value={setupData.name}
                       onChange={(e) => setSetupData({...setupData, name: e.target.value})}
@@ -124,7 +124,7 @@ export function ProfileSetup() {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Age</label>
-                    <input
+                    <input data-testid='input-profilesetup-2'
                       type="number"
                       value={setupData.age}
                       onChange={(e) => setSetupData({...setupData, age: e.target.value ? Number(e.target.value) : ''})}
@@ -150,7 +150,7 @@ export function ProfileSetup() {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Height (cm)</label>
-                    <input
+                    <input data-testid='input-profilesetup-3'
                       type="number"
                       value={setupData.height}
                       onChange={(e) => setSetupData({...setupData, height: e.target.value ? Number(e.target.value) : ''})}
@@ -160,7 +160,7 @@ export function ProfileSetup() {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-content-secondary mb-3 uppercase tracking-wider">Weight (kg)</label>
-                    <input
+                    <input data-testid='input-profilesetup-4'
                       type="number"
                       value={setupData.weight}
                       onChange={(e) => setSetupData({...setupData, weight: e.target.value ? Number(e.target.value) : ''})}
@@ -194,7 +194,7 @@ export function ProfileSetup() {
                 
                 <div className="flex flex-wrap gap-3">
                   {DIET_OPTIONS.map(diet => (
-                    <button
+                    <button data-testid='btn-profilesetup-2'
                       key={diet}
                       onClick={() => setSetupData({...setupData, diet})}
                       className={`px-5 py-3 rounded-2xl font-bold transition-all ${
@@ -218,7 +218,7 @@ export function ProfileSetup() {
                 
                 <div className="flex flex-wrap gap-3">
                   {getConditionOptions(setupData.gender).map(condition => (
-                    <button
+                    <button data-testid='btn-profilesetup-3'
                       key={condition}
                       onClick={() => toggleArrayItem('conditions', condition)}
                       className={`px-5 py-3 rounded-2xl font-bold transition-all ${
@@ -242,7 +242,7 @@ export function ProfileSetup() {
                 
                 <div className="flex flex-wrap gap-3">
                   {ALLERGEN_OPTIONS.map(allergen => (
-                    <button
+                    <button data-testid='btn-profilesetup-4'
                       key={allergen}
                       onClick={() => toggleArrayItem('allergens', allergen)}
                       className={`px-5 py-3 rounded-2xl font-bold transition-all ${
@@ -268,7 +268,7 @@ export function ProfileSetup() {
         </AnimatePresence>
 
         <div className="pb-safe pb-8 pt-4">
-          <button
+          <button data-testid='btn-profilesetup-5'
             onClick={handleNext}
             disabled={!isStepValid()}
             className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-95 rounded-2xl py-4 font-bold text-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-lg shadow-brand-primary/20"

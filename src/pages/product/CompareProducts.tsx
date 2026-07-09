@@ -27,7 +27,7 @@ export function CompareProducts() {
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center justify-between border-b border-navy-800 bg-navy-900/90 backdrop-blur-md sticky top-0 z-20">
         <div className="flex items-center">
-          <button
+          <button data-testid='btn-compareproducts-1'
             onClick={() => navigate(-1)}
             className="p-2 -ml-2 text-content-secondary hover:text-white"
           >
@@ -35,7 +35,7 @@ export function CompareProducts() {
           </button>
           <h1 className="font-display font-bold text-lg ml-2">Compare</h1>
         </div>
-        <button className="text-brand-primary text-sm font-medium px-3 py-1 bg-brand-primary/10 rounded-full">
+        <button data-testid='btn-compareproducts-2' className="text-brand-primary text-sm font-medium px-3 py-1 bg-brand-primary/10 rounded-full">
           Change
         </button>
       </header>
@@ -160,7 +160,7 @@ export function CompareProducts() {
             <p className="text-sm text-content-secondary mb-5">
               It has significantly lower sodium, zero hazardous additives, and is safer for your health profile.
             </p>
-            <button className="w-full py-3 bg-navy-800 hover:bg-navy-700 text-white rounded-xl font-medium border border-navy-700 flex items-center justify-center gap-2">
+            <button data-testid='btn-compareproducts-3' className="w-full py-3 bg-navy-800 hover:bg-navy-700 text-white rounded-xl font-medium border border-navy-700 flex items-center justify-center gap-2">
               View Detailed Report <ArrowRight className="w-4 h-4" />
             </button>
           </div>

@@ -146,7 +146,7 @@ export function Register() {
                 {/* Full Name */}
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-                  <input
+                  <input data-testid='input-register-1'
                     type="text"
                     required
                     placeholder="Full Name"
@@ -159,7 +159,7 @@ export function Register() {
                 {/* Email */}
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-                  <input
+                  <input data-testid='input-register-2'
                     type="email"
                     required
                     placeholder="Email address"
@@ -172,7 +172,7 @@ export function Register() {
                 {/* Password with eye toggle */}
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-                  <input
+                  <input data-testid='input-register-3'
                     type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="Password (min. 6 characters)"
@@ -180,7 +180,7 @@ export function Register() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
                   />
-                  <button
+                  <button data-testid='btn-register-1'
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
@@ -193,7 +193,7 @@ export function Register() {
                 {/* Confirm Password with eye toggle */}
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-                  <input
+                  <input data-testid='input-register-4'
                     type={showConfirmPassword ? 'text' : 'password'}
                     required
                     placeholder="Confirm password"
@@ -201,7 +201,7 @@ export function Register() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
                   />
-                  <button
+                  <button data-testid='btn-register-2'
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
@@ -211,7 +211,7 @@ export function Register() {
                   </button>
                 </div>
 
-                <button
+                <button data-testid='btn-register-3'
                   type="submit"
                   disabled={!name || !email || !password || !confirmPassword || isLoading}
                   className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
@@ -244,7 +244,7 @@ export function Register() {
                   Once you have verified your email, you can safely close this screen.
                 </p>
 
-                <button
+                <button data-testid='btn-register-4'
                   type="button"
                   onClick={() => setStep('register')}
                   className="w-full bg-transparent border border-white/10 hover:bg-white/5 text-white rounded-2xl py-3.5 font-medium text-sm transition-all mt-6"

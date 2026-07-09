@@ -61,7 +61,7 @@ export function Onboarding() {
 
       {/* Skip Button */}
       <div className="absolute top-0 right-0 pt-safe pr-6 z-20">
-        <button
+        <button data-testid='btn-onboarding-1'
           onClick={finishOnboarding}
           className="text-content-secondary hover:text-white transition-colors text-sm font-semibold tracking-wide mt-2">
           Skip
@@ -111,7 +111,7 @@ export function Onboarding() {
         </div>
 
         {/* Action Button */}
-        <button
+        <button data-testid='btn-onboarding-2'
           onClick={handleNext}
           className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white hover:opacity-95 rounded-2xl py-4 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-brand-primary/20">
           {currentSlide === SLIDES.length - 1 ? 'Build Your Profile' : 'Continue'}

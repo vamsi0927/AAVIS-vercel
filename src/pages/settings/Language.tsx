@@ -27,7 +27,7 @@ export function LanguageSettings() {
   return (
     <div className="flex flex-col h-full bg-navy-900">
       <header className="pt-safe pt-6 px-4 pb-4 flex items-center border-b border-navy-800">
-        <button
+        <button data-testid='btn-language-1'
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-content-secondary hover:text-white">
           
@@ -43,7 +43,7 @@ export function LanguageSettings() {
         {LANGUAGES.map((lang) => {
           const isSelected = language === lang.code;
           return (
-            <button
+            <button data-testid='btn-language-2'
               key={lang.code}
               onClick={() => handleSelect(lang.code)}
               className={`w-full p-4 rounded-2xl border flex items-center justify-between transition-all ${isSelected ? 'bg-brand-primary/10 border-brand-primary' : 'bg-navy-800 border-navy-700 hover:bg-navy-700'}`}>

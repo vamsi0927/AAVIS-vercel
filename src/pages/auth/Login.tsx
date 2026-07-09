@@ -90,7 +90,7 @@ export function Login() {
             {/* Email */}
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
+              <input data-testid='input-login-1'
                 type="email"
                 required
                 placeholder="Email address"
@@ -103,7 +103,7 @@ export function Login() {
             {/* Password with eye toggle */}
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-content-secondary" />
-              <input
+              <input data-testid='input-login-2'
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="Password"
@@ -111,7 +111,7 @@ export function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full glass-input rounded-2xl py-3.5 pl-11 pr-12 text-white text-sm placeholder:text-content-secondary"
               />
-              <button
+              <button data-testid='btn-login-1'
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-content-secondary hover:text-white transition-colors"
@@ -127,7 +127,7 @@ export function Login() {
               </Link>
             </div>
 
-            <button
+            <button data-testid='btn-login-2'
               type="submit"
               disabled={!email || !password || isLoading}
               className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-95 disabled:opacity-50 text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center gap-2 transition-all mt-6 shadow-lg shadow-brand-primary/20"
