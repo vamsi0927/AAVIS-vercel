@@ -8,7 +8,8 @@ import { toast } from 'sonner';
 export function Verify() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'app-redirect'>('loading');
+  const [appRedirectLink, setAppRedirectLink] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [showLoader, setShowLoader] = useState(false);
   const verifyAttempted = useRef(false);
@@ -87,21 +88,21 @@ export function Verify() {
     };
 
     // Check where the user originally initiated the signup process
-    const source = searchParams.get('source') || 'web';
+    const source = searchParams.get('source') || 'web-desktop';
 
     // Deep link redirect for mobile users
     const isMobileBrowser = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     import('@capacitor/core').then(({ Capacitor }) => {
       // ONLY redirect if the user explicitly started signup on the Native App
-      if (source === 'app' && !Capacitor.isNativePlatform() && isMobileBrowser) {
+      if (source.startsWith('app-') && !Capacitor.isNativePlatform() && isMobileBrowser) {
         // Open the native app via deep link
         const appLink = `aavis://verify?link=${encodeURIComponent(link)}`;
         
-        setStatus('loading');
+        setStatus('app-redirect');
+        setAppRedirectLink(appLink);
         
-        // Directly trigger the app launch. No timer fallback as per requirements.
-        // We assume they have the app since they signed up from it.
+        // Attempt automatic redirect (may be blocked by browser)
         window.location.href = appLink;
         
         return;
@@ -132,18 +133,21 @@ export function Verify() {
           
           <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
             {status === 'loading' && <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />}
+            {status === 'app-redirect' && <CheckCircle className="w-10 h-10 text-brand-primary" />}
             {status === 'success' && <CheckCircle className="w-10 h-10 text-brand-primary animate-bounce-soft" />}
             {status === 'error' && <XCircle className="w-10 h-10 text-red-500 animate-bounce-soft" />}
           </div>
 
           <h2 className="text-2xl font-display font-black text-white mb-2">
             {status === 'loading' && 'Verifying...'}
+            {status === 'app-redirect' && 'Open in App'}
             {status === 'success' && 'Email Verified!'}
             {status === 'error' && 'Verification Failed'}
           </h2>
           
           <p className="text-content-secondary mb-2">
             {status === 'loading' && 'Please wait while we confirm your email address.'}
+            {status === 'app-redirect' && 'Tap below to continue to the AAVIS mobile app.'}
             {status === 'success' && 'Your account has been successfully verified.'}
             {status === 'error' && errorMsg}
           </p>
@@ -152,6 +156,27 @@ export function Verify() {
             <p className="text-sm font-bold text-brand-primary animate-pulse mt-4">
               Taking you to the app...
             </p>
+          )}
+
+          {status === 'app-redirect' && (
+            <div className="flex flex-col w-full mt-6 gap-3">
+              <button data-testid='btn-verify-app'
+                onClick={() => { window.location.href = appRedirectLink; }}
+                className="w-full py-3.5 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl font-bold transition-colors shadow-lg shadow-brand-primary/20"
+              >
+                Open AAVIS App
+              </button>
+              <button data-testid='btn-verify-web-fallback'
+                onClick={() => {
+                  setStatus('loading');
+                  const link = searchParams.get('link');
+                  if (link) verify(link);
+                }}
+                className="text-content-secondary text-sm hover:text-white transition-colors"
+              >
+                Continue in browser
+              </button>
+            </div>
           )}
 
           {status === 'error' && (

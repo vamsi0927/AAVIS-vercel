@@ -39,12 +39,17 @@ export function Register() {
     setIsLoading(true);
     
     try {
-      // Determine signup source
-      let source = 'web';
+      let source = 'web-desktop';
       try {
+        const isMobileBrowser = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobileBrowser) {
+          source = 'web-mobile';
+        }
+
         const { Capacitor } = await import('@capacitor/core');
         if (Capacitor.isNativePlatform()) {
-          source = 'app';
+          const platform = Capacitor.getPlatform();
+          source = platform === 'ios' ? 'app-ios' : 'app-android';
         }
       } catch(e) {
         console.warn('Could not determine Capacitor platform, defaulting to web.');
