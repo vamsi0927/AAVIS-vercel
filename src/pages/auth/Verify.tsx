@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 export function Verify() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'app-redirect'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success-same-device' | 'success-cross-device' | 'error' | 'app-redirect'>('loading');
   const [appRedirectLink, setAppRedirectLink] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [showLoader, setShowLoader] = useState(false);
@@ -20,10 +20,23 @@ export function Verify() {
     verifyAttempted.current = true;
 
     const link = searchParams.get('link');
+    const source = searchParams.get('source') || 'web-desktop';
+
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const isSameDevice = (() => {
+      if (source === 'app-android') return isAndroid;
+      if (source === 'app-ios') return isIOS;
+      return localStorage.getItem('aavis_signup_session') === 'active';
+    })();
+
+    const isAppSource = source.startsWith('app-');
+    const isCapableOfOpeningApp = (source === 'app-android' && isAndroid) || (source === 'app-ios' && isIOS);
+    const shouldAttemptDeepLink = isAppSource && isCapableOfOpeningApp;
 
     if (!link) {
-      // If there's no link, maybe Supabase auto-logged us in via hash fragment,
-      // or the link is invalid. Check session quickly.
+      // If there's no link, check session quickly.
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
           navigate('/onboarding', { replace: true });
@@ -40,17 +53,10 @@ export function Verify() {
 
     const verify = async (linkParam: string) => {
       try {
-        const link = linkParam;
-        
-        if (!link) {
-          throw new Error('Invalid verification link format.');
-        }
-
-        // Call our backend to manually extract the session from the action_link
         const res = await fetch(getApiUrl('/api/auth/verifyLink'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ link })
+          body: JSON.stringify({ link: linkParam })
         });
 
         const data = await res.json();
@@ -68,17 +74,20 @@ export function Verify() {
 
         if (sessionError) throw sessionError;
 
-        // Verification successful, session established
-        setStatus('success');
-        
-        // If we showed the loader, give a brief 1-second success state before redirecting
-        // If we were faster than 500ms, redirect immediately
-        if (showLoader) {
-          setTimeout(() => navigate('/onboarding', { replace: true }), 1000);
+        // Clear local signup session
+        localStorage.removeItem('aavis_signup_session');
+
+        if (isSameDevice) {
+          setStatus('success-same-device');
+          // If we showed the loader, give a brief 1-second success state before redirecting
+          if (showLoader) {
+            setTimeout(() => navigate('/onboarding', { replace: true }), 1000);
+          } else {
+            navigate('/onboarding', { replace: true });
+          }
         } else {
-          navigate('/onboarding', { replace: true });
+          setStatus('success-cross-device');
         }
-        
       } catch (err: any) {
         clearTimeout(loaderTimer);
         setStatus('error');
@@ -87,35 +96,47 @@ export function Verify() {
       }
     };
 
-    // Check where the user originally initiated the signup process
-    const source = searchParams.get('source') || 'web-desktop';
+    const checkSessionAndVerify = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          clearTimeout(loaderTimer);
+          localStorage.removeItem('aavis_signup_session');
+          if (isSameDevice) {
+            setStatus('success-same-device');
+            navigate('/onboarding', { replace: true });
+          } else {
+            setStatus('success-cross-device');
+          }
+          return;
+        }
 
-    // Deep link redirect for mobile users
-    const isMobileBrowser = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    import('@capacitor/core').then(({ Capacitor }) => {
-      // ONLY redirect if the user explicitly started signup on the Native App
-      if (source.startsWith('app-') && !Capacitor.isNativePlatform() && isMobileBrowser) {
-        // Open the native app via deep link
-        const appLink = `aavis://verify?link=${encodeURIComponent(link)}`;
-        
-        setStatus('app-redirect');
-        setAppRedirectLink(appLink);
-        
-        // Attempt automatic redirect (may be blocked by browser)
-        window.location.href = appLink;
-        
-        return;
+        if (shouldAttemptDeepLink) {
+          clearTimeout(loaderTimer);
+          const appLink = `aavis://verify?link=${encodeURIComponent(link)}`;
+          setStatus('app-redirect');
+          setAppRedirectLink(appLink);
+          
+          try {
+            window.location.href = appLink;
+          } catch (e) {
+            console.error('[Verify] App redirect failed:', e);
+          }
+        } else {
+          verify(link);
+        }
+      } catch (err) {
+        console.error('[Verify] Pre-verification error:', err);
+        verify(link);
       }
-      
-      // If source === 'web' (or desktop browser), proceed strictly with web verification
-      verify(link);
-    });
+    };
+
+    checkSessionAndVerify();
 
     return () => clearTimeout(loaderTimer);
   }, [navigate, searchParams, showLoader]);
 
-  // If it's fast (<500ms), we just show nothing or a tiny spinner until redirect happens
+  // If it's fast (<500ms), we just show nothing or a tiny spinner until redirect/state update happens
   if (!showLoader && status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-navy-900">
@@ -123,6 +144,8 @@ export function Verify() {
       </div>
     );
   }
+
+  const isSuccessState = status === 'success-same-device' || status === 'success-cross-device';
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-navy-900">
@@ -134,58 +157,86 @@ export function Verify() {
           <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
             {status === 'loading' && <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />}
             {status === 'app-redirect' && <CheckCircle className="w-10 h-10 text-brand-primary" />}
-            {status === 'success' && <CheckCircle className="w-10 h-10 text-brand-primary animate-bounce-soft" />}
+            {isSuccessState && <CheckCircle className="w-10 h-10 text-brand-primary animate-bounce-soft" />}
             {status === 'error' && <XCircle className="w-10 h-10 text-red-500 animate-bounce-soft" />}
           </div>
 
-          <h2 className="text-2xl font-display font-black text-white mb-2">
-            {status === 'loading' && 'Verifying...'}
-            {status === 'app-redirect' && 'Open in App'}
-            {status === 'success' && 'Email Verified!'}
-            {status === 'error' && 'Verification Failed'}
-          </h2>
-          
-          <p className="text-content-secondary mb-2">
-            {status === 'loading' && 'Please wait while we confirm your email address.'}
-            {status === 'app-redirect' && 'Tap below to continue to the AAVIS mobile app.'}
-            {status === 'success' && 'Your account has been successfully verified.'}
-            {status === 'error' && errorMsg}
-          </p>
-
-          {status === 'success' && (
-            <p className="text-sm font-bold text-brand-primary animate-pulse mt-4">
-              Taking you to the app...
-            </p>
-          )}
-
-          {status === 'app-redirect' && (
-            <div className="flex flex-col w-full mt-6 gap-3">
-              <button data-testid='btn-verify-app'
-                onClick={() => { window.location.href = appRedirectLink; }}
+          {status === 'success-cross-device' ? (
+            <div className="w-full">
+              <h2 className="text-2xl font-display font-black text-white mb-4">
+                Email Verified Successfully
+              </h2>
+              <div className="space-y-4 text-content-secondary mb-8">
+                <p>Your account is now verified.</p>
+                <p>You can continue using AAVIS on this device.</p>
+                <p className="text-sm opacity-80 pt-2 border-t border-white/5">
+                  If you'd like to continue on another device, simply open AAVIS there and sign in with your verified account.
+                </p>
+              </div>
+              <button 
+                data-testid="btn-verify-continue"
+                onClick={() => navigate('/onboarding', { replace: true })}
                 className="w-full py-3.5 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl font-bold transition-colors shadow-lg shadow-brand-primary/20"
               >
-                Open AAVIS App
-              </button>
-              <button data-testid='btn-verify-web-fallback'
-                onClick={() => {
-                  setStatus('loading');
-                  const link = searchParams.get('link');
-                  if (link) verify(link);
-                }}
-                className="text-content-secondary text-sm hover:text-white transition-colors"
-              >
-                Continue in browser
+                Continue
               </button>
             </div>
-          )}
+          ) : (
+            <>
+              <h2 className="text-2xl font-display font-black text-white mb-2">
+                {status === 'loading' && 'Verifying...'}
+                {status === 'app-redirect' && 'Open in App'}
+                {status === 'success-same-device' && 'Email Verified!'}
+                {status === 'error' && 'Verification Failed'}
+              </h2>
+              
+              <p className="text-content-secondary mb-2">
+                {status === 'loading' && 'Please wait while we confirm your email address.'}
+                {status === 'app-redirect' && 'Tap below to continue to the AAVIS mobile app.'}
+                {status === 'success-same-device' && 'Your account has been successfully verified.'}
+                {status === 'error' && errorMsg}
+              </p>
 
-          {status === 'error' && (
-            <button data-testid='btn-verify-1'
-              onClick={() => navigate('/login')}
-              className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
-            >
-              Go to Login
-            </button>
+              {status === 'success-same-device' && (
+                <p className="text-sm font-bold text-brand-primary animate-pulse mt-4">
+                  Taking you to the app...
+                </p>
+              )}
+
+              {status === 'app-redirect' && (
+                <div className="flex flex-col w-full mt-6 gap-3">
+                  <button data-testid='btn-verify-app'
+                    onClick={() => { window.location.href = appRedirectLink; }}
+                    className="w-full py-3.5 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl font-bold transition-colors shadow-lg shadow-brand-primary/20"
+                  >
+                    Open AAVIS App
+                  </button>
+                  <button data-testid='btn-verify-web-fallback'
+                    onClick={() => {
+                      setStatus('loading');
+                      const link = searchParams.get('link');
+                      if (link) {
+                        // Directly trigger web verification
+                        // In case of app fallback verify, we consider it same device if it was from phone
+                        verify(link);
+                      }
+                    }}
+                    className="text-content-secondary text-sm hover:text-white transition-colors"
+                  >
+                    Continue in browser
+                  </button>
+                </div>
+              )}
+
+              {status === 'error' && (
+                <button data-testid='btn-verify-1'
+                  onClick={() => navigate('/login')}
+                  className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+                >
+                  Go to Login
+                </button>
+              )}
+            </>
           )}
 
         </div>

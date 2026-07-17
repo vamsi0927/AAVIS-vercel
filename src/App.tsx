@@ -129,6 +129,7 @@ function AppContent() {
 
     // Handle deep links (e.g. aavis://verify?link=...)
     const handleAppUrlOpen = CapacitorApp.addListener('appUrlOpen', (data) => {
+      console.log('[DEBUG-VERIFY] 10. App.tsx received appUrlOpen:', data);
       if (data.url.startsWith('aavis://verify')) {
         // Extract the full link from the custom URL scheme
         const urlParams = new URL(data.url);

@@ -5,9 +5,9 @@ import { ChevronLeft, BookOpen, Search, ShieldCheck, Box, Info, AlertTriangle, P
 export function EducationHub() {
   const navigate = useNavigate();
 
-  const handleCardClick = (route: string) => {
+  const handleCardClick = React.useCallback((route: string) => {
     navigate(route);
-  };
+  }, [navigate]);
 
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24 relative overflow-y-auto no-scrollbar">

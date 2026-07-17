@@ -413,18 +413,31 @@ async function cacheProduct(productData: {
 /**
  * Get scan history for a user.
  */
+// Promise cache for request deduplication
+const inflightScans = new Map<string, Promise<DBScan[]>>();
+
 export async function getUserScans(userId: string, limit = 50): Promise<DBScan[]> {
   if (!isSupabaseConfigured()) return [];
+  
+  const cacheKey = `${userId}-${limit}`;
+  if (inflightScans.has(cacheKey)) {
+    return inflightScans.get(cacheKey)!;
+  }
 
-  const { data, error } = await supabase
+  const promise = supabase
     .from('scans')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
-    .limit(limit);
+    .limit(limit)
+    .then(({ data, error }) => {
+      inflightScans.delete(cacheKey);
+      if (error) return [];
+      return (data || []) as DBScan[];
+    });
 
-  if (error) return [];
-  return (data || []) as DBScan[];
+  inflightScans.set(cacheKey, promise);
+  return promise;
 }
 
 /**
@@ -753,21 +766,31 @@ export async function saveMythToCloud(
   }
 }
 
+const inflightMyths = new Map<string, Promise<import('./types').SavedMyth[]>>();
+
 export async function getSavedMyths(userId: string): Promise<import('./types').SavedMyth[]> {
   if (!isSupabaseConfigured()) return [];
 
-  const { data, error } = await supabase
+  if (inflightMyths.has(userId)) {
+    return inflightMyths.get(userId)!;
+  }
+
+  const promise = supabase
     .from('saved_myths')
     .select('*')
     .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .then(({ data, error }) => {
+      inflightMyths.delete(userId);
+      if (error) {
+        console.error('[Supabase] Error fetching saved myths:', error);
+        return [];
+      }
+      return data as import('./types').SavedMyth[];
+    });
 
-  if (error) {
-    console.error('[Supabase] Error fetching saved myths:', error);
-    return [];
-  }
-
-  return data as import('./types').SavedMyth[];
+  inflightMyths.set(userId, promise);
+  return promise;
 }
 
 export async function deleteSavedMyth(mythId: string): Promise<boolean> {

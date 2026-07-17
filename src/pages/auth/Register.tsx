@@ -74,6 +74,7 @@ export function Register() {
         throw new Error(data.error || 'Failed to sign up');
       }
 
+      localStorage.setItem('aavis_signup_session', 'active');
       setStep('verify');
     } catch (err: any) {
       // Show clean user-facing message, not raw JSON

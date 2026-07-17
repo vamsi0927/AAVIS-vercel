@@ -35,14 +35,16 @@ export function Search() {
   }, [userId]);
 
   // Local product match
-  const results = query.trim() ?
-    SAMPLE_PRODUCTS.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.brand.toLowerCase().includes(query.toLowerCase())
-    ) : [];
+  const results = React.useMemo(() => {
+    return query.trim() ?
+      SAMPLE_PRODUCTS.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query.toLowerCase()) ||
+          p.brand.toLowerCase().includes(query.toLowerCase())
+      ) : [];
+  }, [query]);
 
-  const handleAskAI = async (searchQuery: string) => {
+  const handleAskAI = React.useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     
     setQuery(searchQuery);
@@ -84,13 +86,13 @@ export function Search() {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [userId]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = React.useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleAskAI(query);
     }
-  };
+  }, [handleAskAI, query]);
 
   return (
     <div className="flex flex-col h-full bg-navy-900">

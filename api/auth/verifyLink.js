@@ -20,15 +20,35 @@ export default async function handler(req, res) {
   try {
     const parsedUrl = new URL(link);
     
-    // Strict SSRF Protection
+    // Strict SSRF Protection: Protocol & Port
     if (parsedUrl.protocol !== 'https:') {
       return res.status(400).json({ error: 'Verification link must use HTTPS.' });
     }
+    if (parsedUrl.port && parsedUrl.port !== '443') {
+      return res.status(400).json({ error: 'Verification link must use standard HTTPS port.' });
+    }
+
+    // Strict SSRF Protection: Credentials
+    if (parsedUrl.username || parsedUrl.password) {
+      return res.status(400).json({ error: 'Verification link cannot contain credentials.' });
+    }
+
+    // Strict SSRF Protection: Hostname Allowlist
+    const envUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    if (!envUrl) {
+      console.error('SUPABASE_URL is not configured.');
+      return res.status(500).json({ error: 'Internal server configuration error.' });
+    }
     
-    // Basic protection against obvious internal IP attacks
-    const hostname = parsedUrl.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('169.254.') || hostname.startsWith('10.') || hostname.startsWith('192.168.')) {
-      return res.status(400).json({ error: 'Invalid verification domain.' });
+    let expectedHost;
+    try {
+      expectedHost = new URL(envUrl).hostname;
+    } catch (e) {
+      return res.status(500).json({ error: 'Internal server configuration error.' });
+    }
+
+    if (parsedUrl.hostname !== expectedHost) {
+      return res.status(400).json({ error: 'Verification failed: Untrusted domain.' });
     }
 
     const client = https;

@@ -41,43 +41,47 @@ export function History() {
     }
   }, [supabaseUserId]);
 
-  const filteredScans = scans.filter((scan) => {
-    const product = scan.product || SAMPLE_PRODUCTS.find((p) => p.id === scan.productId);
-    if (!product) return false;
-    const matchesSearch =
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.brand.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === 'all' || scan.verdict === filter;
-    return matchesSearch && matchesFilter;
-  });
+  const filteredScans = React.useMemo(() => {
+    return scans.filter((scan) => {
+      const product = scan.product || SAMPLE_PRODUCTS.find((p) => p.id === scan.productId);
+      if (!product) return false;
+      const matchesSearch =
+        product.name.toLowerCase().includes(search.toLowerCase()) ||
+        product.brand.toLowerCase().includes(search.toLowerCase());
+      const matchesFilter = filter === 'all' || scan.verdict === filter;
+      return matchesSearch && matchesFilter;
+    });
+  }, [scans, search, filter]);
 
-  const sortedScans = [...filteredScans].sort((a, b) => {
-    if (sortBy === 'newest') {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    }
-    if (sortBy === 'oldest') {
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    }
-    if (sortBy === 'highest') {
-      return b.score - a.score;
-    }
-    if (sortBy === 'lowest') {
-      return a.score - b.score;
-    }
-    return 0;
-  });
+  const sortedScans = React.useMemo(() => {
+    return [...filteredScans].sort((a, b) => {
+      if (sortBy === 'newest') {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+      if (sortBy === 'oldest') {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+      if (sortBy === 'highest') {
+        return b.score - a.score;
+      }
+      if (sortBy === 'lowest') {
+        return a.score - b.score;
+      }
+      return 0;
+    });
+  }, [filteredScans, sortBy]);
 
-  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+  const handleDeleteClick = React.useCallback((e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setScanToDelete(id);
-  };
+  }, []);
 
-  const handleImageClick = (e: React.MouseEvent, scan: ScanResult) => {
+  const handleImageClick = React.useCallback((e: React.MouseEvent, scan: ScanResult) => {
     e.stopPropagation();
     setSelectedImageScan(scan);
-  };
+  }, []);
 
-  const confirmDelete = async () => {
+  const confirmDelete = React.useCallback(async () => {
     if (!scanToDelete || !supabaseUserId) return;
     
     // Capture state for rollback
@@ -103,7 +107,7 @@ export function History() {
     } finally {
       setIsDeleting(false);
     }
-  };
+  }, [scanToDelete, supabaseUserId, scans, removeScan, restoreScans]);
 
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24 relative">

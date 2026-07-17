@@ -46,7 +46,7 @@ export default async function handler(req, res) {
       email,
       password,
       email_confirm: false,
-      user_metadata: { name }
+      user_metadata: { name, signupSource: source }
     });
 
     let userId;
