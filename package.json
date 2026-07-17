@@ -3,13 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "homepage": "https://vamsi0927.github.io/AAVIS-vercel",
   "scripts": {
     "dev": "npx vite",
     "build": "npx vite build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "preview": "npx vite preview",
     "server": "node server/index.cjs",
-    "android": "npx cap open android"
+    "android": "npx cap open android",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",
@@ -60,6 +63,7 @@
     "eslint": "^8.50.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.1",
+    "gh-pages": "^6.3.0",
     "mocha": "^11.7.6",
     "mochawesome": "^7.1.4",
     "mochawesome-report-generator": "^6.3.2",

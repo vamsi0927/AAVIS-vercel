@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  BrowserRouter,
+  HashRouter,
   Routes,
   Route,
   useLocation,
@@ -493,7 +493,7 @@ function AppContent() {
 export function App() {
   return (
     <AppProvider>
-      <BrowserRouter>
+      <HashRouter>
         <MobileFrame>
           <OfflineBanner />
           <AppContent />
@@ -510,7 +510,7 @@ export function App() {
             }} />
           
         </MobileFrame>
-      </BrowserRouter>
+      </HashRouter>
     </AppProvider>);
 
 }
