@@ -15,7 +15,7 @@ const STORAGE_KEYS = {
 // Key loaded from .env at build time — cannot be viewed or changed from UI
 const _GEMINI_KEY = (() => {
   try {
-    const key = import.meta.env?.VITE_GEMINI_API_KEY || '';
+    const key = import.meta.env?.VITE_GEMINI_API_KEY || localStorage.getItem('aavis_gemini_api_key') || '';
     return key;
   } catch {
     return '';

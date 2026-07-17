@@ -20,6 +20,7 @@
 
 import Tesseract from 'tesseract.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getGeminiApiKey } from './apiConfig';
 // Groq removed
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -226,7 +227,7 @@ export async function optimizedOCR(
   mode: 'ingredients' | 'nutrition' | 'general' = 'general',
   onProgress?: (percent: number) => void
 ): Promise<string> {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = getGeminiApiKey();
 
   if (apiKey && apiKey.length > 10) {
     try {
@@ -292,7 +293,7 @@ export async function optimizedOCR(
       console.warn('[OCR] Gemini Vision failed, falling back to Tesseract...', e);
     }
   } else {
-    console.warn('[OCR] VITE_GEMINI_API_KEY not found! Using offline Tesseract fallback.');
+    console.warn('[OCR] Gemini API key not configured! Using offline Tesseract fallback.');
   }
 
   // FALLBACK TO TESSERACT IF GEMINI FAILS OR API KEY IS MISSING

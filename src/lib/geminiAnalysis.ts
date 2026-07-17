@@ -8,6 +8,8 @@ import { optimizedOCR } from './imagePreprocess';
 import { extractNutrientsFromText } from './nutritionParser';
 import { supabase } from './supabase';
 
+import { getGeminiApiKey } from './apiConfig';
+
 const BACKEND_URL = 'https://aavis-backend.onrender.com';
 
 const TEXT_ANALYSIS_PROMPT = `Analyze this food label text as a professional nutrition expert.
@@ -101,9 +103,7 @@ export interface GeminiAnalysisResult {
 
 // ─── Helper: call backend ─────────────────────────────────────────
 async function callBackend(endpoint: string, body: object): Promise<any> {
-
-
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = getGeminiApiKey();
 
   if (apiKey && (endpoint === '/api/analyze' || endpoint === '/api/chat')) {
     // Bypass Render backend completely for Vercel previews

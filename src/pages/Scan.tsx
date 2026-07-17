@@ -15,6 +15,7 @@ import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { getCroppedImg } from '../lib/cropImage';
 import { Html5Qrcode } from 'html5-qrcode';
+import { isGeminiConfigured } from '../lib/apiConfig';
 
 type ScanStep = 'ingredients' | 'nutrition_prompt' | 'nutrition_scan' | 'processing';
 type PreviewMode = 'none' | 'ingredients' | 'nutrition' | 'barcode';
@@ -225,7 +226,7 @@ export function Scan() {
       });
 
       // Skip correction if Gemini Vision was used, as it outputs perfect text.
-      const hasGeminiKey = import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.VITE_GEMINI_API_KEY.length > 10;
+      const hasGeminiKey = isGeminiConfigured();
       
       if (!hasGeminiKey) {
         text = await intelligentOcrCorrection(
