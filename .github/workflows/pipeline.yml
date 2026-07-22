@@ -119,13 +119,15 @@ jobs:
         run: npm ci
 
       - name: Run Functional API Tests
-        run: |
-          node -e "
-            const http = require('http');
-            // Simple validation suite for live endpoint response codes
-            console.log('Running functional API checks...');
-            process.exit(0);
-          "
+        run: node api-functional-tests.cjs
+
+      - name: Upload API Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-reports
+          path: Test Results/API/
+          retention-days: 14
 
   # Stage 5: Integration & Data Sync Testing
   integration-testing:

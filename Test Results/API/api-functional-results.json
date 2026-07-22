@@ -1,0 +1,32 @@
+[
+  {
+    "id": "TC_API_001",
+    "name": "GET /api/health returns 200",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_002",
+    "name": "POST /api/signup with empty payload returns 400",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_003",
+    "name": "POST /api/login with empty credentials returns 400",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_004",
+    "name": "POST /api/analyze with empty image returns 400",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_005",
+    "name": "POST /api/chat with empty message returns 400",
+    "status": "PASS",
+    "error": null
+  }
+]
