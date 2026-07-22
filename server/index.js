@@ -8,6 +8,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// ─── SECURITY HARDENING ────────────────────────────────────────────
+app.disable('x-powered-by'); // Prevent server technology disclosure (SEC-HDR-001)
+
 // ─── MIDDLEWARE ────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json({

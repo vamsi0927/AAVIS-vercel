@@ -31,6 +31,7 @@ export function BottomNav() {
         <div className="flex-1 flex flex-col items-center justify-center relative">
           <div className="absolute -top-10">
             <button
+              data-testid="btn-bottomnav-scan"
               onClick={() => navigate('/scan')}
               className={`bg-brand-primary hover:bg-brand-primary/90 text-white p-3 rounded-full shadow-[0_4px_20px_rgba(99,102,241,0.5)] transition-transform active:scale-95 ${location.pathname === '/scan' ? 'scale-110' : ''}`}>
               <Scan className="w-6 h-6" />

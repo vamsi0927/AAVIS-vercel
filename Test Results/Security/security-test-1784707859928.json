@@ -1,0 +1,143 @@
+{
+  "timestamp": "2026-07-22T08:10:59.929Z",
+  "summary": {
+    "total": 22,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 2
+  },
+  "results": [
+    {
+      "id": "SEC-AUTH-001",
+      "name": "Unauthenticated /api/profile returns 401/404",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-AUTH-002",
+      "name": "POST /api/analyze without image data returns 400",
+      "status": "PASS",
+      "reason": "Status: 400 (expected 400/401/403 for empty image)"
+    },
+    {
+      "id": "SEC-AUTH-003",
+      "name": "Invalid JWT in Authorization header rejected",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-AUTH-004",
+      "name": "Empty Authorization header rejected",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-AUTH-005",
+      "name": "SQL Injection in email field rejected",
+      "status": "PASS",
+      "reason": "Status: 404, no SQL error exposed"
+    },
+    {
+      "id": "SEC-INP-001",
+      "name": "XSS payload in scan body does not crash server",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-INP-002",
+      "name": "Prompt injection in image data handled safely",
+      "status": "PASS",
+      "reason": "Status: 404, no secrets in response"
+    },
+    {
+      "id": "SEC-INP-003",
+      "name": "Oversized payload rejected (10MB body)",
+      "status": "PASS",
+      "reason": "Status: 413 (expected 413/400/connection refused)"
+    },
+    {
+      "id": "SEC-INP-004",
+      "name": "Content-Type mismatch handled gracefully",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-INP-005",
+      "name": "Malformed JSON body rejected",
+      "status": "PASS",
+      "reason": "Status: 400"
+    },
+    {
+      "id": "SEC-HDR-001",
+      "name": "No X-Powered-By header exposed",
+      "status": "PASS",
+      "reason": "Not exposed ✅"
+    },
+    {
+      "id": "SEC-HDR-002",
+      "name": "Content-Type header present on API responses",
+      "status": "PASS",
+      "reason": "Content-Type: application/json; charset=utf-8"
+    },
+    {
+      "id": "SEC-HDR-003",
+      "name": "Server does not expose version info",
+      "status": "PASS",
+      "reason": "Server header: \"not present\""
+    },
+    {
+      "id": "SEC-SECRETS-001",
+      "name": "No hardcoded passwords in src/",
+      "status": "PASS",
+      "reason": "No matches found ✅"
+    },
+    {
+      "id": "SEC-SECRETS-002",
+      "name": "VITE_ env vars not hardcoded in source files",
+      "status": "PASS",
+      "reason": "No hardcoded API keys found ✅"
+    },
+    {
+      "id": "SEC-SECRETS-003",
+      "name": ".env file not committed (not in git tracked files)",
+      "status": "PASS",
+      "reason": ".env not tracked ✅"
+    },
+    {
+      "id": "SEC-SECRETS-004",
+      "name": "No private keys in repository",
+      "status": "PASS",
+      "reason": "No private keys found ✅"
+    },
+    {
+      "id": "SEC-RATELIMIT-001",
+      "name": "API does not crash under 50 rapid requests",
+      "status": "PASS",
+      "reason": "50 rapid requests, all responded without crash"
+    },
+    {
+      "id": "SEC-RATELIMIT-002",
+      "name": "200 concurrent GET /health requests handled",
+      "status": "PASS",
+      "reason": "200/200 requests returned 200 or 429"
+    },
+    {
+      "id": "SEC-DEP-001",
+      "name": "npm audit passes with no critical/high vulnerabilities in server/",
+      "status": "PASS",
+      "reason": "Audit passed ✅"
+    },
+    {
+      "id": "SEC-DEP-002",
+      "name": "Semgrep SAST scan",
+      "status": "SKIPPED",
+      "reason": "Requires Semgrep CLI installation (run in CI)"
+    },
+    {
+      "id": "SEC-DEP-003",
+      "name": "Gitleaks scan",
+      "status": "SKIPPED",
+      "reason": "Requires Gitleaks binary (run in CI)"
+    }
+  ]
+}

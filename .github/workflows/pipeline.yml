@@ -29,15 +29,15 @@ jobs:
         run: npm ci
 
       - name: Run Semgrep SAST Audit
-        run: npx semgrep --config=auto src/ || true
+        run: npx semgrep --config=auto src/ --error
 
       - name: Run Trivy Security Scan
         run: |
-          npx trivy fs . --severity HIGH,CRITICAL || true
+          npx trivy fs . --severity HIGH,CRITICAL --exit-code 1
 
       - name: Run Gitleaks Secrets Audit
         run: |
-          npx gitleaks detect --verbose || true
+          npx gitleaks detect --verbose --exit-code 1
 
   # Stage 2: Web App Deployment
   deploy-gh-pages:
@@ -88,10 +88,18 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Headless Selenium Login Test
-        run: npm run login
+      - name: Run Full Selenium Test Suite
+        run: npx mocha selenium/tests/*.test.js --timeout 60000 --reporter mochawesome --reporter-options reportDir=selenium/reports,overwrite=true
         env:
           BASE_URL: https://vamsi0927.github.io/AAVIS-vercel
+
+      - name: Upload Selenium Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-reports
+          path: selenium/reports/
+          retention-days: 14
 
   # Stage 4: Appium Android E2E Tests
   appium-tests:
