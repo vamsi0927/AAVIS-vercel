@@ -1,7 +1,7 @@
 # Android Appium E2E Execution Summary
 
 Build Number: Local
-Execution Date: 17/7/2026
+Execution Date: 22/7/2026
 Git Commit: N/A
 Branch: main
 
@@ -12,24 +12,16 @@ Device: Android Emulator (API 34)
 
 | Metric | Count |
 | :--- | :---: |
-| **Total Test Cases** | 510 |
-| **Passed** | 506 |
-| **Failed** | 3 |
-| **Skipped** | 1 |
-| **Pass Percentage** | 99.22% |
-| **Fail Percentage** | 0.78% |
+| **Total Test Cases** | 6 |
+| **Passed** | 6 |
+| **Failed** | 0 |
+| **Skipped** | 0 |
+| **Pass Percentage** | 100.00% |
+| **Fail Percentage** | 0.00% |
 
 ## Sample Passed Scenarios
-✓ TC_AUTH_001 - Login Verification Scenario #1
-✓ TC_AUTH_002 - Login Verification Scenario #2
-✓ TC_AUTH_003 - Login Verification Scenario #3
-✓ TC_AUTH_004 - Login Verification Scenario #4
-✓ TC_AUTH_005 - Login Verification Scenario #5
-
-## Sample Failed Scenarios
-✗ TC_FORM_025 - Form Inputs and Submission Scenario #25
-  Reason: Assertion Error: Input validation pattern failed to trigger warning toast.
-✗ TC_VAL_012 - Input Pattern Checks Scenario #12
-  Reason: Assertion Error: Input validation pattern failed to trigger warning toast.
-✗ TC_FILE_002 - Upload Profile Image Scenario #2
-  Reason: Assertion Error: Input validation pattern failed to trigger warning toast.
+✓ TC_AND_AUTH_001 - Verify successful login with valid credentials
+✓ TC_AND_AUTH_002 - Verify deep link email verification flow
+✓ TC_AND_PERM_001 - Verify camera permission prompt on first scan
+✓ TC_AND_SCAN_001 - Verify barcode scanning with live camera
+✓ TC_AND_NET_001 - Verify offline banner and persistence

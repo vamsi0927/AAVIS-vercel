@@ -7,13 +7,13 @@
   },
   {
     "id": "INT-SYNC-002",
-    "name": "Concurrent profile updates handle conflict resolution gracefully",
+    "name": "Supabase RLS prevents cross-tenant access to user scan records",
     "status": "PASS",
     "error": null
   },
   {
     "id": "INT-SYNC-003",
-    "name": "Supabase RLS prevents cross-tenant access to user scan records",
+    "name": "Concurrent profile updates handle conflict resolution gracefully",
     "status": "PASS",
     "error": null
   }
