@@ -33,11 +33,26 @@ async function startSuite() {
   const supabaseUrl = 'https://lfhnlsniuubcvjpjwldj.supabase.co';
   const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmaG5sc25pdXViY3ZqcGp3bGRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODY1NTAsImV4cCI6MjA5NDE2MjU1MH0.yhY_JtKYOikbja4PNIXcq52iWANqYfvzOQF4gNMcuyM';
 
-  const supabase = createClient ? createClient(supabaseUrl, supabaseAnonKey) : null;
+  // Helper to create custom auth client
+  const getSupabaseClient = (token = null) => {
+    if (!createClient) return null;
+    return createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      },
+      global: token ? {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      } : {}
+    });
+  };
+
+  const baseClient = getSupabaseClient();
 
   // 1. Supabase Persistence check
   await runIntegrationTest('INT-SYNC-001', 'Offline scans cache locally before syncing to Supabase', async () => {
-    // Basic offline/local write simulation
     const localStorageMock = {
       scans: JSON.stringify([{ barcode: '8901030940306', date: new Date().toISOString(), status: 'pending_sync' }])
     };
@@ -49,39 +64,102 @@ async function startSuite() {
 
   // 2. Profile Sync & RLS Isolation check
   await runIntegrationTest('INT-SYNC-002', 'Supabase RLS prevents cross-tenant access to user scan records', async () => {
-    if (!supabase) throw new Error('BLOCKED: Supabase SDK is not available.');
+    if (!baseClient) throw new Error('BLOCKED: Supabase SDK is not available.');
     
-    // Attempt sign up User A and User B
+    // Attempt signup of two temporary test users
     const emailA = `test_user_a_${Date.now()}@example.com`;
     const emailB = `test_user_b_${Date.now()}@example.com`;
     const password = 'TempPassword123!';
 
+    let userA, userB;
     try {
-      const { data: userA, error: errA } = await supabase.auth.signUp({ email: emailA, password });
+      const { data: dataA, error: errA } = await baseClient.auth.signUp({ email: emailA, password });
       if (errA) throw new Error(`BLOCKED: Supabase SignUp blocked: ${errA.message}`);
+      userA = dataA;
       
-      const { data: userB, error: errB } = await supabase.auth.signUp({ email: emailB, password });
+      const { data: dataB, error: errB } = await baseClient.auth.signUp({ email: emailB, password });
       if (errB) throw new Error(`BLOCKED: Supabase SignUp blocked: ${errB.message}`);
+      userB = dataB;
+    } catch (e) {
+      throw new Error(`BLOCKED: Authentication endpoints blocked: ${e.message}`);
+    }
 
-      if (!userA.user || !userB.user) {
-        throw new Error('BLOCKED: Signups did not return valid user records.');
+    if (!userA.session || !userB.session) {
+      throw new Error('BLOCKED: Test requires dynamic verification sessions which were not initialized.');
+    }
+
+    const clientA = getSupabaseClient(userA.session.access_token);
+    const clientB = getSupabaseClient(userB.session.access_token);
+
+    let insertedScanId = null;
+
+    try {
+      // User A creates row
+      const { data: scanRow, error: insertErr } = await clientA
+        .from('scans')
+        .insert({
+          user_id: userA.user.id,
+          health_score: 85,
+          product_name: 'Test Product User A'
+        })
+        .select();
+
+      if (insertErr) {
+        throw new Error(`Insert failed: ${insertErr.message}`);
       }
-      
-      // Attempt read scan table with User B session to query User A ID
-      const { data, error } = await supabase
+
+      insertedScanId = scanRow[0].id;
+
+      // User A can SELECT
+      const { data: selectA, error: selectErrA } = await clientA
         .from('scans')
         .select('*')
-        .eq('user_id', userA.user.id);
-        
-      if (error) {
-        // Correctly blocked by RLS or schema
-        return;
+        .eq('id', insertedScanId);
+
+      if (selectErrA || !selectA || selectA.length === 0) {
+        throw new Error('User A could not select their own created scan record.');
       }
-      if (data && data.length > 0) {
-        throw new Error('FAIL: User B successfully read User A\'s scans. RLS isolation failed.');
+
+      // User B SELECT blocked / returns no unauthorized data
+      const { data: selectB, error: selectErrB } = await clientB
+        .from('scans')
+        .select('*')
+        .eq('id', insertedScanId);
+
+      if (selectB && selectB.length > 0) {
+        throw new Error('FAIL: User B successfully read User A\'s scans. RLS isolation breach!');
       }
-    } catch (e) {
-      throw new Error(`BLOCKED: Integration checks blocked due to: ${e.message}`);
+
+      // User B UPDATE blocked
+      const { data: updateB, error: updateErrB } = await clientB
+        .from('scans')
+        .update({ health_score: 99 })
+        .eq('id', insertedScanId)
+        .select();
+
+      if (updateB && updateB.length > 0) {
+        throw new Error('FAIL: User B successfully updated User A\'s scans. RLS update isolation breach!');
+      }
+
+      // User B DELETE blocked
+      const { data: deleteB, error: deleteErrB } = await clientB
+        .from('scans')
+        .delete()
+        .eq('id', insertedScanId)
+        .select();
+
+      if (deleteB && deleteB.length > 0) {
+        throw new Error('FAIL: User B successfully deleted User A\'s scans. RLS delete isolation breach!');
+      }
+
+    } finally {
+      // CLEANUP: Clean up User A's row by deleting it using User A client
+      if (insertedScanId) {
+        await clientA
+          .from('scans')
+          .delete()
+          .eq('id', insertedScanId);
+      }
     }
   });
 
@@ -103,7 +181,6 @@ async function startSuite() {
   fs.writeFileSync(path.join(dir, 'integration-results.json'), JSON.stringify(results, null, 2));
   console.log(`\n🎉 Integration suite finished. JSON saved to: ${path.join(dir, 'integration-results.json')}`);
 
-  // Exit code is 0 as blocked / not executable tests are not failures. Only true fails exit 1.
   const failed = results.filter(r => r.status === 'FAIL');
   process.exit(failed.length > 0 ? 1 : 0);
 }
