@@ -1,0 +1,35 @@
+name: Selenium E2E Login Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  selenium-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Chrome Driver is Installed
+        run: |
+          google-chrome --version
+          chromedriver --version || true
+
+      - name: Run Headless Selenium Login Test
+        run: npm run login
+        env:
+          BASE_URL: https://vamsi0927.github.io/AAVIS-vercel

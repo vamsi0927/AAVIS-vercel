@@ -11,6 +11,7 @@
     "preview": "npx vite preview",
     "server": "node server/index.cjs",
     "android": "npx cap open android",
+    "login": "cd selenium-tests && npm run login",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },

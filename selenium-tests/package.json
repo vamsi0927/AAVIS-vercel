@@ -1,0 +1,9 @@
+{
+  "name": "aavis-selenium-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "login": "mocha tests/login.test.cjs --timeout 60000"
+  }
+}
