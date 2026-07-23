@@ -71,6 +71,9 @@ export function ForgotPassword() {
             <p className="text-content-secondary text-sm">
               We'll send you a recovery link to access your account.
             </p>
+            <p className="text-content-secondary text-xs mt-2">
+              If you don't see the email in your inbox, please <strong>check your spam folder</strong>.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -97,9 +100,6 @@ export function ForgotPassword() {
                 <>Send Reset Link <ArrowRight className="w-4 h-4" /></>
               )}
             </button>
-            <p className="text-center text-xs text-content-secondary mt-4">
-              If you don't see the email in your inbox, please <strong>check your spam folder</strong>.
-            </p>
           </form>
         </motion.div>
       </div>

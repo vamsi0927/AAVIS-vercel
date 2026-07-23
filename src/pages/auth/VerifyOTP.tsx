@@ -112,15 +112,15 @@ export function VerifyOTP() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="w-16 h-16 bg-gradient-to-br from-brand-primary to-purple-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.3)] mx-auto mb-6">
-            <Shield className="w-8 h-8 text-white" />
-          </div>
           <h1 className="text-3xl font-display font-bold mb-2">Verify OTP</h1>
           <p className="text-content-secondary">
             {email
               ? `We sent a 6-digit code to ${email}. Enter it below to verify.`
               : 'Enter the 6-digit code sent to your email to verify your account.'
             }
+          </p>
+          <p className="text-content-secondary text-xs mt-2">
+            If you don't see the email in your inbox, please <strong>check your spam folder</strong>.
           </p>
         </motion.div>
 
@@ -156,9 +156,6 @@ export function VerifyOTP() {
                 Resend Code
               </button>
             )}
-            <p className="text-xs text-content-secondary mt-3">
-              If you don't see the email in your inbox, please <strong>check your spam folder</strong>.
-            </p>
           </div>
 
           <div className="mt-auto pt-8">
