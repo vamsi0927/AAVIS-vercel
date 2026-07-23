@@ -20,6 +20,7 @@ export function History() {
   const [scanToDelete, setScanToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedImageScan, setSelectedImageScan] = useState<ScanResult | null>(null);
+  const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
 
   // Keyboard shortcut for ESC to close modals
   useEffect(() => {
@@ -27,6 +28,7 @@ export function History() {
       if (e.key === 'Escape') {
         setScanToDelete(null);
         setSelectedImageScan(null);
+        setShowClearAllConfirm(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -109,6 +111,12 @@ export function History() {
     }
   }, [scanToDelete, supabaseUserId, scans, removeScan, restoreScans]);
 
+  const confirmClearAll = () => {
+    clearHistory();
+    setShowClearAllConfirm(false);
+    toast.success("All scan history cleared.");
+  };
+
   return (
     <div className="flex flex-col h-full bg-navy-900 pb-24 relative">
       <header className="pt-safe pt-8 px-6 pb-4 md:max-w-7xl md:mx-auto md:w-full md:px-8">
@@ -123,7 +131,7 @@ export function History() {
             )}
             {scans.length > 0 &&
               <button data-testid='btn-history-1'
-                onClick={clearHistory}
+                onClick={() => setShowClearAllConfirm(true)}
                 className="text-brand-hazardous p-2 hover:bg-brand-hazardous/10 rounded-full transition-colors"
                 title="Delete All History"
               >
@@ -309,6 +317,42 @@ export function History() {
               >
                 {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear All Confirmation Modal */}
+      {showClearAllConfirm && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowClearAllConfirm(false)}
+        >
+          <div 
+            className="bg-navy-900 border border-white/10 rounded-3xl p-6 w-full max-w-sm shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-full bg-brand-hazardous/20 flex items-center justify-center mb-4">
+              <Trash2 className="w-6 h-6 text-brand-hazardous" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Clear all history?</h3>
+            <p className="text-sm text-content-secondary mb-6">
+              This action will permanently remove all your scans. This cannot be undone.
+            </p>
+            <div className="flex items-center gap-3">
+              <button data-testid='btn-history-clear-cancel'
+                onClick={() => setShowClearAllConfirm(false)}
+                className="flex-1 py-3 px-4 rounded-xl font-bold text-content-secondary bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                Cancel
+              </button>
+              <button data-testid='btn-history-clear-confirm'
+                onClick={confirmClearAll}
+                className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-brand-hazardous hover:bg-brand-hazardous/90 transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear All
               </button>
             </div>
           </div>
