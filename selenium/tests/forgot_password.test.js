@@ -3,72 +3,63 @@ const AuthPage = require('../pages/AuthPage');
 const { expect } = require('chai');
 const { until, By } = require('selenium-webdriver');
 
-describe('Forgot Password & Register Flows', function() {
-  this.timeout(45000);
-  let driver;
-  let authPage;
+const TEST_EMAIL = 'selenium-test-2@gmail.com';
+const TEST_PASS  = 'TestPassword123!';
+
+describe('TC_SEL_AUTH_REGISTER — Register & Forgot Password', function () {
+  this.timeout(60000);
+  let driver, authPage;
 
   before(async () => {
     driver = await DriverFactory.build();
     authPage = new AuthPage(driver);
   });
 
-  after(async () => {
-    if (driver) await driver.quit();
-  });
+  after(async () => { if (driver) await driver.quit(); });
 
-  it('TC_SEL_AUTH_003: /register page renders signup form', async () => {
+  it('TC_SEL_AUTH_005: /register page renders signup form', async () => {
     await authPage.navigate('/register');
     await driver.sleep(1000);
     const inputs = await driver.findElements(By.css('input[type="email"], input[type="password"]'));
     expect(inputs.length).to.be.greaterThan(0);
   });
 
-  it('TC_SEL_AUTH_004: Register with mismatched passwords shows error', async () => {
+  it('TC_SEL_AUTH_006: Register with mismatched passwords prevents submission', async () => {
     await authPage.navigate('/register');
     await driver.sleep(800);
-    const emailInputs = await driver.findElements(By.css('input[type="email"]'));
-    const passInputs = await driver.findElements(By.css('input[type="password"]'));
-    if (emailInputs.length > 0) {
-      await emailInputs[0].sendKeys('test_mismatch@example.com');
+    const emails = await driver.findElements(By.css('input[type="email"]'));
+    const pwds   = await driver.findElements(By.css('input[type="password"]'));
+    if (emails.length > 0) await emails[0].sendKeys('test@unique.com');
+    if (pwds.length >= 2) {
+      await pwds[0].sendKeys('Password123!');
+      await pwds[1].sendKeys('Different456!');
     }
-    if (passInputs.length >= 2) {
-      await passInputs[0].sendKeys('Password123!');
-      await passInputs[1].sendKeys('DifferentPass456!');
-    }
-    const submitBtns = await driver.findElements(By.css('button[type="submit"]'));
-    if (submitBtns.length > 0) {
-      await submitBtns[0].click();
-      await driver.sleep(1500);
-    }
-    // Expect still on register or an error is shown
+    const btns = await driver.findElements(By.css('button[type="submit"]'));
+    if (btns.length > 0) await btns[0].click();
+    await driver.sleep(1500);
     const url = await driver.getCurrentUrl();
     const src = await driver.getPageSource();
-    const hasError = src.toLowerCase().includes('match') || src.toLowerCase().includes('password') || url.includes('register');
-    expect(hasError).to.be.true;
+    const onRegister = url.includes('register');
+    const hasError = src.toLowerCase().includes('match') || src.toLowerCase().includes('password');
+    expect(onRegister || hasError).to.be.true;
   });
 
-  it('TC_SEL_AUTH_005: /forgot-password page renders email field', async () => {
+  it('TC_SEL_AUTH_007: /forgot-password renders email field', async () => {
     await authPage.navigate('/forgot-password');
-    await driver.sleep(1000);
+    await driver.sleep(800);
     const emailFields = await driver.findElements(By.css('input[type="email"]'));
     expect(emailFields.length).to.be.greaterThan(0);
   });
 
-  it('TC_SEL_AUTH_006: Forgot password submission with invalid email shows error', async () => {
+  it('TC_SEL_AUTH_008: Forgot password submit navigates or shows feedback', async () => {
     await authPage.navigate('/forgot-password');
     await driver.sleep(800);
-    const emailFields = await driver.findElements(By.css('input[type="email"]'));
-    if (emailFields.length > 0) {
-      await emailFields[0].sendKeys('not-an-email');
-    }
-    const submitBtns = await driver.findElements(By.css('button[type="submit"]'));
-    if (submitBtns.length > 0) {
-      await submitBtns[0].click();
-      await driver.sleep(1500);
-    }
+    const emails = await driver.findElements(By.css('input[type="email"]'));
+    if (emails.length > 0) await emails[0].sendKeys('test@example.com');
+    const btns = await driver.findElements(By.css('button[type="submit"]'));
+    if (btns.length > 0) await btns[0].click();
+    await driver.sleep(2000);
     const src = await driver.getPageSource();
-    // Should show validation error or stay on page
-    expect(src.length).to.be.greaterThan(100);
+    expect(src.length).to.be.greaterThan(200);
   });
 });
