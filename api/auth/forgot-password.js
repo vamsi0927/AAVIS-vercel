@@ -55,9 +55,9 @@ export default async function handler(req, res) {
 
     const userId = user.id;
 
-    // 2. Generate secure token
-    const token = crypto.randomBytes(32).toString('hex');
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    // 2. Generate secure 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedToken = crypto.createHash('sha256').update(otpCode).digest('hex');
     
     // Token expires in 10 minutes
     const expiresAt = new Date();
@@ -78,21 +78,19 @@ export default async function handler(req, res) {
     }
 
     // 4. Send Password Reset Email via Resend
-    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-    const host = req.headers.host;
-    // We send them to the frontend /#/reset-password page, passing the token and uid as URL params
-    const resetLink = `${protocol}://${host}/#/reset-password?token=${token}&uid=${userId}`;
-
     const { error: resendError } = await resend.emails.send({
       from: `AAVIS Security <${SENDER_EMAIL}>`,
       to: [email],
-      subject: 'Reset your AAVIS Password',
+      subject: 'Your AAVIS Password Reset Code',
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2>Password Reset Request</h2>
           <p>We received a request to reset the password for the AAVIS account associated with ${escapeHtml(email)}.</p>
-          <a href="${resetLink}" style="display: inline-block; background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px;">Reset Password</a>
-          <p style="margin-top: 20px; color: #dc2626; font-weight: bold;">This link will expire in 10 minutes.</p>
+          <p>Your password reset code is:</p>
+          <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; text-align: center; margin: 24px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #111827;">${otpCode}</span>
+          </div>
+          <p style="margin-top: 20px; color: #dc2626; font-weight: bold;">This code will expire in 10 minutes.</p>
           <p style="margin-top: 30px; font-size: 12px; color: #666;">If you didn't request a password reset, you can safely ignore this email.</p>
         </div>
       `,
