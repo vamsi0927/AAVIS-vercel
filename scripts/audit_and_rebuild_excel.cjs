@@ -155,27 +155,55 @@ async function auditAndRebuildExcel() {
         const latestFile = files.sort().reverse()[0];
         const parsed = JSON.parse(fs.readFileSync(path.join(secDir, latestFile), 'utf8'));
         
+        let autoFuzzCount = 0;
+        let autoFuzzPassed = 0;
+        
         parsed.results.forEach((secTest) => {
-          let s = secTest.status.toUpperCase();
-          if (s === 'PASS') { summaryData.Security.passed++; summaryData.Security.executed++; }
-          else if (s === 'FAIL') { summaryData.Security.failed++; summaryData.Security.executed++; }
-          else { summaryData.Security.blocked++; }
+          if (secTest.id.startsWith('SEC-AUTO')) {
+            autoFuzzCount++;
+            if (secTest.status.toUpperCase() === 'PASS') autoFuzzPassed++;
+          } else {
+            let s = secTest.status.toUpperCase();
+            if (s === 'PASS') { summaryData.Security.passed++; summaryData.Security.executed++; }
+            else if (s === 'FAIL') { summaryData.Security.failed++; summaryData.Security.executed++; }
+            else { summaryData.Security.blocked++; }
 
+            securityData.push({
+              id: secTest.id,
+              type: 'Vulnerability (DAST)',
+              mod: 'Security',
+              scenario: secTest.name,
+              executed: 'YES',
+              expected: 'Secure configuration',
+              actual: secTest.reason || '',
+              status: s,
+              duration: 'N/A',
+              evidence: latestFile,
+              reason: s === 'FAIL' ? secTest.reason : 'N/A',
+              remarks: 'Genuine security assertion parsed'
+            });
+          }
+        });
+        
+        if (autoFuzzCount > 0) {
+          summaryData.Security.executed++;
+          if (autoFuzzPassed === autoFuzzCount) { summaryData.Security.passed++; } else { summaryData.Security.failed++; }
+          
           securityData.push({
-            id: secTest.id,
+            id: 'SEC-AUTO-FUZZ',
             type: 'Vulnerability (DAST)',
-            mod: 'Security',
-            scenario: secTest.name,
+            mod: 'Security Fuzzing',
+            scenario: `Automated Fuzzing Scenarios (${autoFuzzCount} iterations)`,
             executed: 'YES',
-            expected: 'Secure configuration',
-            actual: secTest.reason || '',
-            status: s,
+            expected: 'All fuzzing payloads handled safely',
+            actual: `${autoFuzzPassed}/${autoFuzzCount} iterations passed`,
+            status: autoFuzzPassed === autoFuzzCount ? 'PASS' : 'FAIL',
             duration: 'N/A',
             evidence: latestFile,
-            reason: s === 'FAIL' ? secTest.reason : 'N/A',
-            remarks: 'Genuine security assertion parsed'
+            reason: autoFuzzPassed === autoFuzzCount ? 'N/A' : 'Some fuzz checks failed',
+            remarks: 'Consolidated repetitive checks'
           });
-        });
+        }
       }
     }
   } catch (e) {
@@ -188,19 +216,21 @@ async function auditAndRebuildExcel() {
     const perfDir = path.join(rootPath, 'Test Results/Performance');
     if (fs.existsSync(perfDir)) {
       const files = fs.readdirSync(perfDir).filter(f => f.endsWith('.json'));
-      files.forEach((file, idx) => {
-        const parsed = JSON.parse(fs.readFileSync(path.join(perfDir, file), 'utf8'));
+      if (files.length > 0) {
+        // Take the latest single execution run as the true load scenario representation
+        const latestFile = files.sort().reverse()[0];
+        const parsed = JSON.parse(fs.readFileSync(path.join(perfDir, latestFile), 'utf8'));
         const total = parsed.totalRequests || 0;
         
         let avgLat = parsed.avgLatencyMs;
         let avgLatStr = `${Number(avgLat).toFixed(2)}ms`;
-        if (avgLat < 0 || isNaN(avgLat)) avgLatStr = 'INVALID/UNAVAILABLE (Negative/Invalid metric in raw logs)';
+        if (avgLat < 0 || isNaN(avgLat)) avgLatStr = 'INVALID/UNAVAILABLE (Negative/Invalid metric)';
         
         summaryData.Load.executed++;
         if (parsed.failed === 0) { summaryData.Load.passed++; } else { summaryData.Load.failed++; }
 
         loadData.push({
-          scenario: `Load Scenario ${idx + 1}`,
+          scenario: `Core API Load Profile (Latest Run)`,
           vus: 'N/A (Load test config)',
           duration: `${parsed.durationMs}ms`,
           totalReq: total,
@@ -211,9 +241,9 @@ async function auditAndRebuildExcel() {
           throughput: parsed.durationMs ? `${(total / (parsed.durationMs / 1000)).toFixed(2)} req/s` : 'N/A',
           threshold: 'N/A',
           status: parsed.failed === 0 ? 'PASS' : 'FAIL',
-          evidence: file
+          evidence: latestFile
         });
-      });
+      }
     }
   } catch (e) {
     console.error('Error parsing Load logs:', e);

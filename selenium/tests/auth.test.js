@@ -44,7 +44,7 @@ describe('TC_SEL_AUTH — Authentication Flow', function () {
 
   it('TC_SEL_AUTH_004: Successful login with valid creds redirects to /home', async () => {
     await authPage.login(TEST_EMAIL, TEST_PASS);
-    await authPage.wait.waitUntilUrlContains('/home');
+    await driver.wait(until.urlContains('home'), 15000);
     const url = await driver.getCurrentUrl();
     expect(url).to.include('/home');
   });

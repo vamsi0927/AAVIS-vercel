@@ -18,7 +18,8 @@ describe('TC_SEL_DASH — Dashboard & Navigation', function () {
     dashPage = new DashboardPage(driver);
     // Login once for all dashboard tests
     await authPage.login(TEST_EMAIL, TEST_PASS);
-    await authPage.wait.waitUntilUrlContains('/home');
+    const { until } = require('selenium-webdriver');
+    await driver.wait(until.urlContains('home'), 15000);
   });
 
   after(async () => { if (driver) await driver.quit(); });

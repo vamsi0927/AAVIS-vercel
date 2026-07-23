@@ -22,8 +22,8 @@ class DashboardPage extends BasePage {
 
   async getDashboardVisibility() {
     try {
-      await this.wait.waitForElementVisible(this.healthScoreCard);
-      return true;
+      const el = await this.wait.waitForElementVisible(this.healthScoreCard);
+      return el !== null;
     } catch {
       return false; 
     }
