@@ -4,6 +4,7 @@ import { askGeminiChat } from '../lib/geminiAnalysis';
 import { motion, AnimatePresence } from 'framer-motion';
 import aiAssistantImg from '../assets/ai-assistant.jpg';
 import { useLocation } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 type Message = {
   role: 'user' | 'model';
@@ -11,6 +12,7 @@ type Message = {
 };
 
 export function GlobalAIChat() {
+  const { profile } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{
     role: 'model',
@@ -42,6 +44,15 @@ export function GlobalAIChat() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsTyping(true);
+
+    // Easter Egg
+    if (userMessage === '2345') {
+      setTimeout(() => {
+        setMessages(prev => [...prev, { role: 'model', text: `welcome ${profile.name} chimtu "it should be secret....."` }]);
+        setIsTyping(false);
+      }, 1000);
+      return;
+    }
 
     try {
       const chatHistory = messages.map(m => ({
