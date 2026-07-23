@@ -485,6 +485,24 @@ export async function deleteUserScan(scanId: string, userId: string): Promise<bo
   return true;
 }
 
+/**
+ * Delete all scans for a user.
+ */
+export async function deleteAllUserScans(userId: string): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false;
+
+  const { error } = await supabase
+    .from('scans')
+    .delete()
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('[Aavis] Failed to clear all scans:', error);
+    return false;
+  }
+  return true;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // SEARCH OPERATIONS
 // ═══════════════════════════════════════════════════════════════

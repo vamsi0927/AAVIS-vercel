@@ -5,7 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { EmptyState } from '../components/EmptyState';
 import { ScanResult } from '../lib/types';
-import { deleteUserScan } from '../lib/supabaseService';
+import { deleteUserScan, deleteAllUserScans } from '../lib/supabaseService';
 import { toast } from 'sonner';
 
 export function History() {
@@ -111,7 +111,19 @@ export function History() {
     }
   }, [scanToDelete, supabaseUserId, scans, removeScan, restoreScans]);
 
-  const confirmClearAll = () => {
+  const confirmClearAll = async () => {
+    if (supabaseUserId) {
+      setIsDeleting(true);
+      const success = await deleteAllUserScans(supabaseUserId);
+      setIsDeleting(false);
+      
+      if (!success) {
+        toast.error("Failed to clear cloud scan history.");
+        setShowClearAllConfirm(false);
+        return;
+      }
+    }
+    
     clearHistory();
     setShowClearAllConfirm(false);
     toast.success("All scan history cleared.");

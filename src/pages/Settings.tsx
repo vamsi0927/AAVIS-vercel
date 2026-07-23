@@ -19,22 +19,31 @@ import { useAppContext } from '../context/AppContext';
 import { toast } from 'sonner';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { getApiUrl } from '../lib/apiConfig';
+import { deleteAllUserScans } from '../lib/supabaseService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function Settings() {
   const navigate = useNavigate();
-  const { profile, updateProfile, logout, clearHistory, scans, theme, setTheme, cameraPermission, setCameraPermission } = useAppContext();
+  const { profile, updateProfile, logout, clearHistory, scans, theme, setTheme, cameraPermission, setCameraPermission, supabaseUserId } = useAppContext();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
 
-  const handleClearHistory = () => {
+  const handleClearHistory = async () => {
     if (scans.length === 0) {
       toast.info('No scan history to clear.');
       return;
     }
     if (window.confirm(`Delete all ${scans.length} scan records? This cannot be undone.`)) {
+      if (supabaseUserId) {
+        toast.loading("Clearing history...", { id: 'clear-hist' });
+        const success = await deleteAllUserScans(supabaseUserId);
+        if (!success) {
+          toast.error("Failed to clear cloud scan history.", { id: 'clear-hist' });
+          return;
+        }
+      }
       clearHistory();
-      toast.success('Scan history cleared.');
+      toast.success('Scan history cleared.', { id: 'clear-hist' });
     }
   };
 
