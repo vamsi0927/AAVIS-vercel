@@ -163,8 +163,21 @@ export function Register() {
       // Create profile in users table
       await getOrCreateUser(email.trim(), name);
 
-      toast.success('Email verified successfully! Please sign in.');
-      navigate('/login', { replace: true });
+      // Auto-login after successful verification
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password
+      });
+
+      if (authError) {
+        console.error('Auto-login error:', authError);
+        toast.error('Verified, but could not auto-login. Please sign in.');
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      toast.success('Account created successfully!');
+      navigate('/onboarding', { replace: true });
     } catch (err: any) {
       toast.error('Verification failed. Please try again.');
     } finally {
