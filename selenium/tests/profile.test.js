@@ -76,12 +76,14 @@ describe('TC_SEL_PROF — Profile Management Flow', function () {
   });
 
   it('TC_SEL_PROF_008: Save profile with updated name persists data', async () => {
-    // Navigate away first to force SPA component remount (resets isEditing state)
+    // isEditing is persisted in sessionStorage — must clear it before navigating
+    await driver.executeScript("sessionStorage.removeItem('profile_isEditing');");
+    await driver.sleep(300);
     await profilePage.navigate('/home');
-    await driver.sleep(1000);
+    await driver.sleep(800);
     await profilePage.navigate('/profile');
     await driver.sleep(2000);
-    // Edit button is only visible when !isEditing — should now be visible after remount
+    // Edit button now visible since sessionStorage cleared isEditing
     const editBtn = await profilePage.wait.waitForElementVisible(profilePage.editProfileBtn);
     await editBtn.click();
     await profilePage.wait.waitForElementVisible(profilePage.nameInput);
