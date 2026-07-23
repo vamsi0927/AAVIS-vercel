@@ -25,6 +25,7 @@ export function Settings() {
   const navigate = useNavigate();
   const { profile, updateProfile, logout, clearHistory, scans, theme, setTheme, cameraPermission, setCameraPermission } = useAppContext();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
 
   const handleClearHistory = () => {
     if (scans.length === 0) {
@@ -273,7 +274,10 @@ export function Settings() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setShowDeleteConfirm(false)}
+              onClick={() => {
+                setShowDeleteConfirm(false);
+                setDeleteConfirmationText('');
+              }}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -285,19 +289,35 @@ export function Settings() {
                 <UserX className="w-6 h-6 text-red-500" />
               </div>
               <h3 className="text-xl font-display font-bold text-white mb-2">Delete Account?</h3>
-              <p className="text-content-secondary text-sm mb-6">
+              <p className="text-content-secondary text-sm mb-4">
                 Are you absolutely sure you want to delete your account? This action is permanent and will delete all your data.
               </p>
+              <div className="mb-6">
+                <label className="block text-xs font-bold text-content-secondary mb-2 uppercase tracking-wider text-center">
+                  Type DELETE to confirm
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmationText}
+                  onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                  placeholder="DELETE"
+                  className="w-full glass-input border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-content-secondary/50 font-mono text-center tracking-widest focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
+                />
+              </div>
               <div className="flex gap-3">
                 <button
-                  onClick={() => setShowDeleteConfirm(false)}
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setDeleteConfirmationText('');
+                  }}
                   className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-white/10 hover:bg-white/15 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteAccount}
-                  className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+                  disabled={deleteConfirmationText !== 'DELETE'}
+                  className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-red-500 transition-colors shadow-lg shadow-red-500/20"
                 >
                   Delete
                 </button>
