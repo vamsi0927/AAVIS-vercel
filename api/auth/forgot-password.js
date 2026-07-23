@@ -80,8 +80,8 @@ export default async function handler(req, res) {
     // 4. Send Password Reset Email via Resend
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
     const host = req.headers.host;
-    // We send them to the frontend /reset-password page, passing the token and uid as URL params
-    const resetLink = `${protocol}://${host}/reset-password?token=${token}&uid=${userId}`;
+    // We send them to the frontend /#/reset-password page, passing the token and uid as URL params
+    const resetLink = `${protocol}://${host}/#/reset-password?token=${token}&uid=${userId}`;
 
     const { error: resendError } = await resend.emails.send({
       from: `AAVIS Security <${SENDER_EMAIL}>`,

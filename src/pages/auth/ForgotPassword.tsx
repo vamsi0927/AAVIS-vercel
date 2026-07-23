@@ -97,6 +97,9 @@ export function ForgotPassword() {
                 <>Send Reset Link <ArrowRight className="w-4 h-4" /></>
               )}
             </button>
+            <p className="text-center text-xs text-content-secondary mt-4">
+              If you don't see the email in your inbox within a few minutes, please <strong>check your spam folder</strong>.
+            </p>
           </form>
         </motion.div>
       </div>

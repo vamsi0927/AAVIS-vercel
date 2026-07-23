@@ -156,6 +156,9 @@ export function VerifyOTP() {
                 Resend Code
               </button>
             )}
+            <p className="text-xs text-content-secondary mt-3">
+              Not seeing the code? Please <strong>check your spam folder</strong>.
+            </p>
           </div>
 
           <div className="mt-auto pt-8">
