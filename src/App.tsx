@@ -15,8 +15,6 @@ import { BottomNav } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
 import { RatingPrompt } from './components/RatingPrompt';
 import { OfflineBanner } from './components/OfflineBanner';
-import { useShakeDetector } from './hooks/useShakeDetector';
-import { motion, AnimatePresence } from 'framer-motion';
 // Existing pages
 import { Splash } from './pages/Splash';
 import { Onboarding } from './pages/Onboarding';
@@ -118,33 +116,6 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, isAuthenticated } = useAppContext();
-  const [isPanicking, setIsPanicking] = React.useState(false);
-
-  useShakeDetector(() => {
-    if (!isPanicking) {
-      setIsPanicking(true);
-      
-      // Make elements fall
-      const elements = document.querySelectorAll('.glass-card, button, img, h1, h2, h3, p, .bg-navy-800');
-      elements.forEach((el: any) => {
-        const rot = Math.random() * 90 - 45;
-        const delay = Math.random() * 0.3;
-        el.style.transition = `transform 1.2s cubic-bezier(0.5, 0, 1, 1) ${delay}s`;
-        el.style.transform = `translateY(150vh) rotate(${rot}deg)`;
-        el.style.pointerEvents = 'none';
-      });
-
-      // Recover after 4 seconds
-      setTimeout(() => {
-        elements.forEach((el: any) => {
-          el.style.transition = 'transform 0.5s ease-out';
-          el.style.transform = '';
-          el.style.pointerEvents = '';
-        });
-        setIsPanicking(false);
-      }, 4000);
-    }
-  });
 
   React.useEffect(() => {
     const handleBackButton = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
