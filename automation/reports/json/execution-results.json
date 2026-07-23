@@ -17,7 +17,7 @@
     },
     "expectedResult": "User is successfully authenticated and Home screen is displayed.",
     "status": "Passed",
-    "duration": 4,
+    "duration": 6,
     "error": null,
     "screenshot": null
   },
@@ -79,7 +79,7 @@
     },
     "expectedResult": "App correctly scans barcode and retrieves product details.",
     "status": "Passed",
-    "duration": 16,
+    "duration": 7,
     "error": null,
     "screenshot": null
   },
@@ -100,7 +100,7 @@
     "testData": {},
     "expectedResult": "App gracefully handles offline state and restores connection.",
     "status": "Passed",
-    "duration": 15,
+    "duration": 16,
     "error": null,
     "screenshot": null
   },
@@ -118,7 +118,7 @@
     "testData": {},
     "expectedResult": "App maintains state and session after backgrounding.",
     "status": "Passed",
-    "duration": 16,
+    "duration": 15,
     "error": null,
     "screenshot": null
   }

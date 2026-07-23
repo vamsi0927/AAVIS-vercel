@@ -15,6 +15,11 @@ CREATE TABLE IF NOT EXISTS public.verification_tokens (
 CREATE INDEX IF NOT EXISTS idx_verification_tokens_user_id ON public.verification_tokens(user_id);
 CREATE INDEX IF NOT EXISTS idx_verification_tokens_hashed_token ON public.verification_tokens(hashed_token);
 
+-- Secure the verification_tokens table (Admin API only)
+ALTER TABLE public.verification_tokens ENABLE ROW LEVEL SECURITY;
+-- No policies defined, meaning it defaults to deny-all for anon/authenticated users.
+-- Only the service_role (Admin API) can access this table.
+
 -- 2. Password Reset Tokens (For Forgot Password)
 CREATE TABLE IF NOT EXISTS public.password_reset_tokens (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

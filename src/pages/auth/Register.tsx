@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { getOrCreateUser } from '../../lib/supabaseService';
+import { getApiUrl } from '../../lib/apiConfig';
 import logoImg from '../../assets/logo.png';
 
 export function Register() {
@@ -54,28 +55,22 @@ export function Register() {
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: { name }
-        }
+      const res = await fetch(getApiUrl('/api/auth/send-otp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password, name, source: 'app' })
       });
 
-      if (error) {
-        throw error;
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Registration failed');
       }
+
       setStep('verify');
     } catch (err: any) {
-      // Show clean user-facing message, not raw JSON
       const msg = err.message || '';
-      if (msg.includes('failed to send verification email')) {
-        toast.error('Account created, but we could not send the verification email. Please contact support.');
-      } else if (msg.startsWith('{') || msg.startsWith('[')) {
-        toast.error('Registration failed. Please try again.');
-      } else {
-        toast.error(msg || 'Registration failed. Please try again.');
-      }
+      toast.error(msg || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -120,11 +115,15 @@ export function Register() {
     setOtp(['', '', '', '', '', '']);
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email.trim()
+      const res = await fetch(getApiUrl('/api/auth/send-otp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password, name, source: 'app' })
       });
-      if (error) throw error;
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to resend code');
+      
       toast.success('New code sent!');
       setResendTimer(60);
       inputRefs.current[0]?.focus();
@@ -146,26 +145,26 @@ export function Register() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
-        token: enteredCode,
-        type: 'signup'
+      const res = await fetch(getApiUrl('/api/auth/verify-otp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), otp: enteredCode })
       });
 
-      if (error) {
-        toast.error(error.message || 'Invalid or expired verification code');
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Invalid or expired verification code');
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
         return;
       }
 
       // Create profile in users table
-      if (data.user) {
-        await getOrCreateUser(data.user.email || email.trim(), name);
-      }
+      await getOrCreateUser(email.trim(), name);
 
-      toast.success('Account verified successfully! 🎉');
-      navigate('/onboarding', { replace: true });
+      toast.success('Email verified successfully! Please sign in.');
+      navigate('/login', { replace: true });
     } catch (err: any) {
       toast.error('Verification failed. Please try again.');
     } finally {

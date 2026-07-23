@@ -2,11 +2,14 @@ import nodemailer from 'nodemailer';
 
 export const SENDER_EMAIL = 'aavis.support@gmail.com';
 
+const SENDER = process.env.GMAIL_USER || 'aavis.support@gmail.com';
+const PASS = process.env.GMAIL_APP_PASSWORD || '';
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'aavis.support@gmail.com',
-    pass: 'buienjgnkksbvcbk' // App password without spaces
+    user: SENDER,
+    pass: PASS
   }
 });
 
