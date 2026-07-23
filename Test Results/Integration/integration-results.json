@@ -16,5 +16,17 @@
     "name": "Concurrent profile updates handle conflict resolution gracefully",
     "status": "PASS",
     "error": null
+  },
+  {
+    "id": "INT-SYNC-004",
+    "name": "Bookmarks offline cache sync behaves correctly",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "INT-SYNC-005",
+    "name": "Profile edit cancellation rolls back state properly",
+    "status": "PASS",
+    "error": null
   }
 ]

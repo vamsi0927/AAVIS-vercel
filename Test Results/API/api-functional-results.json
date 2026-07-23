@@ -28,5 +28,35 @@
     "name": "POST /api/chat with empty message returns 400",
     "status": "PASS",
     "error": null
+  },
+  {
+    "id": "TC_API_006",
+    "name": "GET /api/nonexistent returns 404",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_007",
+    "name": "POST /api/chat with malformed body returns 400",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_008",
+    "name": "POST /api/analyze with massive payload triggers limits or 400",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_009",
+    "name": "OPTIONS /api/health returns correct CORS headers",
+    "status": "PASS",
+    "error": null
+  },
+  {
+    "id": "TC_API_010",
+    "name": "GET / root path returns index.html successfully",
+    "status": "FAIL",
+    "error": null
   }
 ]

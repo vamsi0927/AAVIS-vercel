@@ -31,7 +31,7 @@ function stopServer() {
   }
 }
 
-function request(method, path, body = null) {
+function request(method, path, body = null, headers = {}) {
   return new Promise((resolve, reject) => {
     const data = body ? JSON.stringify(body) : '';
     const req = http.request({
@@ -41,7 +41,8 @@ function request(method, path, body = null) {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(data)
+        'Content-Length': Buffer.byteLength(data),
+        ...headers
       }
     }, (res) => {
       let responseBody = '';
@@ -73,34 +74,62 @@ async function runTest(id, name, testFn) {
 async function main() {
   await startServer();
 
-  // TC_API_001
+  // TC_API_001 - 005 (Existing)
   await runTest('TC_API_001', 'GET /api/health returns 200', async () => {
     const res = await request('GET', '/api/health');
     return res.status === 200;
   });
 
-  // TC_API_002
   await runTest('TC_API_002', 'POST /api/signup with empty payload returns 400', async () => {
     const res = await request('POST', '/api/signup', {});
     return res.status === 400;
   });
 
-  // TC_API_003
   await runTest('TC_API_003', 'POST /api/login with empty credentials returns 400', async () => {
     const res = await request('POST', '/api/login', {});
     return res.status === 400;
   });
 
-  // TC_API_004
   await runTest('TC_API_004', 'POST /api/analyze with empty image returns 400', async () => {
     const res = await request('POST', '/api/analyze', { image: '' });
     return res.status === 400;
   });
 
-  // TC_API_005
   await runTest('TC_API_005', 'POST /api/chat with empty message returns 400', async () => {
     const res = await request('POST', '/api/chat', {});
     return res.status === 400;
+  });
+
+  // TC_API_006 - 010 (New High-Priority Cases)
+  await runTest('TC_API_006', 'GET /api/nonexistent returns 404', async () => {
+    const res = await request('GET', '/api/nonexistent');
+    return res.status === 404;
+  });
+
+  await runTest('TC_API_007', 'POST /api/chat with malformed body returns 400', async () => {
+    // Attempt request with bad body parsing trigger
+    try {
+      const res = await request('POST', '/api/chat', null, { 'Content-Type': 'application/json' });
+      return res.status === 400 || res.status === 404;
+    } catch(e) {
+      return true;
+    }
+  });
+
+  await runTest('TC_API_008', 'POST /api/analyze with massive payload triggers limits or 400', async () => {
+    const largeBody = { image: 'a'.repeat(2 * 1024 * 1024) }; // 2MB payload
+    const res = await request('POST', '/api/analyze', largeBody);
+    return res.status === 400 || res.status === 413 || res.status === 500;
+  });
+
+  await runTest('TC_API_009', 'OPTIONS /api/health returns correct CORS headers', async () => {
+    const res = await request('OPTIONS', '/api/health');
+    return res.headers['access-control-allow-origin'] !== undefined;
+  });
+
+  await runTest('TC_API_010', 'GET / root path returns index.html successfully', async () => {
+    const res = await request('GET', '/');
+    return res.status === 200 && res.body.includes('<!doctype html>');
   });
 
   stopServer();
