@@ -22,7 +22,7 @@ import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 import { PersonalizedInsights } from '../components/PersonalizedInsights';
 import { motion, AnimatePresence } from 'framer-motion';
 import logoImg from '../assets/logo.png';
-import { FloatingBot } from '../components/FloatingBot';
+
 
 export function Home() {
   const navigate = useNavigate();
@@ -315,7 +315,7 @@ export function Home() {
         </div>
       </div>
 
-      <FloatingBot />
+
     </div>
   );
 }

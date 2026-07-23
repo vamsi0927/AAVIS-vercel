@@ -73,10 +73,10 @@ export function GlobalAIChat() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-[84px] right-4 z-40 w-14 h-14 rounded-full bg-gradient-to-tr from-brand-primary to-emerald-400 text-white shadow-lg shadow-brand-primary/30 flex items-center justify-center"
+            className="fixed bottom-[84px] right-4 z-40 w-16 h-16 rounded-full bg-navy-800 flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.6)] overflow-hidden border-2 border-brand-primary/50"
           >
-            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 border-2 border-navy-900 rounded-full animate-pulse" />
-            <Bot className="w-6 h-6" />
+            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 border-2 border-navy-900 rounded-full animate-pulse z-10" />
+            <img src={aiAssistantImg} alt="AI" className="w-full h-full object-cover pointer-events-none" draggable={false} />
           </motion.button>
         )}
       </AnimatePresence>
