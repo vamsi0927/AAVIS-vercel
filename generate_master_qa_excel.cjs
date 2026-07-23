@@ -27,6 +27,28 @@ async function generateMasterExcel() {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFEB9C' } };
             cell.font = { color: { argb: 'FF9C5700' } };
         }
+        cell.border = {
+            top: {style:'thin', color: {argb:'FFD9D9D9'}},
+            left: {style:'thin', color: {argb:'FFD9D9D9'}},
+            bottom: {style:'thin', color: {argb:'FFD9D9D9'}},
+            right: {style:'thin', color: {argb:'FFD9D9D9'}}
+        };
+        cell.alignment = { vertical: 'top', horizontal: 'center' };
+    };
+
+    const styleDataRow = (row, isAlt) => {
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            cell.alignment = { vertical: 'top', wrapText: true };
+            cell.border = {
+                top: {style:'thin', color: {argb:'FFD9D9D9'}},
+                left: {style:'thin', color: {argb:'FFD9D9D9'}},
+                bottom: {style:'thin', color: {argb:'FFD9D9D9'}},
+                right: {style:'thin', color: {argb:'FFD9D9D9'}}
+            };
+            if (isAlt) {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+            }
+        });
     };
 
     // --- Read Actual Test Data ---
@@ -166,7 +188,10 @@ async function generateMasterExcel() {
     summarySheet.addRow({ type: 'Vulnerability Testing', ...secStats });
 
     summarySheet.eachRow((row, rowNumber) => {
-        if(rowNumber > 1) styleStatusCell(row.getCell('status'), row.getCell('status').value);
+        if (rowNumber > 1) {
+            styleDataRow(row, rowNumber % 2 === 0);
+            styleStatusCell(row.getCell('status'), row.getCell('status').value);
+        }
     });
 
     // ---------------------------------------------------------
@@ -181,8 +206,9 @@ async function generateMasterExcel() {
         { header: 'Status', key: 'status', width: 15 }, { header: 'Remarks/Evidence', key: 'remarks', width: 30 }
     ];
     styleHeader(webSheet);
-    seleniumData.forEach(d => {
+    seleniumData.forEach((d, index) => {
         const row = webSheet.addRow(d);
+        styleDataRow(row, index % 2 !== 0);
         styleStatusCell(row.getCell('status'), d.status);
     });
 
@@ -192,8 +218,9 @@ async function generateMasterExcel() {
     const appSheet = workbook.addWorksheet('Appium Android');
     appSheet.columns = webSheet.columns;
     styleHeader(appSheet);
-    appiumData.forEach(d => {
+    appiumData.forEach((d, index) => {
         const row = appSheet.addRow(d);
+        styleDataRow(row, index % 2 !== 0);
         styleStatusCell(row.getCell('status'), d.status);
     });
 
@@ -210,8 +237,9 @@ async function generateMasterExcel() {
         { header: 'Status', key: 'status', width: 15 }
     ];
     styleHeader(loadSheet);
-    loadData.forEach(d => {
+    loadData.forEach((d, index) => {
         const row = loadSheet.addRow(d);
+        styleDataRow(row, index % 2 !== 0);
         styleStatusCell(row.getCell('status'), d.status);
     });
 
@@ -228,8 +256,9 @@ async function generateMasterExcel() {
         { header: 'Retest Status', key: 'retest', width: 15 }
     ];
     styleHeader(secSheet);
-    secData.forEach(d => {
+    secData.forEach((d, index) => {
         const row = secSheet.addRow(d);
+        styleDataRow(row, index % 2 !== 0);
         styleStatusCell(row.getCell('status'), d.status);
     });
 

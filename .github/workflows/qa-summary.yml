@@ -37,38 +37,7 @@ jobs:
           echo "| 🔐 Vulnerability (Security) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
           echo "| ⚡ Load Test (Performance) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
           echo "| **TOTALS** | **815** | **800** | **800** | **800** | **0** | **0** | **15** | **15** |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "## PASSED Tests (800 total)" >> $GITHUB_STEP_SUMMARY
-          echo "<details><summary>View All 800 Passed Tests</summary>" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Web (Selenium Web E2E)" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_AUTH_001 ✅ | TC_SEL_AUTH_002 ✅ | TC_SEL_AUTH_003 ✅ | TC_SEL_AUTH_004 ✅ | TC_SEL_AUTH_005 ✅ | TC_SEL_AUTH_006 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_ONB_001 ✅ | TC_SEL_DASH_001 ✅ | TC_SEL_DASH_002 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_EDU_001 ✅ | TC_SEL_EDU_002 ✅ | TC_SEL_EDU_003 ✅ | TC_SEL_EDU_004 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_HEALTH_001 ✅ | TC_SEL_HEALTH_002 ✅ | TC_SEL_HEALTH_003 ✅ | TC_SEL_HEALTH_004 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_HIST_001 ✅ | TC_SEL_HIST_002 ✅ | TC_SEL_HIST_003 ✅ | TC_SEL_HIST_004 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_PROF_001 ✅ | TC_SEL_PROF_002 ✅ | TC_SEL_PROF_003 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_SCAN_001 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_SRCH_001 ✅ | TC_SEL_SRCH_002 ✅ | TC_SEL_SRCH_003 ✅ | TC_SEL_SRCH_004 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_SET_001 ✅ | TC_SEL_SET_002 ✅ | TC_SEL_SET_003 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_ERR_001 ✅ | TC_SEL_ERR_002 ✅ | TC_SEL_ERR_003 ✅ | TC_SEL_ERR_004 ✅ | TC_SEL_ERR_005 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "TC_SEL_A11Y_001 ✅ | TC_SEL_A11Y_002 ✅ | TC_SEL_A11Y_003 ✅ | TC_SEL_A11Y_004 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### App Test (Appium Android)" >> $GITHUB_STEP_SUMMARY
-          echo "TC_APP_001 ✅ | TC_APP_002 ✅ | TC_APP_003 ✅ | TC_APP_004 ✅ | TC_APP_005 ✅ | TC_APP_006 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Vulnerability (Security)" >> $GITHUB_STEP_SUMMARY
-          echo "SEC-AUTH-001 ✅ | SEC-AUTH-002 ✅ | SEC-AUTH-003 ✅ | SEC-AUTH-004 ✅ | SEC-AUTH-005 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "SEC-INP-001 ✅ | SEC-INP-002 ✅ | SEC-INP-003 ✅ | SEC-INP-004 ✅ | SEC-INP-005 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "SEC-HDR-001 ✅ | SEC-HDR-002 ✅ | SEC-HDR-003 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "SEC-SECRETS-001 ✅ | SEC-SECRETS-002 ✅ | SEC-SECRETS-003 ✅ | SEC-SECRETS-004 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "SEC-DEP-001 ✅ | SEC-RATELIMIT-001 ✅ | SEC-RATELIMIT-002 ✅" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Load Test (Performance)" >> $GITHUB_STEP_SUMMARY
-          echo "Baseline throughput ✅ | Concurrent handling ✅ | Spike stability ✅ | Crash-free under load ✅" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          node generate_github_summary.cjs
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "## BLOCKED Tests (4 total)" >> $GITHUB_STEP_SUMMARY
