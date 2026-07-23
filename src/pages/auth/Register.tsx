@@ -308,12 +308,12 @@ export function Register() {
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-6 text-center py-4"
               >
-                <div className="w-16 h-16 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-6">
-                  <Shield className="w-8 h-8 text-brand-primary" />
-                </div>
                 <h2 className="text-xl font-bold text-white mb-2">Verify your email</h2>
                 <p className="text-content-secondary text-sm">
                   We've sent a 6-digit code to <span className="text-white font-medium">{email}</span>.
+                </p>
+                <p className="text-content-secondary text-xs mt-2">
+                  If you don't see the email in your inbox, please <strong>check your spam folder</strong>.
                 </p>
 
                 <form onSubmit={(e) => handleVerify(e)} className="space-y-6 mt-6">
