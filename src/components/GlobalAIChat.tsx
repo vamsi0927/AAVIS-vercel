@@ -45,10 +45,17 @@ export function GlobalAIChat() {
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsTyping(true);
 
-    // Easter Egg
-    if (userMessage === '2345') {
+    // Easter Eggs
+    const secretCodes: Record<string, string> = {
+      '2345': `welcome ${profile.name} chimtu "it should be secret....."`,
+      '3456': `${profile.name} come to my room`,
+      '4567': `eh ra kanna ${profile.name}`,
+      '5678': `${profile.name} paduko em undi le inka`
+    };
+
+    if (secretCodes[userMessage]) {
       setTimeout(() => {
-        setMessages(prev => [...prev, { role: 'model', text: `welcome ${profile.name} chimtu "it should be secret....."` }]);
+        setMessages(prev => [...prev, { role: 'model', text: secretCodes[userMessage] }]);
         setIsTyping(false);
       }, 1000);
       return;
