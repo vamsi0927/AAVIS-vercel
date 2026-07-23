@@ -139,7 +139,7 @@ export function Settings() {
             </button>
             <button data-testid='btn-settings-3'
               onClick={requestCameraPermission}
-              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
+              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
               <div className="flex items-center gap-4">
                 <Camera className="w-5 h-5 text-brand-safe" />
                 <span className="font-bold text-[15px] text-content-primary">Camera Permissions</span>
@@ -148,18 +148,9 @@ export function Settings() {
                 {cameraPermission === 'unknown' ? 'Request' : cameraPermission} <ChevronRight className="w-5 h-5" />
               </span>
             </button>
-          </div>
-        </section>
-
-        {/* Column 2: DATA & PRIVACY */}
-        <section className="space-y-5">
-          <h3 className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">
-            Data & Privacy
-          </h3>
-          <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
             <button data-testid='btn-settings-4'
               onClick={handleClearHistory}
-              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
+              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-4">
                 <Trash2 className="w-5 h-5 text-red-400" />
                 <div className="text-left flex flex-col">
@@ -170,6 +161,16 @@ export function Settings() {
                 </div>
               </div>
             </button>
+          </div>
+        </section>
+
+        {/* Column 2: DATA & PRIVACY */}
+        <section className="space-y-5">
+          <h3 className="text-xs font-bold text-content-secondary uppercase tracking-widest px-1">
+            Data & Privacy
+          </h3>
+          <div className="glass-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
+
             <button data-testid='btn-settings-5'
               onClick={() => navigate('/privacy')}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
