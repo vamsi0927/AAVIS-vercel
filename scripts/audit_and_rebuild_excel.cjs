@@ -222,14 +222,21 @@ async function auditAndRebuildExcel() {
         
         if (Array.isArray(parsedArray)) {
           parsedArray.forEach((parsed) => {
-            summaryData.Load.executed++;
-            if (parsed.failed === 0) { summaryData.Load.passed++; } else { summaryData.Load.failed++; }
+            const statusStr = (parsed.status || '').toUpperCase();
+            
+            if (statusStr === 'NOT RUN' || statusStr === 'BLOCKED') {
+              summaryData.Load.blocked++;
+            } else {
+              summaryData.Load.executed++;
+              if (statusStr === 'PASS') { summaryData.Load.passed++; } else { summaryData.Load.failed++; }
+            }
 
             let avgLat = parsed.avgLatencyMs;
             let avgLatStr = `${Number(avgLat).toFixed(2)}ms`;
-            if (avgLat < 0 || isNaN(avgLat)) avgLatStr = 'INVALID/UNAVAILABLE (Negative/Invalid metric)';
+            if (avgLat <= 0 || isNaN(avgLat)) avgLatStr = 'N/A';
 
             loadData.push({
+              id: parsed.id,
               scenario: parsed.scenario,
               vus: parsed.vus || 'N/A',
               duration: `${parsed.durationMs}ms`,
@@ -238,9 +245,9 @@ async function auditAndRebuildExcel() {
               failed: parsed.failed || 0,
               avgLatency: avgLatStr,
               p95: parsed.p95 || 'N/A',
-              throughput: parsed.durationMs ? `${(parsed.totalRequests / (parsed.durationMs / 1000)).toFixed(2)} req/s` : 'N/A',
+              throughput: parsed.totalRequests ? `${(parsed.totalRequests / (parsed.durationMs / 1000)).toFixed(2)} req/s` : 'N/A',
               threshold: 'N/A',
-              status: parsed.failed === 0 ? 'PASS' : 'FAIL',
+              status: statusStr,
               evidence: latestFile
             });
           });
@@ -250,6 +257,19 @@ async function auditAndRebuildExcel() {
   } catch (e) {
     console.error('Error parsing Load logs:', e);
   }
+
+  // Generate exact required summary format
+  console.log('\n--- EXACT REPORT SUMMARY ---');
+  console.log('Category | Designed | Actually Executed | PASS | FAIL | BLOCKED');
+  Object.keys(summaryData).forEach(cat => {
+    const d = summaryData[cat];
+    const total = d.passed + d.failed + d.blocked;
+    console.log(`${cat.padEnd(20)} | ${String(total).padEnd(8)} | ${String(d.executed).padEnd(17)} | ${String(d.passed).padEnd(4)} | ${String(d.failed).padEnd(4)} | ${String(d.blocked).padEnd(7)}`);
+  });
+  console.log('----------------------------\n');
+
+  // WRITE TO EXCEL
+  // ... rest of writing logic ...
 
   // Generate Sheets
   // A. Master Summary

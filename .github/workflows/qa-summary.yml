@@ -39,7 +39,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - run: node security-tests.cjs || true
+      - run: node scripts/run_vulnerability_tests.cjs || true
       - uses: actions/upload-artifact@v4
         with:
           name: security-results
@@ -56,7 +56,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - run: node performance-check.cjs || true
+      - run: node scripts/run_load_tests.cjs || true
       - uses: actions/upload-artifact@v4
         with:
           name: performance-results
@@ -79,12 +79,14 @@ jobs:
           name: build-output
           path: dist/
 
-      - name: Boot Frontend & Execute 200 Real Web UI Tests
+      - name: Boot Frontend & Execute Real Web UI Tests
+        env:
+          BASE_URL: http://localhost:4173
         run: |
           npx vite preview --port 4173 &
           sleep 5
           mkdir -p selenium/reports/sync
-          npx mocha selenium/tests/real_e2e_suite.test.js --reporter mochawesome --reporter-options reportDir=selenium/reports/sync,overwrite=true,reportFilename=mochawesome || true
+          npx mocha selenium/tests/parameterized_e2e.test.js --reporter mochawesome --reporter-options reportDir=selenium/reports/sync,overwrite=true,reportFilename=mochawesome || true
 
   mobile-e2e-appium:
     name: 📱 Mobile E2E (Appium Android)
@@ -92,13 +94,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Execute Native Device Tests
-        run: |
-          echo "Connecting to Android Emulator..."
-          sleep 2
-          echo "Running 200 Appium UI Checks..."
-          sleep 5
-          echo "Mobile execution succeeded!"
+      - name: Execute Native Device Tests via Appium
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: |
+            npm install -g appium
+            appium &
+            sleep 10
+            mkdir -p automation/reports/json
+            npx wdio run wdio.conf.js || true
 
   aggregate-master-report:
     name: 🏆 Aggregate Master QA Report
@@ -139,8 +144,8 @@ jobs:
           mv "Test Results"/*.json "Test Results/Security/" 2>/dev/null || true
           mv "Test Results/Security"/*load-test*.json "Test Results/Performance/" 2>/dev/null || true
           
-          node generate_github_summary.cjs
-          node generate_master_qa_excel.cjs
+          node generate_github_summary.cjs || true
+          node scripts/audit_and_rebuild_excel.cjs
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY

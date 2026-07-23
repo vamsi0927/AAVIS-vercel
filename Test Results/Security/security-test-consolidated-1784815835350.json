@@ -1,0 +1,1841 @@
+{
+  "timestamp": "2026-07-23T14:10:35.349Z",
+  "summary": {
+    "total": 305,
+    "passed": 304,
+    "failed": 1,
+    "skipped": 0
+  },
+  "results": [
+    {
+      "id": "SEC-001",
+      "name": "SQLi payload in login email",
+      "status": "PASS",
+      "reason": "No SQL error exposed"
+    },
+    {
+      "id": "SEC-002",
+      "name": "XSS payload in profile update",
+      "status": "PASS",
+      "reason": "Script tag rejected or encoded"
+    },
+    {
+      "id": "SEC-003",
+      "name": "Path Traversal on scan endpoint",
+      "status": "PASS",
+      "reason": "No system files exposed"
+    },
+    {
+      "id": "SEC-004",
+      "name": "Missing Authorization header",
+      "status": "FAIL",
+      "reason": "Status returned: 200"
+    },
+    {
+      "id": "SEC-005",
+      "name": "CORS Origin Validation",
+      "status": "PASS",
+      "reason": "Wildcard/evil origin rejected"
+    },
+    {
+      "id": "SEC-006",
+      "name": "SQLi fuzzing iteration 1 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-007",
+      "name": "SQLi fuzzing iteration 2 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-008",
+      "name": "SQLi fuzzing iteration 3 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-009",
+      "name": "SQLi fuzzing iteration 4 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-010",
+      "name": "SQLi fuzzing iteration 5 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-011",
+      "name": "SQLi fuzzing iteration 6 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-012",
+      "name": "SQLi fuzzing iteration 7 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-013",
+      "name": "SQLi fuzzing iteration 8 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-014",
+      "name": "SQLi fuzzing iteration 9 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-015",
+      "name": "SQLi fuzzing iteration 10 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-016",
+      "name": "XSS fuzzing iteration 1 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-017",
+      "name": "XSS fuzzing iteration 2 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-018",
+      "name": "XSS fuzzing iteration 3 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-019",
+      "name": "XSS fuzzing iteration 4 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-020",
+      "name": "XSS fuzzing iteration 5 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-021",
+      "name": "XSS fuzzing iteration 6 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-022",
+      "name": "XSS fuzzing iteration 7 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-023",
+      "name": "XSS fuzzing iteration 8 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-024",
+      "name": "XSS fuzzing iteration 9 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-025",
+      "name": "XSS fuzzing iteration 10 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-026",
+      "name": "NoSQLi fuzzing iteration 1 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-027",
+      "name": "NoSQLi fuzzing iteration 2 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-028",
+      "name": "NoSQLi fuzzing iteration 3 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-029",
+      "name": "NoSQLi fuzzing iteration 4 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-030",
+      "name": "NoSQLi fuzzing iteration 5 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-031",
+      "name": "NoSQLi fuzzing iteration 6 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-032",
+      "name": "NoSQLi fuzzing iteration 7 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-033",
+      "name": "NoSQLi fuzzing iteration 8 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-034",
+      "name": "NoSQLi fuzzing iteration 9 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-035",
+      "name": "NoSQLi fuzzing iteration 10 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-036",
+      "name": "Command Injection fuzzing iteration 1 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-037",
+      "name": "Command Injection fuzzing iteration 2 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-038",
+      "name": "Command Injection fuzzing iteration 3 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-039",
+      "name": "Command Injection fuzzing iteration 4 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-040",
+      "name": "Command Injection fuzzing iteration 5 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-041",
+      "name": "Command Injection fuzzing iteration 6 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-042",
+      "name": "Command Injection fuzzing iteration 7 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-043",
+      "name": "Command Injection fuzzing iteration 8 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-044",
+      "name": "Command Injection fuzzing iteration 9 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-045",
+      "name": "Command Injection fuzzing iteration 10 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-046",
+      "name": "Mass Assignment fuzzing iteration 1 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-047",
+      "name": "Mass Assignment fuzzing iteration 2 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-048",
+      "name": "Mass Assignment fuzzing iteration 3 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-049",
+      "name": "Mass Assignment fuzzing iteration 4 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-050",
+      "name": "Mass Assignment fuzzing iteration 5 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-051",
+      "name": "Mass Assignment fuzzing iteration 6 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-052",
+      "name": "Mass Assignment fuzzing iteration 7 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-053",
+      "name": "Mass Assignment fuzzing iteration 8 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-054",
+      "name": "Mass Assignment fuzzing iteration 9 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-055",
+      "name": "Mass Assignment fuzzing iteration 10 on /api/auth/login",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-056",
+      "name": "SQLi fuzzing iteration 1 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-057",
+      "name": "SQLi fuzzing iteration 2 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-058",
+      "name": "SQLi fuzzing iteration 3 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-059",
+      "name": "SQLi fuzzing iteration 4 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-060",
+      "name": "SQLi fuzzing iteration 5 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-061",
+      "name": "SQLi fuzzing iteration 6 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-062",
+      "name": "SQLi fuzzing iteration 7 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-063",
+      "name": "SQLi fuzzing iteration 8 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-064",
+      "name": "SQLi fuzzing iteration 9 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-065",
+      "name": "SQLi fuzzing iteration 10 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-066",
+      "name": "XSS fuzzing iteration 1 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-067",
+      "name": "XSS fuzzing iteration 2 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-068",
+      "name": "XSS fuzzing iteration 3 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-069",
+      "name": "XSS fuzzing iteration 4 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-070",
+      "name": "XSS fuzzing iteration 5 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-071",
+      "name": "XSS fuzzing iteration 6 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-072",
+      "name": "XSS fuzzing iteration 7 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-073",
+      "name": "XSS fuzzing iteration 8 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-074",
+      "name": "XSS fuzzing iteration 9 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-075",
+      "name": "XSS fuzzing iteration 10 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-076",
+      "name": "NoSQLi fuzzing iteration 1 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-077",
+      "name": "NoSQLi fuzzing iteration 2 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-078",
+      "name": "NoSQLi fuzzing iteration 3 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-079",
+      "name": "NoSQLi fuzzing iteration 4 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-080",
+      "name": "NoSQLi fuzzing iteration 5 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-081",
+      "name": "NoSQLi fuzzing iteration 6 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-082",
+      "name": "NoSQLi fuzzing iteration 7 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-083",
+      "name": "NoSQLi fuzzing iteration 8 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-084",
+      "name": "NoSQLi fuzzing iteration 9 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-085",
+      "name": "NoSQLi fuzzing iteration 10 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-086",
+      "name": "Command Injection fuzzing iteration 1 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-087",
+      "name": "Command Injection fuzzing iteration 2 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-088",
+      "name": "Command Injection fuzzing iteration 3 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-089",
+      "name": "Command Injection fuzzing iteration 4 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-090",
+      "name": "Command Injection fuzzing iteration 5 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-091",
+      "name": "Command Injection fuzzing iteration 6 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-092",
+      "name": "Command Injection fuzzing iteration 7 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-093",
+      "name": "Command Injection fuzzing iteration 8 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-094",
+      "name": "Command Injection fuzzing iteration 9 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-095",
+      "name": "Command Injection fuzzing iteration 10 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-096",
+      "name": "Mass Assignment fuzzing iteration 1 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-097",
+      "name": "Mass Assignment fuzzing iteration 2 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-098",
+      "name": "Mass Assignment fuzzing iteration 3 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-099",
+      "name": "Mass Assignment fuzzing iteration 4 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-100",
+      "name": "Mass Assignment fuzzing iteration 5 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-101",
+      "name": "Mass Assignment fuzzing iteration 6 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-102",
+      "name": "Mass Assignment fuzzing iteration 7 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-103",
+      "name": "Mass Assignment fuzzing iteration 8 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-104",
+      "name": "Mass Assignment fuzzing iteration 9 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-105",
+      "name": "Mass Assignment fuzzing iteration 10 on /api/auth/register",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-106",
+      "name": "SQLi fuzzing iteration 1 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-107",
+      "name": "SQLi fuzzing iteration 2 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-108",
+      "name": "SQLi fuzzing iteration 3 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-109",
+      "name": "SQLi fuzzing iteration 4 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-110",
+      "name": "SQLi fuzzing iteration 5 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-111",
+      "name": "SQLi fuzzing iteration 6 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-112",
+      "name": "SQLi fuzzing iteration 7 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-113",
+      "name": "SQLi fuzzing iteration 8 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-114",
+      "name": "SQLi fuzzing iteration 9 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-115",
+      "name": "SQLi fuzzing iteration 10 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-116",
+      "name": "XSS fuzzing iteration 1 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-117",
+      "name": "XSS fuzzing iteration 2 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-118",
+      "name": "XSS fuzzing iteration 3 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-119",
+      "name": "XSS fuzzing iteration 4 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-120",
+      "name": "XSS fuzzing iteration 5 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-121",
+      "name": "XSS fuzzing iteration 6 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-122",
+      "name": "XSS fuzzing iteration 7 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-123",
+      "name": "XSS fuzzing iteration 8 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-124",
+      "name": "XSS fuzzing iteration 9 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-125",
+      "name": "XSS fuzzing iteration 10 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-126",
+      "name": "NoSQLi fuzzing iteration 1 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-127",
+      "name": "NoSQLi fuzzing iteration 2 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-128",
+      "name": "NoSQLi fuzzing iteration 3 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-129",
+      "name": "NoSQLi fuzzing iteration 4 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-130",
+      "name": "NoSQLi fuzzing iteration 5 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-131",
+      "name": "NoSQLi fuzzing iteration 6 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-132",
+      "name": "NoSQLi fuzzing iteration 7 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-133",
+      "name": "NoSQLi fuzzing iteration 8 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-134",
+      "name": "NoSQLi fuzzing iteration 9 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-135",
+      "name": "NoSQLi fuzzing iteration 10 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-136",
+      "name": "Command Injection fuzzing iteration 1 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-137",
+      "name": "Command Injection fuzzing iteration 2 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-138",
+      "name": "Command Injection fuzzing iteration 3 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-139",
+      "name": "Command Injection fuzzing iteration 4 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-140",
+      "name": "Command Injection fuzzing iteration 5 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-141",
+      "name": "Command Injection fuzzing iteration 6 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-142",
+      "name": "Command Injection fuzzing iteration 7 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-143",
+      "name": "Command Injection fuzzing iteration 8 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-144",
+      "name": "Command Injection fuzzing iteration 9 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-145",
+      "name": "Command Injection fuzzing iteration 10 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-146",
+      "name": "Mass Assignment fuzzing iteration 1 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-147",
+      "name": "Mass Assignment fuzzing iteration 2 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-148",
+      "name": "Mass Assignment fuzzing iteration 3 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-149",
+      "name": "Mass Assignment fuzzing iteration 4 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-150",
+      "name": "Mass Assignment fuzzing iteration 5 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-151",
+      "name": "Mass Assignment fuzzing iteration 6 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-152",
+      "name": "Mass Assignment fuzzing iteration 7 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-153",
+      "name": "Mass Assignment fuzzing iteration 8 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-154",
+      "name": "Mass Assignment fuzzing iteration 9 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-155",
+      "name": "Mass Assignment fuzzing iteration 10 on /api/profile",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-156",
+      "name": "SQLi fuzzing iteration 1 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-157",
+      "name": "SQLi fuzzing iteration 2 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-158",
+      "name": "SQLi fuzzing iteration 3 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-159",
+      "name": "SQLi fuzzing iteration 4 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-160",
+      "name": "SQLi fuzzing iteration 5 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-161",
+      "name": "SQLi fuzzing iteration 6 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-162",
+      "name": "SQLi fuzzing iteration 7 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-163",
+      "name": "SQLi fuzzing iteration 8 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-164",
+      "name": "SQLi fuzzing iteration 9 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-165",
+      "name": "SQLi fuzzing iteration 10 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-166",
+      "name": "XSS fuzzing iteration 1 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-167",
+      "name": "XSS fuzzing iteration 2 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-168",
+      "name": "XSS fuzzing iteration 3 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-169",
+      "name": "XSS fuzzing iteration 4 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-170",
+      "name": "XSS fuzzing iteration 5 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-171",
+      "name": "XSS fuzzing iteration 6 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-172",
+      "name": "XSS fuzzing iteration 7 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-173",
+      "name": "XSS fuzzing iteration 8 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-174",
+      "name": "XSS fuzzing iteration 9 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-175",
+      "name": "XSS fuzzing iteration 10 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-176",
+      "name": "NoSQLi fuzzing iteration 1 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-177",
+      "name": "NoSQLi fuzzing iteration 2 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-178",
+      "name": "NoSQLi fuzzing iteration 3 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-179",
+      "name": "NoSQLi fuzzing iteration 4 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-180",
+      "name": "NoSQLi fuzzing iteration 5 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-181",
+      "name": "NoSQLi fuzzing iteration 6 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-182",
+      "name": "NoSQLi fuzzing iteration 7 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-183",
+      "name": "NoSQLi fuzzing iteration 8 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-184",
+      "name": "NoSQLi fuzzing iteration 9 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-185",
+      "name": "NoSQLi fuzzing iteration 10 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-186",
+      "name": "Command Injection fuzzing iteration 1 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-187",
+      "name": "Command Injection fuzzing iteration 2 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-188",
+      "name": "Command Injection fuzzing iteration 3 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-189",
+      "name": "Command Injection fuzzing iteration 4 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-190",
+      "name": "Command Injection fuzzing iteration 5 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-191",
+      "name": "Command Injection fuzzing iteration 6 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-192",
+      "name": "Command Injection fuzzing iteration 7 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-193",
+      "name": "Command Injection fuzzing iteration 8 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-194",
+      "name": "Command Injection fuzzing iteration 9 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-195",
+      "name": "Command Injection fuzzing iteration 10 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-196",
+      "name": "Mass Assignment fuzzing iteration 1 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-197",
+      "name": "Mass Assignment fuzzing iteration 2 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-198",
+      "name": "Mass Assignment fuzzing iteration 3 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-199",
+      "name": "Mass Assignment fuzzing iteration 4 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-200",
+      "name": "Mass Assignment fuzzing iteration 5 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-201",
+      "name": "Mass Assignment fuzzing iteration 6 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-202",
+      "name": "Mass Assignment fuzzing iteration 7 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-203",
+      "name": "Mass Assignment fuzzing iteration 8 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-204",
+      "name": "Mass Assignment fuzzing iteration 9 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-205",
+      "name": "Mass Assignment fuzzing iteration 10 on /api/scan",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-206",
+      "name": "SQLi fuzzing iteration 1 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-207",
+      "name": "SQLi fuzzing iteration 2 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-208",
+      "name": "SQLi fuzzing iteration 3 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-209",
+      "name": "SQLi fuzzing iteration 4 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-210",
+      "name": "SQLi fuzzing iteration 5 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-211",
+      "name": "SQLi fuzzing iteration 6 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-212",
+      "name": "SQLi fuzzing iteration 7 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-213",
+      "name": "SQLi fuzzing iteration 8 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-214",
+      "name": "SQLi fuzzing iteration 9 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-215",
+      "name": "SQLi fuzzing iteration 10 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-216",
+      "name": "XSS fuzzing iteration 1 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-217",
+      "name": "XSS fuzzing iteration 2 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-218",
+      "name": "XSS fuzzing iteration 3 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-219",
+      "name": "XSS fuzzing iteration 4 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-220",
+      "name": "XSS fuzzing iteration 5 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-221",
+      "name": "XSS fuzzing iteration 6 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-222",
+      "name": "XSS fuzzing iteration 7 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-223",
+      "name": "XSS fuzzing iteration 8 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-224",
+      "name": "XSS fuzzing iteration 9 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-225",
+      "name": "XSS fuzzing iteration 10 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-226",
+      "name": "NoSQLi fuzzing iteration 1 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-227",
+      "name": "NoSQLi fuzzing iteration 2 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-228",
+      "name": "NoSQLi fuzzing iteration 3 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-229",
+      "name": "NoSQLi fuzzing iteration 4 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-230",
+      "name": "NoSQLi fuzzing iteration 5 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-231",
+      "name": "NoSQLi fuzzing iteration 6 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-232",
+      "name": "NoSQLi fuzzing iteration 7 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-233",
+      "name": "NoSQLi fuzzing iteration 8 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-234",
+      "name": "NoSQLi fuzzing iteration 9 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-235",
+      "name": "NoSQLi fuzzing iteration 10 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-236",
+      "name": "Command Injection fuzzing iteration 1 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-237",
+      "name": "Command Injection fuzzing iteration 2 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-238",
+      "name": "Command Injection fuzzing iteration 3 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-239",
+      "name": "Command Injection fuzzing iteration 4 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-240",
+      "name": "Command Injection fuzzing iteration 5 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-241",
+      "name": "Command Injection fuzzing iteration 6 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-242",
+      "name": "Command Injection fuzzing iteration 7 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-243",
+      "name": "Command Injection fuzzing iteration 8 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-244",
+      "name": "Command Injection fuzzing iteration 9 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-245",
+      "name": "Command Injection fuzzing iteration 10 on /api/history",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-246",
+      "name": "Mass Assignment fuzzing iteration 1 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-247",
+      "name": "Mass Assignment fuzzing iteration 2 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-248",
+      "name": "Mass Assignment fuzzing iteration 3 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-249",
+      "name": "Mass Assignment fuzzing iteration 4 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-250",
+      "name": "Mass Assignment fuzzing iteration 5 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-251",
+      "name": "Mass Assignment fuzzing iteration 6 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-252",
+      "name": "Mass Assignment fuzzing iteration 7 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-253",
+      "name": "Mass Assignment fuzzing iteration 8 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-254",
+      "name": "Mass Assignment fuzzing iteration 9 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-255",
+      "name": "Mass Assignment fuzzing iteration 10 on /api/history",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-256",
+      "name": "SQLi fuzzing iteration 1 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-257",
+      "name": "SQLi fuzzing iteration 2 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-258",
+      "name": "SQLi fuzzing iteration 3 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-259",
+      "name": "SQLi fuzzing iteration 4 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-260",
+      "name": "SQLi fuzzing iteration 5 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-261",
+      "name": "SQLi fuzzing iteration 6 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-262",
+      "name": "SQLi fuzzing iteration 7 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-263",
+      "name": "SQLi fuzzing iteration 8 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-264",
+      "name": "SQLi fuzzing iteration 9 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-265",
+      "name": "SQLi fuzzing iteration 10 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No syntax error"
+    },
+    {
+      "id": "SEC-266",
+      "name": "XSS fuzzing iteration 1 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-267",
+      "name": "XSS fuzzing iteration 2 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-268",
+      "name": "XSS fuzzing iteration 3 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-269",
+      "name": "XSS fuzzing iteration 4 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-270",
+      "name": "XSS fuzzing iteration 5 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-271",
+      "name": "XSS fuzzing iteration 6 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-272",
+      "name": "XSS fuzzing iteration 7 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-273",
+      "name": "XSS fuzzing iteration 8 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-274",
+      "name": "XSS fuzzing iteration 9 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-275",
+      "name": "XSS fuzzing iteration 10 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Proper encoding"
+    },
+    {
+      "id": "SEC-276",
+      "name": "NoSQLi fuzzing iteration 1 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-277",
+      "name": "NoSQLi fuzzing iteration 2 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-278",
+      "name": "NoSQLi fuzzing iteration 3 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-279",
+      "name": "NoSQLi fuzzing iteration 4 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-280",
+      "name": "NoSQLi fuzzing iteration 5 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-281",
+      "name": "NoSQLi fuzzing iteration 6 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-282",
+      "name": "NoSQLi fuzzing iteration 7 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-283",
+      "name": "NoSQLi fuzzing iteration 8 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-284",
+      "name": "NoSQLi fuzzing iteration 9 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-285",
+      "name": "NoSQLi fuzzing iteration 10 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No internal DB exception"
+    },
+    {
+      "id": "SEC-286",
+      "name": "Command Injection fuzzing iteration 1 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-287",
+      "name": "Command Injection fuzzing iteration 2 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-288",
+      "name": "Command Injection fuzzing iteration 3 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-289",
+      "name": "Command Injection fuzzing iteration 4 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-290",
+      "name": "Command Injection fuzzing iteration 5 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-291",
+      "name": "Command Injection fuzzing iteration 6 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-292",
+      "name": "Command Injection fuzzing iteration 7 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-293",
+      "name": "Command Injection fuzzing iteration 8 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-294",
+      "name": "Command Injection fuzzing iteration 9 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-295",
+      "name": "Command Injection fuzzing iteration 10 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified No shell output"
+    },
+    {
+      "id": "SEC-296",
+      "name": "Mass Assignment fuzzing iteration 1 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-297",
+      "name": "Mass Assignment fuzzing iteration 2 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-298",
+      "name": "Mass Assignment fuzzing iteration 3 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-299",
+      "name": "Mass Assignment fuzzing iteration 4 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-300",
+      "name": "Mass Assignment fuzzing iteration 5 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-301",
+      "name": "Mass Assignment fuzzing iteration 6 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-302",
+      "name": "Mass Assignment fuzzing iteration 7 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-303",
+      "name": "Mass Assignment fuzzing iteration 8 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-304",
+      "name": "Mass Assignment fuzzing iteration 9 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    },
+    {
+      "id": "SEC-305",
+      "name": "Mass Assignment fuzzing iteration 10 on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Verified Role not upgraded"
+    }
+  ]
+}
