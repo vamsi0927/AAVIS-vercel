@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
@@ -19,10 +19,12 @@ import { useAppContext } from '../context/AppContext';
 import { toast } from 'sonner';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { getApiUrl } from '../lib/apiConfig';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function Settings() {
   const navigate = useNavigate();
   const { profile, updateProfile, logout, clearHistory, scans, theme, setTheme, cameraPermission, setCameraPermission } = useAppContext();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleClearHistory = () => {
     if (scans.length === 0) {
@@ -69,9 +71,7 @@ export function Settings() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("Are you absolutely sure you want to delete your account? This action is permanent and will delete all your data.")) {
-      return;
-    }
+    setShowDeleteConfirm(false);
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
@@ -190,7 +190,7 @@ export function Settings() {
               <ChevronRight className="w-5 h-5 text-content-secondary" />
             </button>
             <button data-testid='btn-settings-delete-account'
-              onClick={handleDeleteAccount}
+              onClick={() => setShowDeleteConfirm(true)}
               className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-4">
                 <UserX className="w-5 h-5 text-red-500" />
@@ -262,8 +262,51 @@ export function Settings() {
         <div className="col-span-1 md:col-span-3 flex justify-center items-center mt-8 pt-8">
           <p className="text-xs font-semibold text-content-secondary/40 tracking-widest uppercase">Aavis Version 1.0.0 (Build 42)</p>
         </div>
-
       </div>
+
+      {/* Delete Account Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowDeleteConfirm(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative w-full max-w-sm glass-card rounded-3xl p-6 shadow-2xl border border-white/10"
+            >
+              <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+                <UserX className="w-6 h-6 text-red-500" />
+              </div>
+              <h3 className="text-xl font-display font-bold text-white mb-2">Delete Account?</h3>
+              <p className="text-content-secondary text-sm mb-6">
+                Are you absolutely sure you want to delete your account? This action is permanent and will delete all your data.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-white/10 hover:bg-white/15 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
