@@ -12,12 +12,13 @@ import {
   Mail,
   Info,
   LogOut,
-  User,
+  UserX,
   BookOpen,
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { toast } from 'sonner';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { getApiUrl } from '../lib/apiConfig';
 
 export function Settings() {
   const navigate = useNavigate();
@@ -65,6 +66,40 @@ export function Settings() {
 
   const handleFutureReady = () => {
     toast.info('This feature is coming in the next update!');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("Are you absolutely sure you want to delete your account? This action is permanent and will delete all your data.")) {
+      return;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error('You must be logged in to delete your account.');
+      return;
+    }
+
+    toast.loading('Deleting account...', { id: 'delete-acc' });
+    try {
+      const res = await fetch(getApiUrl('/api/auth/delete-account'), {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete account');
+      }
+
+      toast.success('Account successfully deleted.', { id: 'delete-acc' });
+      // clear local session
+      logout();
+      navigate('/login', { replace: true });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete account', { id: 'delete-acc' });
+    }
   };
 
   return (
@@ -146,12 +181,20 @@ export function Settings() {
             </button>
             <button data-testid='btn-settings-6'
               onClick={() => navigate('/terms')}
-              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
+              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors border-b border-white/5">
               <div className="flex items-center gap-4">
                 <FileText className="w-5 h-5 text-content-secondary" />
                 <span className="font-bold text-[15px] text-content-primary">Terms & Conditions</span>
               </div>
               <ChevronRight className="w-5 h-5 text-content-secondary" />
+            </button>
+            <button data-testid='btn-settings-delete-account'
+              onClick={handleDeleteAccount}
+              className="w-full flex items-center justify-between py-5 px-4 hover:bg-white/5 transition-colors">
+              <div className="flex items-center gap-4">
+                <UserX className="w-5 h-5 text-red-500" />
+                <span className="font-bold text-[15px] text-red-500">Delete Account</span>
+              </div>
             </button>
           </div>
         </section>
