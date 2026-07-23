@@ -14,6 +14,7 @@ type Message = {
 export function GlobalAIChat() {
   const { profile } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
+  const [showSecretPopup, setShowSecretPopup] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{
     role: 'model',
     text: "Hi! I'm Aavis AI. What nutrition questions or food myths can I help you clear up today?"
@@ -42,10 +43,15 @@ export function GlobalAIChat() {
 
     const userMessage = input.trim();
     setInput('');
+    
+    // Easter Egg
+    if (userMessage === '2468') {
+      setShowSecretPopup(true);
+      return;
+    }
+
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsTyping(true);
-
-
 
     try {
       const chatHistory = messages.map(m => ({
@@ -187,6 +193,23 @@ export function GlobalAIChat() {
                 </button>
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Secret Popup Overlay */}
+      <AnimatePresence>
+        {showSecretPopup && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            onClick={() => setShowSecretPopup(false)}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md cursor-pointer"
+          >
+            <h1 className="text-4xl md:text-6xl font-display font-black text-center text-white bg-clip-text text-transparent bg-gradient-to-r from-brand-primary to-emerald-400 drop-shadow-2xl">
+              Paduko em undi le inka
+            </h1>
           </motion.div>
         )}
       </AnimatePresence>
