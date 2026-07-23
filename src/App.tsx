@@ -15,6 +15,8 @@ import { BottomNav } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
 import { RatingPrompt } from './components/RatingPrompt';
 import { OfflineBanner } from './components/OfflineBanner';
+import { useShakeDetector } from './hooks/useShakeDetector';
+import { motion, AnimatePresence } from 'framer-motion';
 // Existing pages
 import { Splash } from './pages/Splash';
 import { Onboarding } from './pages/Onboarding';
@@ -116,6 +118,14 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, isAuthenticated } = useAppContext();
+  const [isPanicking, setIsPanicking] = React.useState(false);
+
+  useShakeDetector(() => {
+    if (!isPanicking) {
+      setIsPanicking(true);
+      setTimeout(() => setIsPanicking(false), 3000); // Stop panicking after 3 seconds
+    }
+  });
 
   React.useEffect(() => {
     const handleBackButton = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
@@ -472,6 +482,28 @@ function AppContent() {
         {showBottomNav && <div className="md:hidden"><BottomNav /></div>}
         <GlobalAIChat />
         <RatingPrompt />
+
+        {/* Shake Panic Modal */}
+        <AnimatePresence>
+          {isPanicking && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center p-6 bg-red-900/40 backdrop-blur-sm"
+            >
+              <motion.div
+                animate={{ x: [-10, 10, -10, 10, 0], y: [-5, 5, -5, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 0.2 }}
+                className="bg-navy-900 border-2 border-red-500 rounded-3xl p-6 text-center shadow-2xl max-w-sm"
+              >
+                <div className="text-5xl mb-4">🫨</div>
+                <h2 className="text-xl font-bold text-white mb-2">Whoa, take it easy!</h2>
+                <p className="text-content-secondary">Shaking your device doesn't shake off the calories!</p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
