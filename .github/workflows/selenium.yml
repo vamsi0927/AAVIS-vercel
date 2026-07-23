@@ -585,3 +585,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🐛 Bug Fixed This Run" >> $GITHUB_STEP_SUMMARY
           echo "- **BUG-UI-003**: TC_SEL_PROF_008 timed out on editProfile after save — fixed with explicit navigate + sleep before re-entry" >> $GITHUB_STEP_SUMMARY
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: selenium-*-report
+          path: selenium/reports/
+      - name: Generate Overall Selenium Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: selenium-overall-report
+          path: selenium/reports/Selenium_Test_Report.xlsx
+          retention-days: 7
