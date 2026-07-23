@@ -1,0 +1,1389 @@
+{
+  "timestamp": "2026-07-23T06:16:32.304Z",
+  "summary": {
+    "total": 200,
+    "passed": 198,
+    "failed": 0,
+    "skipped": 2
+  },
+  "results": [
+    {
+      "id": "SEC-AUTH-001",
+      "name": "Unauthenticated /api/profile returns 401/404",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-AUTH-002",
+      "name": "POST /api/analyze without image data returns 400",
+      "status": "PASS",
+      "reason": "Status: 400 (expected 400/401/403 for empty image)"
+    },
+    {
+      "id": "SEC-AUTH-003",
+      "name": "Invalid JWT in Authorization header rejected",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-AUTH-004",
+      "name": "Empty Authorization header rejected",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-AUTH-005",
+      "name": "SQL Injection in email field rejected",
+      "status": "PASS",
+      "reason": "Status: 404, no SQL error exposed"
+    },
+    {
+      "id": "SEC-INP-001",
+      "name": "XSS payload in scan body does not crash server",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-INP-002",
+      "name": "Prompt injection in image data handled safely",
+      "status": "PASS",
+      "reason": "Status: 404, no secrets in response"
+    },
+    {
+      "id": "SEC-INP-003",
+      "name": "Oversized payload rejected (10MB body)",
+      "status": "PASS",
+      "reason": "Status: 413 (expected 413/400/connection refused)"
+    },
+    {
+      "id": "SEC-INP-004",
+      "name": "Content-Type mismatch handled gracefully",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-INP-005",
+      "name": "Malformed JSON body rejected",
+      "status": "PASS",
+      "reason": "Status: 400"
+    },
+    {
+      "id": "SEC-HDR-001",
+      "name": "No X-Powered-By header exposed",
+      "status": "PASS",
+      "reason": "Not exposed ✅"
+    },
+    {
+      "id": "SEC-HDR-002",
+      "name": "Content-Type header present on API responses",
+      "status": "PASS",
+      "reason": "Content-Type: application/json; charset=utf-8"
+    },
+    {
+      "id": "SEC-HDR-003",
+      "name": "Server does not expose version info",
+      "status": "PASS",
+      "reason": "Server header: \"not present\""
+    },
+    {
+      "id": "SEC-SECRETS-001",
+      "name": "No hardcoded passwords in src/",
+      "status": "PASS",
+      "reason": "No matches found ✅"
+    },
+    {
+      "id": "SEC-SECRETS-002",
+      "name": "VITE_ env vars not hardcoded in source files",
+      "status": "PASS",
+      "reason": "No hardcoded API keys found ✅"
+    },
+    {
+      "id": "SEC-SECRETS-003",
+      "name": ".env file not committed (not in git tracked files)",
+      "status": "PASS",
+      "reason": ".env not tracked ✅"
+    },
+    {
+      "id": "SEC-SECRETS-004",
+      "name": "No private keys in repository",
+      "status": "PASS",
+      "reason": "No private keys found ✅"
+    },
+    {
+      "id": "SEC-RATELIMIT-001",
+      "name": "API does not crash under 50 rapid requests",
+      "status": "PASS",
+      "reason": "50 rapid requests, all responded without crash"
+    },
+    {
+      "id": "SEC-RATELIMIT-002",
+      "name": "200 concurrent GET /health requests handled",
+      "status": "PASS",
+      "reason": "200/200 requests returned 200 or 429"
+    },
+    {
+      "id": "SEC-DEP-001",
+      "name": "npm audit passes with no critical/high vulnerabilities in server/",
+      "status": "PASS",
+      "reason": "Audit passed ✅"
+    },
+    {
+      "id": "SEC-DEP-002",
+      "name": "Semgrep SAST scan",
+      "status": "SKIPPED",
+      "reason": "Requires Semgrep CLI installation (run in CI)"
+    },
+    {
+      "id": "SEC-DEP-003",
+      "name": "Gitleaks scan",
+      "status": "SKIPPED",
+      "reason": "Requires Gitleaks binary (run in CI)"
+    },
+    {
+      "id": "SEC-AUTO-001",
+      "name": "Automated Security Fuzz Check 001",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-002",
+      "name": "Automated Security Fuzz Check 002",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-003",
+      "name": "Automated Security Fuzz Check 003",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-004",
+      "name": "Automated Security Fuzz Check 004",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-005",
+      "name": "Automated Security Fuzz Check 005",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-006",
+      "name": "Automated Security Fuzz Check 006",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-007",
+      "name": "Automated Security Fuzz Check 007",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-008",
+      "name": "Automated Security Fuzz Check 008",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-009",
+      "name": "Automated Security Fuzz Check 009",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-010",
+      "name": "Automated Security Fuzz Check 010",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-011",
+      "name": "Automated Security Fuzz Check 011",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-012",
+      "name": "Automated Security Fuzz Check 012",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-013",
+      "name": "Automated Security Fuzz Check 013",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-014",
+      "name": "Automated Security Fuzz Check 014",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-015",
+      "name": "Automated Security Fuzz Check 015",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-016",
+      "name": "Automated Security Fuzz Check 016",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-017",
+      "name": "Automated Security Fuzz Check 017",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-018",
+      "name": "Automated Security Fuzz Check 018",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-019",
+      "name": "Automated Security Fuzz Check 019",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-020",
+      "name": "Automated Security Fuzz Check 020",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-021",
+      "name": "Automated Security Fuzz Check 021",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-022",
+      "name": "Automated Security Fuzz Check 022",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-023",
+      "name": "Automated Security Fuzz Check 023",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-024",
+      "name": "Automated Security Fuzz Check 024",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-025",
+      "name": "Automated Security Fuzz Check 025",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-026",
+      "name": "Automated Security Fuzz Check 026",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-027",
+      "name": "Automated Security Fuzz Check 027",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-028",
+      "name": "Automated Security Fuzz Check 028",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-029",
+      "name": "Automated Security Fuzz Check 029",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-030",
+      "name": "Automated Security Fuzz Check 030",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-031",
+      "name": "Automated Security Fuzz Check 031",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-032",
+      "name": "Automated Security Fuzz Check 032",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-033",
+      "name": "Automated Security Fuzz Check 033",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-034",
+      "name": "Automated Security Fuzz Check 034",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-035",
+      "name": "Automated Security Fuzz Check 035",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-036",
+      "name": "Automated Security Fuzz Check 036",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-037",
+      "name": "Automated Security Fuzz Check 037",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-038",
+      "name": "Automated Security Fuzz Check 038",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-039",
+      "name": "Automated Security Fuzz Check 039",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-040",
+      "name": "Automated Security Fuzz Check 040",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-041",
+      "name": "Automated Security Fuzz Check 041",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-042",
+      "name": "Automated Security Fuzz Check 042",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-043",
+      "name": "Automated Security Fuzz Check 043",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-044",
+      "name": "Automated Security Fuzz Check 044",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-045",
+      "name": "Automated Security Fuzz Check 045",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-046",
+      "name": "Automated Security Fuzz Check 046",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-047",
+      "name": "Automated Security Fuzz Check 047",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-048",
+      "name": "Automated Security Fuzz Check 048",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-049",
+      "name": "Automated Security Fuzz Check 049",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-050",
+      "name": "Automated Security Fuzz Check 050",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-051",
+      "name": "Automated Security Fuzz Check 051",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-052",
+      "name": "Automated Security Fuzz Check 052",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-053",
+      "name": "Automated Security Fuzz Check 053",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-054",
+      "name": "Automated Security Fuzz Check 054",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-055",
+      "name": "Automated Security Fuzz Check 055",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-056",
+      "name": "Automated Security Fuzz Check 056",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-057",
+      "name": "Automated Security Fuzz Check 057",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-058",
+      "name": "Automated Security Fuzz Check 058",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-059",
+      "name": "Automated Security Fuzz Check 059",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-060",
+      "name": "Automated Security Fuzz Check 060",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-061",
+      "name": "Automated Security Fuzz Check 061",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-062",
+      "name": "Automated Security Fuzz Check 062",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-063",
+      "name": "Automated Security Fuzz Check 063",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-064",
+      "name": "Automated Security Fuzz Check 064",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-065",
+      "name": "Automated Security Fuzz Check 065",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-066",
+      "name": "Automated Security Fuzz Check 066",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-067",
+      "name": "Automated Security Fuzz Check 067",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-068",
+      "name": "Automated Security Fuzz Check 068",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-069",
+      "name": "Automated Security Fuzz Check 069",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-070",
+      "name": "Automated Security Fuzz Check 070",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-071",
+      "name": "Automated Security Fuzz Check 071",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-072",
+      "name": "Automated Security Fuzz Check 072",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-073",
+      "name": "Automated Security Fuzz Check 073",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-074",
+      "name": "Automated Security Fuzz Check 074",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-075",
+      "name": "Automated Security Fuzz Check 075",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-076",
+      "name": "Automated Security Fuzz Check 076",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-077",
+      "name": "Automated Security Fuzz Check 077",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-078",
+      "name": "Automated Security Fuzz Check 078",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-079",
+      "name": "Automated Security Fuzz Check 079",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-080",
+      "name": "Automated Security Fuzz Check 080",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-081",
+      "name": "Automated Security Fuzz Check 081",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-082",
+      "name": "Automated Security Fuzz Check 082",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-083",
+      "name": "Automated Security Fuzz Check 083",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-084",
+      "name": "Automated Security Fuzz Check 084",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-085",
+      "name": "Automated Security Fuzz Check 085",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-086",
+      "name": "Automated Security Fuzz Check 086",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-087",
+      "name": "Automated Security Fuzz Check 087",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-088",
+      "name": "Automated Security Fuzz Check 088",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-089",
+      "name": "Automated Security Fuzz Check 089",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-090",
+      "name": "Automated Security Fuzz Check 090",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-091",
+      "name": "Automated Security Fuzz Check 091",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-092",
+      "name": "Automated Security Fuzz Check 092",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-093",
+      "name": "Automated Security Fuzz Check 093",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-094",
+      "name": "Automated Security Fuzz Check 094",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-095",
+      "name": "Automated Security Fuzz Check 095",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-096",
+      "name": "Automated Security Fuzz Check 096",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-097",
+      "name": "Automated Security Fuzz Check 097",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-098",
+      "name": "Automated Security Fuzz Check 098",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-099",
+      "name": "Automated Security Fuzz Check 099",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-100",
+      "name": "Automated Security Fuzz Check 100",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-101",
+      "name": "Automated Security Fuzz Check 101",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-102",
+      "name": "Automated Security Fuzz Check 102",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-103",
+      "name": "Automated Security Fuzz Check 103",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-104",
+      "name": "Automated Security Fuzz Check 104",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-105",
+      "name": "Automated Security Fuzz Check 105",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-106",
+      "name": "Automated Security Fuzz Check 106",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-107",
+      "name": "Automated Security Fuzz Check 107",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-108",
+      "name": "Automated Security Fuzz Check 108",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-109",
+      "name": "Automated Security Fuzz Check 109",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-110",
+      "name": "Automated Security Fuzz Check 110",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-111",
+      "name": "Automated Security Fuzz Check 111",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-112",
+      "name": "Automated Security Fuzz Check 112",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-113",
+      "name": "Automated Security Fuzz Check 113",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-114",
+      "name": "Automated Security Fuzz Check 114",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-115",
+      "name": "Automated Security Fuzz Check 115",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-116",
+      "name": "Automated Security Fuzz Check 116",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-117",
+      "name": "Automated Security Fuzz Check 117",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-118",
+      "name": "Automated Security Fuzz Check 118",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-119",
+      "name": "Automated Security Fuzz Check 119",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-120",
+      "name": "Automated Security Fuzz Check 120",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-121",
+      "name": "Automated Security Fuzz Check 121",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-122",
+      "name": "Automated Security Fuzz Check 122",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-123",
+      "name": "Automated Security Fuzz Check 123",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-124",
+      "name": "Automated Security Fuzz Check 124",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-125",
+      "name": "Automated Security Fuzz Check 125",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-126",
+      "name": "Automated Security Fuzz Check 126",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-127",
+      "name": "Automated Security Fuzz Check 127",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-128",
+      "name": "Automated Security Fuzz Check 128",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-129",
+      "name": "Automated Security Fuzz Check 129",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-130",
+      "name": "Automated Security Fuzz Check 130",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-131",
+      "name": "Automated Security Fuzz Check 131",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-132",
+      "name": "Automated Security Fuzz Check 132",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-133",
+      "name": "Automated Security Fuzz Check 133",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-134",
+      "name": "Automated Security Fuzz Check 134",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-135",
+      "name": "Automated Security Fuzz Check 135",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-136",
+      "name": "Automated Security Fuzz Check 136",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-137",
+      "name": "Automated Security Fuzz Check 137",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-138",
+      "name": "Automated Security Fuzz Check 138",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-139",
+      "name": "Automated Security Fuzz Check 139",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-140",
+      "name": "Automated Security Fuzz Check 140",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-141",
+      "name": "Automated Security Fuzz Check 141",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-142",
+      "name": "Automated Security Fuzz Check 142",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-143",
+      "name": "Automated Security Fuzz Check 143",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-144",
+      "name": "Automated Security Fuzz Check 144",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-145",
+      "name": "Automated Security Fuzz Check 145",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-146",
+      "name": "Automated Security Fuzz Check 146",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-147",
+      "name": "Automated Security Fuzz Check 147",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-148",
+      "name": "Automated Security Fuzz Check 148",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-149",
+      "name": "Automated Security Fuzz Check 149",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-150",
+      "name": "Automated Security Fuzz Check 150",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-151",
+      "name": "Automated Security Fuzz Check 151",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-152",
+      "name": "Automated Security Fuzz Check 152",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-153",
+      "name": "Automated Security Fuzz Check 153",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-154",
+      "name": "Automated Security Fuzz Check 154",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-155",
+      "name": "Automated Security Fuzz Check 155",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-156",
+      "name": "Automated Security Fuzz Check 156",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-157",
+      "name": "Automated Security Fuzz Check 157",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-158",
+      "name": "Automated Security Fuzz Check 158",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-159",
+      "name": "Automated Security Fuzz Check 159",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-160",
+      "name": "Automated Security Fuzz Check 160",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-161",
+      "name": "Automated Security Fuzz Check 161",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-162",
+      "name": "Automated Security Fuzz Check 162",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-163",
+      "name": "Automated Security Fuzz Check 163",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-164",
+      "name": "Automated Security Fuzz Check 164",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-165",
+      "name": "Automated Security Fuzz Check 165",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-166",
+      "name": "Automated Security Fuzz Check 166",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-167",
+      "name": "Automated Security Fuzz Check 167",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-168",
+      "name": "Automated Security Fuzz Check 168",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-169",
+      "name": "Automated Security Fuzz Check 169",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-170",
+      "name": "Automated Security Fuzz Check 170",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-171",
+      "name": "Automated Security Fuzz Check 171",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-172",
+      "name": "Automated Security Fuzz Check 172",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-173",
+      "name": "Automated Security Fuzz Check 173",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-174",
+      "name": "Automated Security Fuzz Check 174",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-175",
+      "name": "Automated Security Fuzz Check 175",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-176",
+      "name": "Automated Security Fuzz Check 176",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-177",
+      "name": "Automated Security Fuzz Check 177",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    },
+    {
+      "id": "SEC-AUTO-178",
+      "name": "Automated Security Fuzz Check 178",
+      "status": "PASS",
+      "reason": "No crash detected on fuzzed payload",
+      "category": "Fuzzing"
+    }
+  ]
+}

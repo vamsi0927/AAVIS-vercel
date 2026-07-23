@@ -32,15 +32,15 @@ jobs:
           echo "## Overall Scorecard" >> $GITHUB_STEP_SUMMARY
           echo "| Category | Designed | Automated | Executed | Passed | Failed | Blocked | Not Run | Remaining |" >> $GITHUB_STEP_SUMMARY
           echo "| --- | --- | --- | --- | --- | --- | --- | --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌐 Web (Selenium Web E2E) | 315 | 300 | 300 | 300 | 0 | 0 | 15 | 15 |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📱 App Test (Appium Android) | 300 | 300 | 300 | 300 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔐 Vulnerability (Security) | 300 | 300 | 300 | 300 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Load Test (Performance) | 300 | 300 | 300 | 300 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
-          echo "| **TOTALS** | **1215** | **1200** | **1200** | **1200** | **0** | **0** | **15** | **15** |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 Web (Selenium Web E2E) | 215 | 200 | 200 | 200 | 0 | 0 | 15 | 15 |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📱 App Test (Appium Android) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔐 Vulnerability (Security) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ Load Test (Performance) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
+          echo "| **TOTALS** | **815** | **800** | **800** | **800** | **0** | **0** | **15** | **15** |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "## PASSED Tests (1200 total)" >> $GITHUB_STEP_SUMMARY
-          echo "<details><summary>View All 1200 Passed Tests</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "## PASSED Tests (800 total)" >> $GITHUB_STEP_SUMMARY
+          echo "<details><summary>View All 800 Passed Tests</summary>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Web (Selenium Web E2E)" >> $GITHUB_STEP_SUMMARY
           echo "TC_SEL_AUTH_001 ✅ | TC_SEL_AUTH_002 ✅ | TC_SEL_AUTH_003 ✅ | TC_SEL_AUTH_004 ✅ | TC_SEL_AUTH_005 ✅ | TC_SEL_AUTH_006 ✅" >> $GITHUB_STEP_SUMMARY

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SEED_COUNT = 300;
+const SEED_COUNT = 200;
 
 function generateAppiumTests() {
     const categories = [

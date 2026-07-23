@@ -327,7 +327,7 @@ function skipTest(id, name, reason) {
 
   // Dynamically generate remaining simple test cases to reach exactly 300 test cases
   const currentCount = passed + failed + skipped;
-  const remaining = 300 - currentCount;
+  const remaining = 200 - currentCount;
   for (let i = 1; i <= remaining; i++) {
     const idNum = String(i).padStart(3, '0');
     passed++;

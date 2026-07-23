@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-07-23T06:16:28.307Z",
+  "totalRequests": 200,
+  "success": 200,
+  "failed": 0,
+  "passRate": "100.00%",
+  "durationMs": 196,
+  "avgLatencyMs": 0.98
+}

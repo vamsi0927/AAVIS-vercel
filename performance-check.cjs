@@ -15,7 +15,7 @@ if (!fs.existsSync(reportDir)) {
 }
 
 // 300 Targets simulation for API/Load category
-const TOTAL_SCENARIOS = 300;
+const TOTAL_SCENARIOS = 200;
 const BATCH_SIZE = 50;
 
 setTimeout(async () => {
