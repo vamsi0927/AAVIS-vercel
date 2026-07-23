@@ -38,6 +38,7 @@ jobs:
           echo "| ⚡ Load Test (Performance) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
           echo "| **TOTALS** | **815** | **800** | **800** | **800** | **0** | **0** | **15** | **15** |" >> $GITHUB_STEP_SUMMARY
           node generate_github_summary.cjs
+          node generate_master_qa_excel.cjs
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "## BLOCKED Tests (4 total)" >> $GITHUB_STEP_SUMMARY

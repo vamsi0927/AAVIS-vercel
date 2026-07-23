@@ -262,9 +262,22 @@ async function generateMasterExcel() {
         styleStatusCell(row.getCell('status'), d.status);
     });
 
-    const desktopPath = path.join(require('os').homedir(), 'Desktop', 'AAVIS_Testing_Master_Report.xlsx');
-    await workbook.xlsx.writeFile(desktopPath);
-    console.log(`✅ Formatted Master Excel Report successfully generated from REAL execution data at: ${desktopPath}`);
+    // Save to the project's Test Results directory (for GitHub Actions artifact upload)
+    const projectPath = path.join(__dirname, 'Test Results', 'AAVIS_Testing_Master_Report.xlsx');
+    if (!fs.existsSync(path.join(__dirname, 'Test Results'))) {
+        fs.mkdirSync(path.join(__dirname, 'Test Results'), { recursive: true });
+    }
+    await workbook.xlsx.writeFile(projectPath);
+    console.log(`✅ Master Excel Report saved to Project folder: ${projectPath}`);
+
+    // Save to the user's Desktop (if running locally)
+    try {
+        const desktopPath = path.join(require('os').homedir(), 'Desktop', 'AAVIS_Testing_Master_Report.xlsx');
+        await workbook.xlsx.writeFile(desktopPath);
+        console.log(`✅ Master Excel Report saved to Desktop: ${desktopPath}`);
+    } catch (e) {
+        // Ignore desktop error if running in CI/GitHub Actions
+    }
 }
 
 generateMasterExcel().catch(err => console.error(err));
