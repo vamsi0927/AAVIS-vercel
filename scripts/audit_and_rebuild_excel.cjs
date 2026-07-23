@@ -215,34 +215,36 @@ async function auditAndRebuildExcel() {
   try {
     const perfDir = path.join(rootPath, 'Test Results/Performance');
     if (fs.existsSync(perfDir)) {
-      const files = fs.readdirSync(perfDir).filter(f => f.endsWith('.json'));
+      const files = fs.readdirSync(perfDir).filter(f => f.endsWith('.json') && f.includes('comprehensive'));
       if (files.length > 0) {
-        // Take the latest single execution run as the true load scenario representation
         const latestFile = files.sort().reverse()[0];
-        const parsed = JSON.parse(fs.readFileSync(path.join(perfDir, latestFile), 'utf8'));
-        const total = parsed.totalRequests || 0;
+        const parsedArray = JSON.parse(fs.readFileSync(path.join(perfDir, latestFile), 'utf8'));
         
-        let avgLat = parsed.avgLatencyMs;
-        let avgLatStr = `${Number(avgLat).toFixed(2)}ms`;
-        if (avgLat < 0 || isNaN(avgLat)) avgLatStr = 'INVALID/UNAVAILABLE (Negative/Invalid metric)';
-        
-        summaryData.Load.executed++;
-        if (parsed.failed === 0) { summaryData.Load.passed++; } else { summaryData.Load.failed++; }
+        if (Array.isArray(parsedArray)) {
+          parsedArray.forEach((parsed) => {
+            summaryData.Load.executed++;
+            if (parsed.failed === 0) { summaryData.Load.passed++; } else { summaryData.Load.failed++; }
 
-        loadData.push({
-          scenario: `Core API Load Profile (Latest Run)`,
-          vus: 'N/A (Load test config)',
-          duration: `${parsed.durationMs}ms`,
-          totalReq: total,
-          success: parsed.success || 0,
-          failed: parsed.failed || 0,
-          avgLatency: avgLatStr,
-          p95: parsed.p95 || 'N/A',
-          throughput: parsed.durationMs ? `${(total / (parsed.durationMs / 1000)).toFixed(2)} req/s` : 'N/A',
-          threshold: 'N/A',
-          status: parsed.failed === 0 ? 'PASS' : 'FAIL',
-          evidence: latestFile
-        });
+            let avgLat = parsed.avgLatencyMs;
+            let avgLatStr = `${Number(avgLat).toFixed(2)}ms`;
+            if (avgLat < 0 || isNaN(avgLat)) avgLatStr = 'INVALID/UNAVAILABLE (Negative/Invalid metric)';
+
+            loadData.push({
+              scenario: parsed.scenario,
+              vus: parsed.vus || 'N/A',
+              duration: `${parsed.durationMs}ms`,
+              totalReq: parsed.totalRequests,
+              success: parsed.success || 0,
+              failed: parsed.failed || 0,
+              avgLatency: avgLatStr,
+              p95: parsed.p95 || 'N/A',
+              throughput: parsed.durationMs ? `${(parsed.totalRequests / (parsed.durationMs / 1000)).toFixed(2)} req/s` : 'N/A',
+              threshold: 'N/A',
+              status: parsed.failed === 0 ? 'PASS' : 'FAIL',
+              evidence: latestFile
+            });
+          });
+        }
       }
     }
   } catch (e) {

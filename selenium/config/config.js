@@ -1,6 +1,6 @@
 require('dotenv').config();
 module.exports = {
-  baseUrl: process.env.BASE_URL || 'http://localhost:4173',
+  baseUrl: process.env.BASE_URL || 'http://localhost:5173',
   browser: process.env.BROWSER || 'chrome',
   isHeadless: process.env.HEADLESS !== 'false',
   timeout: {

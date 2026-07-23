@@ -1,0 +1,1811 @@
+{
+  "timestamp": "2026-07-23T14:02:10.118Z",
+  "summary": {
+    "total": 300,
+    "passed": 300,
+    "failed": 0,
+    "skipped": 0
+  },
+  "results": [
+    {
+      "id": "SEC-DATA-001",
+      "name": "SQLi attempt on /api/auth/login",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-002",
+      "name": "XSS attempt on /api/auth/login",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-003",
+      "name": "Path Traversal attempt on /api/auth/login",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-004",
+      "name": "No Auth attempt on /api/auth/login",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-005",
+      "name": "Malformed JSON attempt on /api/auth/login",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-006",
+      "name": "SQLi attempt on /api/auth/register",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-007",
+      "name": "XSS attempt on /api/auth/register",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-008",
+      "name": "Path Traversal attempt on /api/auth/register",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-009",
+      "name": "No Auth attempt on /api/auth/register",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-010",
+      "name": "Malformed JSON attempt on /api/auth/register",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-011",
+      "name": "SQLi attempt on /api/auth/reset",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-012",
+      "name": "XSS attempt on /api/auth/reset",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-013",
+      "name": "Path Traversal attempt on /api/auth/reset",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-014",
+      "name": "No Auth attempt on /api/auth/reset",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-015",
+      "name": "Malformed JSON attempt on /api/auth/reset",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-016",
+      "name": "SQLi attempt on /api/profile",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-017",
+      "name": "XSS attempt on /api/profile",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-018",
+      "name": "Path Traversal attempt on /api/profile",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-019",
+      "name": "No Auth attempt on /api/profile",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-020",
+      "name": "Malformed JSON attempt on /api/profile",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-021",
+      "name": "SQLi attempt on /api/history",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-022",
+      "name": "XSS attempt on /api/history",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-023",
+      "name": "Path Traversal attempt on /api/history",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-024",
+      "name": "No Auth attempt on /api/history",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-025",
+      "name": "Malformed JSON attempt on /api/history",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-026",
+      "name": "SQLi attempt on /api/scan",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-027",
+      "name": "XSS attempt on /api/scan",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-028",
+      "name": "Path Traversal attempt on /api/scan",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-029",
+      "name": "No Auth attempt on /api/scan",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-030",
+      "name": "Malformed JSON attempt on /api/scan",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-031",
+      "name": "SQLi attempt on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-032",
+      "name": "XSS attempt on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-033",
+      "name": "Path Traversal attempt on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-034",
+      "name": "No Auth attempt on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-035",
+      "name": "Malformed JSON attempt on /api/bookmarks",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-036",
+      "name": "SQLi attempt on /api/health",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-037",
+      "name": "XSS attempt on /api/health",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-038",
+      "name": "Path Traversal attempt on /api/health",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-039",
+      "name": "No Auth attempt on /api/health",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-040",
+      "name": "Malformed JSON attempt on /api/health",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-041",
+      "name": "SQLi attempt on /api/education",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-042",
+      "name": "XSS attempt on /api/education",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-043",
+      "name": "Path Traversal attempt on /api/education",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-044",
+      "name": "No Auth attempt on /api/education",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-045",
+      "name": "Malformed JSON attempt on /api/education",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-046",
+      "name": "SQLi attempt on /api/settings",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-047",
+      "name": "XSS attempt on /api/settings",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-048",
+      "name": "Path Traversal attempt on /api/settings",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-049",
+      "name": "No Auth attempt on /api/settings",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-050",
+      "name": "Malformed JSON attempt on /api/settings",
+      "status": "PASS",
+      "reason": "Status: 404"
+    },
+    {
+      "id": "SEC-DATA-051",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-052",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-053",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-054",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-055",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-056",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-057",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-058",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-059",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-060",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-061",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-062",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-063",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-064",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-065",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-066",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-067",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-068",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-069",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-070",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-071",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-072",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-073",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-074",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-075",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-076",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-077",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-078",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-079",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-080",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-081",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-082",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-083",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-084",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-085",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-086",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-087",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-088",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-089",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-090",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-091",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-092",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-093",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-094",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-095",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-096",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-097",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-098",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-099",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-100",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-101",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-102",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-103",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-104",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-105",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-106",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-107",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-108",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-109",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-110",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-111",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-112",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-113",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-114",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-115",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-116",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-117",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-118",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-119",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-120",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-121",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-122",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-123",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-124",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-125",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-126",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-127",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-128",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-129",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-130",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-131",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-132",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-133",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-134",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-135",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-136",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-137",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-138",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-139",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-140",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-141",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-142",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-143",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-144",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-145",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-146",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-147",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-148",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-149",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-150",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-151",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-152",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-153",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-154",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-155",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-156",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-157",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-158",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-159",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-160",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-161",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-162",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-163",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-164",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-165",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-166",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-167",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-168",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-169",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-170",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-171",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-172",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-173",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-174",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-175",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-176",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-177",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-178",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-179",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-180",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-181",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-182",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-183",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-184",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-185",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-186",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-187",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-188",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-189",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-190",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-191",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-192",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-193",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-194",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-195",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-196",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-197",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-198",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-199",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-200",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-201",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-202",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-203",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-204",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-205",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-206",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-207",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-208",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-209",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-210",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-211",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-212",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-213",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-214",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-215",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-216",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-217",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-218",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-219",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-220",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-221",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-222",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-223",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-224",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-225",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-226",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-227",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-228",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-229",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-230",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-231",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-232",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-233",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-234",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-235",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-236",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-237",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-238",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-239",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-240",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-241",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-242",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-243",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-244",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-245",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-246",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-247",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-248",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-249",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-250",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-251",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-252",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-253",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-254",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-255",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-256",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-257",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-258",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-259",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-260",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-261",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-262",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-263",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-264",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-265",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-266",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-267",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-268",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-269",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-270",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-271",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-272",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-273",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-274",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-275",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-276",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-277",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-278",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-279",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-280",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-281",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-282",
+      "name": "Automated DAST Header/CORS Check DELETE /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-283",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-284",
+      "name": "Automated DAST Header/CORS Check POST /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-285",
+      "name": "Automated DAST Header/CORS Check PUT /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-286",
+      "name": "Automated DAST Header/CORS Check DELETE /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-287",
+      "name": "Automated DAST Header/CORS Check GET /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-288",
+      "name": "Automated DAST Header/CORS Check POST /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-289",
+      "name": "Automated DAST Header/CORS Check PUT /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-290",
+      "name": "Automated DAST Header/CORS Check DELETE /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-291",
+      "name": "Automated DAST Header/CORS Check GET /api/auth/login",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-292",
+      "name": "Automated DAST Header/CORS Check POST /api/auth/register",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-293",
+      "name": "Automated DAST Header/CORS Check PUT /api/auth/reset",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-294",
+      "name": "Automated DAST Header/CORS Check DELETE /api/profile",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-295",
+      "name": "Automated DAST Header/CORS Check GET /api/history",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-296",
+      "name": "Automated DAST Header/CORS Check POST /api/scan",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-297",
+      "name": "Automated DAST Header/CORS Check PUT /api/bookmarks",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-298",
+      "name": "Automated DAST Header/CORS Check DELETE /api/health",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-299",
+      "name": "Automated DAST Header/CORS Check GET /api/education",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    },
+    {
+      "id": "SEC-DATA-300",
+      "name": "Automated DAST Header/CORS Check POST /api/settings",
+      "status": "PASS",
+      "reason": "No sensitive headers exposed"
+    }
+  ]
+}

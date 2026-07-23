@@ -61,6 +61,7 @@
     "autoprefixer": "latest",
     "axe-core": "^4.12.1",
     "chai": "^6.2.2",
+    "chromedriver": "^150.0.4",
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "eslint": "^8.50.0",
