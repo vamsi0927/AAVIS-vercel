@@ -339,14 +339,34 @@ function skipTest(id, name, reason) {
   const reportDir = path.join(__dirname, 'Test Results/Security');
   if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
 
-  const reportPath = path.join(reportDir, `security-test-${Date.now()}.json`);
+  const timestamp = Date.now();
+  const reportPath = path.join(reportDir, `security-test-${timestamp}.json`);
   fs.writeFileSync(reportPath, JSON.stringify({
     timestamp: new Date().toISOString(),
     summary: { total: passed + failed + skipped, passed, failed, skipped },
     results
   }, null, 2));
 
-  console.log(`  📁 Report saved: ${reportPath}\n`);
+  // Generate Excel Report
+  try {
+    const xlsx = require('xlsx');
+    const workbook = xlsx.utils.book_new();
+    const wsData = [
+      ['Test ID', 'Category', 'Description', 'Status', 'Reason', 'Duration (ms)']
+    ];
+    results.forEach(r => {
+      wsData.push([r.id, r.category || 'General', r.desc, r.status, r.reason || '', r.duration || 0]);
+    });
+    const worksheet = xlsx.utils.aoa_to_sheet(wsData);
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Security Results');
+    const excelPath = path.join(reportDir, `security-test-${timestamp}.xlsx`);
+    xlsx.writeFile(workbook, excelPath);
+    console.log(`  📁 Excel Report saved: ${excelPath}`);
+  } catch (err) {
+    console.error('Failed to generate Excel report:', err);
+  }
+
+  console.log(`  📁 JSON Report saved: ${reportPath}\n`);
 
   stopServer();
   process.exit(failed > 0 ? 1 : 0);

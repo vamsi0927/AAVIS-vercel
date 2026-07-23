@@ -48,7 +48,14 @@ jobs:
           echo "| TC_SEL_AUTH_005 | /register page renders signup form | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_AUTH_006 | Mismatched passwords prevents submission | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_AUTH_007 | /forgot-password renders email field | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_AUTH_008 | Forgot password submit shows feedback | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -95,7 +102,14 @@ jobs:
           echo "| TC_SEL_DASH_002 | Bottom nav has 5+ items | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_DASH_003 | History nav link navigates to /history | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_DASH_004 | Page title includes 'Aavis' | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_DASH_005 | /home has no SEVERE console errors | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -142,7 +156,14 @@ jobs:
           echo "| TC_SEL_EDU_005 | Food Claims card present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_EDU_006 | Clicking Label Guide navigates to article | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_EDU_007 | Boards card present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_EDU_008 | Additives card present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -189,7 +210,14 @@ jobs:
           echo "| TC_SEL_HEALTH_005 | Month tab click renders month view | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_HEALTH_006 | Week tab click renders week view | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_HEALTH_007 | Previous period nav works without crash | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_HEALTH_008 | Scan History button present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -234,7 +262,14 @@ jobs:
           echo "| TC_SEL_HIST_003 | View Saved button rendered | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_HIST_004 | Nonexistent search returns no results | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_HIST_005 | Clearing search empties field | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_HIST_006 | Filter button present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -280,7 +315,14 @@ jobs:
           echo "| TC_SEL_SRCH_004 | Clearing empties field | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_SRCH_005 | Trending term buttons visible | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_SRCH_006 | Clicking trending term populates input | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_SRCH_007 | Back button present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -327,7 +369,14 @@ jobs:
           echo "| TC_SEL_PROF_005 | Cancel hides save button | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_PROF_006 | Settings button navigates to /settings | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_PROF_007 | Diet toggle button present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_PROF_008 | Save profile persists data | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -374,7 +423,14 @@ jobs:
           echo "| TC_SEL_SET_005 | Back from privacy returns to settings | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_SET_006 | Terms button present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_SET_007 | About button present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_SET_008 | Logout redirects to /login | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -424,6 +480,11 @@ jobs:
           echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_SCAN_005 | Real camera barcode capture — device camera needed |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_SCAN_006 | AI analysis result display — live Gemini API key needed |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -471,7 +532,14 @@ jobs:
           echo "| TC_SEL_A11Y_001 | html lang attribute set | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_A11Y_002 | No SEVERE console errors on login | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_SEL_A11Y_003 | Viewport meta tag present | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-          echo "| TC_SEL_A11Y_004 | Mobile 375px no overflow | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| TC_SEL_... >> $GITHUB_STEP_SUMMARY
+          echo \"\" >> $GITHUB_STEP_SUMMARY
+          echo \"> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts.\" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON/HTML reports are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - name: Generate Excel Report
+        run: node generate-selenium-excel.cjs selenium/reports/
+        if: always()
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -31,10 +31,12 @@ jobs:
           echo "| SEC-AUTH-003 | Invalid JWT in Authorization header rejected | 🟢 PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| SEC-AUTH-004 | Empty Authorization header rejected | 🟢 PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| SEC-AUTH-005 | SQL Injection in email field rejected | 🟢 PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Note:** A detailed security Excel report (.xlsx) and JSON report are attached as artifacts." >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: security-auth-report
+          name: security-audit-report
           path: Test Results/Security/
           retention-days: 7
 

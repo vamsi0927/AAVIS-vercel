@@ -94,7 +94,8 @@ setTimeout(async () => {
   console.log('----------------------------------\n');
 
   // Write report
-  const reportPath = path.join(reportDir, `load-test-${Date.now()}.json`);
+  const timestamp = Date.now();
+  const reportPath = path.join(reportDir, `load-test-${timestamp}.json`);
   fs.writeFileSync(reportPath, JSON.stringify({
     timestamp: new Date().toISOString(),
     totalRequests: TOTAL_SCENARIOS,
@@ -105,7 +106,30 @@ setTimeout(async () => {
     avgLatencyMs: avgLatency
   }, null, 2));
 
-  console.log(`✅ Performance report saved to ${reportPath}`);
+  // Generate Excel Report
+  try {
+    const xlsx = require('xlsx');
+    const workbook = xlsx.utils.book_new();
+    const wsData = [
+      ['Metric', 'Value'],
+      ['Timestamp', new Date().toISOString()],
+      ['Total Scenarios', TOTAL_SCENARIOS],
+      ['Success', successCount],
+      ['Failed', failCount],
+      ['Pass Rate', `${passRate}%`],
+      ['Total Duration (ms)', duration],
+      ['Avg Latency (ms)', avgLatency]
+    ];
+    const worksheet = xlsx.utils.aoa_to_sheet(wsData);
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Load Results');
+    const excelPath = path.join(reportDir, `load-test-${timestamp}.xlsx`);
+    xlsx.writeFile(workbook, excelPath);
+    console.log(`✅ Performance Excel report saved to ${excelPath}`);
+  } catch (err) {
+    console.error('Failed to generate Excel report:', err);
+  }
+
+  console.log(`✅ Performance JSON report saved to ${reportPath}`);
 
   // Terminate server process
   serverProcess.kill();

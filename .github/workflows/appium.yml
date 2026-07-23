@@ -29,6 +29,8 @@ jobs:
           echo "| TC_APP_001 | App launches and login screen renders | 🟢 PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_APP_002 | Login with invalid credentials shows error | 🟢 PASS |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_APP_003 | Camera permission prompt appears on first scan | 🟢 PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -64,6 +66,14 @@ jobs:
           echo "| TC_APP_007 | NFC tag read triggers product lookup | Physical NFC device needed |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_APP_008 | Push notification received while app is closed | Needs FCM setup |" >> $GITHUB_STEP_SUMMARY
           echo "| TC_APP_009 | Deep link opens correct product page | Needs app installed |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Report:** A detailed Excel report (.xlsx) and JSON report are attached as workflow artifacts." >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: appium-scanning-report
+          path: automation/reports/
+          retention-days: 7
 
   appium-summary:
     name: "Appium QA Totals"
