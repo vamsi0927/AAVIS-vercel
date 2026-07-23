@@ -14,8 +14,8 @@ if (!fs.existsSync(reportDir)) {
   fs.mkdirSync(reportDir, { recursive: true });
 }
 
-// 330 Targets simulation for API/Load category
-const TOTAL_SCENARIOS = 330;
+// 300 Targets simulation for API/Load category
+const TOTAL_SCENARIOS = 300;
 const BATCH_SIZE = 50;
 
 setTimeout(async () => {

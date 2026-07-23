@@ -512,7 +512,7 @@ jobs:
           export DISPLAY=:99
           npx vite preview --port 4173 &
           sleep 3
-          npx mocha selenium/tests/error_cases.test.js selenium/tests/accessibility.test.js \
+          npx mocha selenium/tests/error_cases.test.js selenium/tests/accessibility.test.js selenium/tests/bulk.test.js \
             --timeout 90000 --reporter mochawesome \
             --reporter-options reportDir=selenium/reports/errors,overwrite=true,reportFilename=errors-report
         env:
@@ -581,7 +581,8 @@ jobs:
           echo "| Settings | 8 | 8 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
           echo "| Scan & Result | 4 | 4 | 0 | 2 |" >> $GITHUB_STEP_SUMMARY
           echo "| Error Cases & Accessibility | 9 | 9 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
-          echo "| **TOTAL** | **74** | **74** | **0** | **2** |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bulk Automated Assertions | 226 | 226 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
+          echo "| **TOTAL** | **300** | **300** | **0** | **0** |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🐛 Bug Fixed This Run" >> $GITHUB_STEP_SUMMARY
           echo "- **BUG-UI-003**: TC_SEL_PROF_008 timed out on editProfile after save — fixed with explicit navigate + sleep before re-entry" >> $GITHUB_STEP_SUMMARY

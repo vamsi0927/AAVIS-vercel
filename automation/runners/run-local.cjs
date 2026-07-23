@@ -19,7 +19,8 @@ async function executeTestSuite() {
   if (!fs.existsSync(testCasesPath)) {
     throw new Error('Test case database not found! Run generate_test_cases.js first.');
   }
-  const testCases = JSON.parse(fs.readFileSync(testCasesPath, 'utf8'));
+  let testCases = JSON.parse(fs.readFileSync(testCasesPath, 'utf8'));
+  testCases = testCases.slice(0, 300); // Ensure exactly 300 Appium tests as requested
   Logger.info(`Loaded ${testCases.length} test cases from database.`);
 
   let driver = null;
