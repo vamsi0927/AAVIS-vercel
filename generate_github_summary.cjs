@@ -97,7 +97,7 @@ try {
         const raw = fs.readFileSync(path.join(__dirname, 'Test Results/Performance', loadFiles[loadFiles.length - 1]), 'utf8');
         const json = JSON.parse(raw);
         for(let i=1; i<=json.totalRequests; i++) {
-             perfResults.push({ id: \`LD-\${String(i).padStart(3, '0')}\`, mod: 'Load Test', scenario: \`Concurrent Virtual User Request \${i}\` });
+             perfResults.push({ id: `LD-${String(i).padStart(3, '0')}`, mod: 'Load Test', scenario: `Concurrent Virtual User Request ${i}` });
         }
     }
 } catch (e) {
