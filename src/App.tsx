@@ -65,6 +65,7 @@ import { WaterTracker } from './pages/dashboard/WaterTracker';
 import { Achievements } from './pages/dashboard/Achievements';
 import { WeeklyReport } from './pages/dashboard/WeeklyReport';
 import { NutritionChat } from './pages/dashboard/NutritionChat';
+import { GlobalAIChat } from './components/GlobalAIChat';
 // Product Extensions
 import { CompareProducts } from './pages/product/CompareProducts';
 import { ProductAlternatives } from './pages/product/ProductAlternatives';
@@ -469,6 +470,7 @@ function AppContent() {
         <Route path="/dashboard/chat" element={<ProtectedRoute><NutritionChat /></ProtectedRoute>} />
         </Routes>
         {showBottomNav && <div className="md:hidden"><BottomNav /></div>}
+        <GlobalAIChat />
         <RatingPrompt />
       </div>
     </div>

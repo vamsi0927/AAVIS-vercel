@@ -465,16 +465,7 @@ export function HealthDashboard() {
           </div>
           </div>
 
-          {/* Ask AI Navigation */}
-          <button data-testid='btn-healthdashboard-6'
-            onClick={() => navigate('/dashboard/chat')}
-            className="bg-navy-800 rounded-2xl p-4 flex items-center justify-center text-center gap-3 hover:bg-navy-700 transition-colors shadow-lg shadow-black/20"
-          >
-            <div className="w-10 h-10 rounded-full bg-navy-800 flex items-center justify-center overflow-hidden border border-brand-primary/30">
-              <img src={aiAssistantImg} alt="AI" className="w-full h-full object-cover" />
-            </div>
-            <span className="text-sm font-medium text-white">Ask AI Nutritionist</span>
-          </button>
+
 
           {/* Grade Breakdown */}
           <div className="glass-card border border-white/5 rounded-2xl p-5">
