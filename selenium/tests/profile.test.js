@@ -76,19 +76,18 @@ describe('TC_SEL_PROF — Profile Management Flow', function () {
   });
 
   it('TC_SEL_PROF_008: Save profile with updated name persists data', async () => {
-    // After PROF_007 we are in edit mode (editProfileBtn clicked inside editProfile).
-    // Navigate fresh so isEditing resets, then enter edit mode cleanly.
+    // Navigate away first to force SPA component remount (resets isEditing state)
+    await profilePage.navigate('/home');
+    await driver.sleep(1000);
     await profilePage.navigate('/profile');
-    await driver.sleep(2500);
-    // Wait for edit button to appear (only shown when !isEditing)
+    await driver.sleep(2000);
+    // Edit button is only visible when !isEditing — should now be visible after remount
     const editBtn = await profilePage.wait.waitForElementVisible(profilePage.editProfileBtn);
     await editBtn.click();
-    // Wait for name input
     await profilePage.wait.waitForElementVisible(profilePage.nameInput);
     const nameInput = await driver.findElement(profilePage.nameInput);
     await nameInput.clear();
     await nameInput.sendKeys('Selenium Final Name');
-    // Save
     await profilePage.click(profilePage.saveBtn);
     await driver.sleep(2000);
     const url = await driver.getCurrentUrl();
