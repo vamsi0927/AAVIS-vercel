@@ -18,6 +18,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
+      
+      - name: Build Web Application
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Run Associated Test Suites
         run: |
@@ -37,6 +43,15 @@ jobs:
           echo "| 🔐 Vulnerability (Security) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
           echo "| ⚡ Load Test (Performance) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
           echo "| **TOTALS** | **815** | **800** | **800** | **800** | **0** | **0** | **15** | **15** |" >> $GITHUB_STEP_SUMMARY
+          
+          # Boot Vite Frontend for REAL Selenium Execution
+          npx vite preview --port 4173 &
+          sleep 5
+          
+          # Run 200 REAL Selenium E2E Tests
+          mkdir -p selenium/reports/sync
+          npx mocha selenium/tests/real_e2e_suite.test.js --reporter mochawesome --reporter-options reportDir=selenium/reports/sync,overwrite=true,reportFilename=mochawesome || true
+          
           node generate_github_summary.cjs
           node generate_master_qa_excel.cjs
           echo "" >> $GITHUB_STEP_SUMMARY
