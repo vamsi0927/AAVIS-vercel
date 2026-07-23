@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff, Shield, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { getOrCreateUser } from '../../lib/supabaseService';
-import { getApiUrl } from '../../lib/apiConfig';
 import logoImg from '../../assets/logo.png';
 
 export function Register() {
@@ -17,10 +16,26 @@ export function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [resendTimer, setResendTimer] = useState(0);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (step === 'verify') {
+      setResendTimer(60);
+      inputRefs.current[0]?.focus();
+    }
+  }, [step]);
+
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const t = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [resendTimer]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,42 +54,17 @@ export function Register() {
     setIsLoading(true);
     
     try {
-      let source = 'web-desktop';
-      try {
-        const isMobileBrowser = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if (isMobileBrowser) {
-          source = 'web-mobile';
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: { name }
         }
-
-        const { Capacitor } = await import('@capacitor/core');
-        if (Capacitor.isNativePlatform()) {
-          const platform = Capacitor.getPlatform();
-          source = platform === 'ios' ? 'app-ios' : 'app-android';
-        }
-      } catch(e) {
-        console.warn('Could not determine Capacitor platform, defaulting to web.');
-      }
-
-      const res = await fetch(getApiUrl('/api/auth/register'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-          name,
-          source
-        })
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to sign up');
+      if (error) {
+        throw error;
       }
-
-      localStorage.setItem('aavis_signup_session', 'active');
       setStep('verify');
     } catch (err: any) {
       // Show clean user-facing message, not raw JSON
@@ -91,9 +81,64 @@ export function Register() {
     }
   };
 
-  const handleVerify = async (e: React.FormEvent) => {
+  const handleChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    if (value && index === 5) {
+      const fullCode = [...newOtp].join('');
+      if (fullCode.length === 6) {
+        handleVerify(undefined, fullCode);
+      }
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    if (!otp || otp.length < 6) {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (pasted.length === 6) {
+      setOtp(pasted.split(''));
+      handleVerify(undefined, pasted);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0 || !email) return;
+    setOtp(['', '', '', '', '', '']);
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim()
+      });
+      if (error) throw error;
+      toast.success('New code sent!');
+      setResendTimer(60);
+      inputRefs.current[0]?.focus();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to resend code');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerify = async (e?: React.FormEvent, code?: string) => {
+    e?.preventDefault();
+    const enteredCode = code || otp.join('');
+    if (enteredCode.length < 6) {
       toast.error('Please enter the 6-digit code');
       return;
     }
@@ -103,12 +148,14 @@ export function Register() {
     try {
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
-        token: otp,
+        token: enteredCode,
         type: 'signup'
       });
 
       if (error) {
         toast.error(error.message || 'Invalid or expired verification code');
+        setOtp(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
         return;
       }
 
@@ -250,22 +297,60 @@ export function Register() {
                 className="space-y-6 text-center py-4"
               >
                 <div className="w-16 h-16 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-6">
-                  <Mail className="w-8 h-8 text-brand-primary" />
+                  <Shield className="w-8 h-8 text-brand-primary" />
                 </div>
+                <h2 className="text-xl font-bold text-white mb-2">Verify your email</h2>
                 <p className="text-content-secondary text-sm">
-                  We've sent a verification link to <span className="text-white font-medium">{email}</span>. Please click the link to activate your account.
-                </p>
-                <p className="text-brand-safe text-xs font-medium bg-brand-safe/10 py-2 px-3 rounded-lg mt-4 inline-block">
-                  Note: If you don't see the email, please check your spam or junk folder.
-                </p>
-                <p className="text-content-secondary text-xs mt-4">
-                  Once you have verified your email, you can safely close this screen.
+                  We've sent a 6-digit code to <span className="text-white font-medium">{email}</span>.
                 </p>
 
-                <button data-testid='btn-register-4'
+                <form onSubmit={(e) => handleVerify(e)} className="space-y-6 mt-6">
+                  <div className="flex justify-between max-w-[300px] mx-auto w-full gap-2" onPaste={handlePaste}>
+                    {otp.map((digit, index) => (
+                      <input data-testid={`input-register-otp-${index}`}
+                        key={index}
+                        ref={(el) => (inputRefs.current[index] = el)}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
+                        className="w-11 h-14 text-center text-xl font-bold bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
+                      />
+                    ))}
+                  </div>
+
+                  <button data-testid='btn-register-verify'
+                    type="submit"
+                    disabled={isLoading || otp.join('').length < 6}
+                    className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-50 text-white rounded-xl py-3.5 font-bold shadow-lg shadow-brand-primary/20 flex items-center justify-center gap-2 transition-all"
+                  >
+                    {isLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</> : 'Verify & Continue'}
+                  </button>
+                </form>
+
+                <div className="text-center mt-6">
+                  {resendTimer > 0 ? (
+                    <p className="text-sm text-content-secondary flex items-center justify-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      Resend in {resendTimer}s
+                    </p>
+                  ) : (
+                    <button data-testid='btn-register-resend'
+                      type="button"
+                      onClick={handleResend}
+                      className="text-sm text-brand-primary font-medium hover:underline"
+                    >
+                      Resend Code
+                    </button>
+                  )}
+                </div>
+
+                <button data-testid='btn-register-edit-email'
                   type="button"
                   onClick={() => setStep('register')}
-                  className="w-full bg-transparent border border-white/10 hover:bg-white/5 text-white rounded-2xl py-3.5 font-medium text-sm transition-all mt-6"
+                  className="w-full bg-transparent text-content-secondary hover:text-white py-2 font-medium text-sm transition-all mt-4"
                 >
                   Edit email address
                 </button>

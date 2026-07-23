@@ -28,7 +28,6 @@ import { Terms } from './pages/Terms';
 // Auth
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
-import { Verify } from './pages/auth/Verify';
 import { ForgotPassword } from './pages/auth/ForgotPassword';
 import { VerifyOTP } from './pages/auth/VerifyOTP';
 import { ResetPassword } from './pages/auth/ResetPassword';
@@ -127,22 +126,8 @@ function AppContent() {
       }
     });
 
-    // Handle deep links (e.g. aavis://verify?link=...)
-    const handleAppUrlOpen = CapacitorApp.addListener('appUrlOpen', (data) => {
-      console.log('[DEBUG-VERIFY] 10. App.tsx received appUrlOpen:', data);
-      if (data.url.startsWith('aavis://verify')) {
-        // Extract the full link from the custom URL scheme
-        const urlParams = new URL(data.url);
-        const link = urlParams.searchParams.get('link');
-        if (link) {
-          navigate(`/verify?link=${encodeURIComponent(link)}`);
-        }
-      }
-    });
-
     return () => {
       handleBackButton.then(listener => listener.remove());
-      handleAppUrlOpen.then(listener => listener.remove());
     };
   }, [navigate]);
 
@@ -174,7 +159,6 @@ function AppContent() {
         <Route path="/" element={<Splash />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/verify" element={<Verify />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />

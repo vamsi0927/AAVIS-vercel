@@ -26,6 +26,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="aavis" android:host="verify" />
             </intent-filter>
+            
+            <!-- Android App Links for deep linking directly from emails -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="aavis.vercel.app" android:pathPrefix="/verify" />
+            </intent-filter>
         </activity>
 
         <provider
