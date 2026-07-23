@@ -98,7 +98,7 @@ export function ForgotPassword() {
               )}
             </button>
             <p className="text-center text-xs text-content-secondary mt-4">
-              If you don't see the email in your inbox within a few minutes, please <strong>check your spam folder</strong>.
+              If you don't see the email in your inbox, please <strong>check your spam folder</strong>.
             </p>
           </form>
         </motion.div>

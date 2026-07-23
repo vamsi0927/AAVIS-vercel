@@ -157,7 +157,7 @@ export function VerifyOTP() {
               </button>
             )}
             <p className="text-xs text-content-secondary mt-3">
-              Not seeing the code? Please <strong>check your spam folder</strong>.
+              If you don't see the email in your inbox, please <strong>check your spam folder</strong>.
             </p>
           </div>
 
