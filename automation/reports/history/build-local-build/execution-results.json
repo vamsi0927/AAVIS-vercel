@@ -37,7 +37,7 @@
     },
     "expectedResult": "App intercepts deep link and displays verification flow.",
     "status": "Passed",
-    "duration": 17,
+    "duration": 15,
     "error": null,
     "screenshot": null
   },
@@ -57,7 +57,7 @@
     "testData": {},
     "expectedResult": "App handles denied camera permission gracefully.",
     "status": "Passed",
-    "duration": 11,
+    "duration": 16,
     "error": null,
     "screenshot": null
   },
@@ -100,7 +100,7 @@
     "testData": {},
     "expectedResult": "App gracefully handles offline state and restores connection.",
     "status": "Passed",
-    "duration": 9,
+    "duration": 15,
     "error": null,
     "screenshot": null
   },
@@ -118,7 +118,7 @@
     "testData": {},
     "expectedResult": "App maintains state and session after backgrounding.",
     "status": "Passed",
-    "duration": 15,
+    "duration": 16,
     "error": null,
     "screenshot": null
   }
