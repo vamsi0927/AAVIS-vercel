@@ -470,7 +470,7 @@ function AppContent() {
         <Route path="/dashboard/chat" element={<ProtectedRoute><NutritionChat /></ProtectedRoute>} />
         </Routes>
         {showBottomNav && <div className="md:hidden"><BottomNav /></div>}
-        <GlobalAIChat />
+        {isAuthenticated && !hideSidebar && <GlobalAIChat />}
         <RatingPrompt />
       </div>
     </div>
