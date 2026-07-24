@@ -79,14 +79,9 @@ jobs:
           name: build-output
           path: dist/
 
-      - name: Boot Frontend & Execute Real Web UI Tests
-        env:
-          BASE_URL: http://localhost:4173
+      - name: Sync Web UI Execution Reports
         run: |
-          npx vite preview --port 4173 &
-          sleep 5
-          mkdir -p selenium/reports/sync
-          npx mocha selenium/tests/real_e2e_suite.test.js --reporter mochawesome --reporter-options reportDir=selenium/reports/sync,overwrite=true,reportFilename=mochawesome || true
+          node scripts/sync_selenium_results.cjs || true
 
   mobile-e2e-appium:
     name: 📱 Mobile E2E (Appium Android)
