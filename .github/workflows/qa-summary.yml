@@ -137,17 +137,6 @@ jobs:
 
       - name: Generate Master Summary Dashboard
         run: |
-          echo "# AAVIS Complete QA Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Overall Scorecard" >> $GITHUB_STEP_SUMMARY
-          echo "| Category | Designed | Automated | Executed | Passed | Failed | Blocked | Not Run | Remaining |" >> $GITHUB_STEP_SUMMARY
-          echo "| --- | --- | --- | --- | --- | --- | --- | --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌐 Web (Selenium Web E2E) | 215 | 200 | 200 | 200 | 0 | 0 | 15 | 15 |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📱 App Test (Appium Android) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔐 Vulnerability (Security) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Load Test (Performance) | 200 | 200 | 200 | 200 | 0 | 0 | 0 | 0 |" >> $GITHUB_STEP_SUMMARY
-          echo "| **TOTALS** | **815** | **800** | **800** | **800** | **0** | **0** | **15** | **15** |" >> $GITHUB_STEP_SUMMARY
-          
           # Move the artifacts out of "Test Results" root if they got dumped there to ensure generator scripts find them
           mkdir -p "Test Results/Security"
           mkdir -p "Test Results/Performance"
@@ -166,16 +155,6 @@ jobs:
           
           node generate_github_summary.cjs || true
           node scripts/audit_and_rebuild_excel.cjs
-          
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "## BLOCKED Tests (4 total)" >> $GITHUB_STEP_SUMMARY
-          echo "| Test ID | Category | Reason |" >> $GITHUB_STEP_SUMMARY
-          echo "| --- | --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| \`TC_WEB_114\` | Web E2E | Waiting on design team for final layout approval |" >> $GITHUB_STEP_SUMMARY
-          echo "| \`TC_WEB_142\` | Web E2E | Payment gateway sandbox currently down |" >> $GITHUB_STEP_SUMMARY
-          echo "| \`TC_WEB_189\` | Web E2E | 3rd party OCR API dependency pending upgrade |" >> $GITHUB_STEP_SUMMARY
-          echo "| \`TC_WEB_202\` | Web E2E | Multi-language localization strings not ready |" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Final Excel Master Report
         uses: actions/upload-artifact@v4
