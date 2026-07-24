@@ -99,9 +99,9 @@ jobs:
         with:
           api-level: 29
           script: |
-            npm install -g appium
-            appium driver install uiautomator2
-            nohup appium > /dev/null 2>&1 &
+            npm install appium --no-save
+            npx appium driver install uiautomator2 || true
+            nohup npx appium > /dev/null 2>&1 &
             sleep 10
             mkdir -p automation/reports/json
             npx wdio run wdio.conf.js || true
