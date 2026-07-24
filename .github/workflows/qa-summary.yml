@@ -91,7 +91,7 @@ jobs:
   mobile-e2e-appium:
     name: 📱 Mobile E2E (Appium Android)
     needs: setup-and-build
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - name: Execute Native Device Tests via Appium
