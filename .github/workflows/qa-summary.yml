@@ -144,6 +144,16 @@ jobs:
           mv "Test Results"/*.json "Test Results/Security/" 2>/dev/null || true
           mv "Test Results/Security"/*load-test*.json "Test Results/Performance/" 2>/dev/null || true
           
+          # Generate HTML reports
+          node generate_html_reports.cjs || true
+          
+          # Commit the HTML reports so htmlpreview.github.io can access them
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add "Test Results/HTML/"
+          git commit -m "chore: update QA HTML reports" || true
+          git push || true
+          
           node generate_github_summary.cjs || true
           node scripts/audit_and_rebuild_excel.cjs
           

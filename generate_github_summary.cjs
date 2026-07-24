@@ -10,10 +10,10 @@ This report contains the automated execution results for the 800 test cases acro
 
 | Category | Total Executed | Passed | Failed | Pass Rate |
 | :--- | :---: | :---: | :---: | :---: |
-| 🌐 **Web (Selenium)** | 200 | 200 | 0 | 100% |
-| 📱 **Mobile (Appium)** | 200 | 200 | 0 | 100% |
-| 🔐 **Security (SAST/DAST)** | 200 | 200 | 0 | 100% |
-| ⚡ **Performance (Load)** | 200 | 200 | 0 | 100% |
+| [🌐 **Web (Selenium)**](https://htmlpreview.github.io/?https://github.com/vamsi0927/AAVIS-vercel/blob/main/Test%20Results/HTML/web_report.html) | 200 | 200 | 0 | 100% |
+| [📱 **Mobile (Appium)**](https://htmlpreview.github.io/?https://github.com/vamsi0927/AAVIS-vercel/blob/main/Test%20Results/HTML/mobile_report.html) | 200 | 200 | 0 | 100% |
+| [🔐 **Security (SAST/DAST)**](https://htmlpreview.github.io/?https://github.com/vamsi0927/AAVIS-vercel/blob/main/Test%20Results/HTML/security_report.html) | 200 | 200 | 0 | 100% |
+| [⚡ **Performance (Load)**](https://htmlpreview.github.io/?https://github.com/vamsi0927/AAVIS-vercel/blob/main/Test%20Results/HTML/load_report.html) | 200 | 200 | 0 | 100% |
 | **TOTAL** | **800** | **800** | **0** | **100%** |
 
 ---
