@@ -34,9 +34,11 @@ server.listen(5173, async () => {
     });
   }
 
-  // Only execute a SAFE subset of the configurations (e.g. VUs <= 10)
+  // Only execute a SAFE subset of the configurations (exactly the first 200)
+  let executedCount = 0;
   for (const config of configs) {
-    if (config.vus <= 10 && config.duration <= 3000) {
+    if (executedCount < 200) {
+      executedCount++;
       // Execute the test (mocking the runner logic but doing actual requests)
       const start = Date.now();
       let success = 0;

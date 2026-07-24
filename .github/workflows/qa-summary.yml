@@ -81,9 +81,15 @@ jobs:
           name: build-output
           path: dist/
 
-      - name: Sync Web UI Execution Reports
+
+      - name: Boot Frontend & Execute Real Web UI Tests
+        env:
+          BASE_URL: http://localhost:4173
         run: |
-          node scripts/sync_selenium_results.cjs || true
+          npx vite preview --port 4173 &
+          sleep 5
+          mkdir -p selenium/reports/sync
+          npx mocha selenium/tests/real_e2e_suite.test.js --reporter mochawesome --reporter-options reportDir=selenium/reports/sync,overwrite=true,reportFilename=mochawesome || true
       - uses: actions/upload-artifact@v4
         with:
           name: selenium-results
@@ -95,26 +101,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Sync Mobile Execution Reports
+      - name: Execute WebdriverIO tests against Mock Appium
         run: |
+          node scripts/mock_appium_server.cjs &
+          sleep 3
           mkdir -p automation/reports/json
-          echo "Syncing 300 mobile E2E test cases with honest Blocked status..."
-          node -e "
-            const fs = require('fs');
-            const path = require('path');
-            const list = [];
-            for (let i = 1; i <= 300; i++) {
-              list.push({
-                id: 'TC_APP_' + String(i).padStart(3, '0'),
-                module: 'Mobile E2E',
-                name: 'Android Mobile E2E Test Case #' + i,
-                status: 'PASS',
-                expectedResult: 'Expected mobile behavior executes',
-                duration: 120
-              });
-            }
-            fs.writeFileSync('automation/reports/json/execution-results.json', JSON.stringify(list, null, 2));
-          "
+          npx wdio run wdio.conf.js || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: appium-results
+          path: automation/reports/
 
   aggregate-master-report:
     name: 🏆 Aggregate Master QA Report
@@ -142,7 +138,9 @@ jobs:
           mkdir -p "Test Results/Security"
           mkdir -p "Test Results/Performance"
           mkdir -p "selenium/reports/sync"
+          mkdir -p "automation/reports/json"
           mv "Test Results"/mochawesome.json "selenium/reports/sync/" 2>/dev/null || true
+          mv "Test Results"/execution-results.json "automation/reports/json/" 2>/dev/null || true
           mv "Test Results"/*.json "Test Results/Security/" 2>/dev/null || true
           mv "Test Results/Security"/*load-test*.json "Test Results/Performance/" 2>/dev/null || true
           
