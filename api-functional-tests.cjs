@@ -12,7 +12,7 @@ let serverProcess = null;
 
 function startServer() {
   return new Promise((resolve) => {
-    serverProcess = spawn('node', ['server/index.js'], {
+    serverProcess = spawn('node', ['backend/server/index.cjs'], {
       stdio: 'inherit',
       detached: true
     });

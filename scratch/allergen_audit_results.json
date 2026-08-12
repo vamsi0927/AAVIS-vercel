@@ -1,0 +1,500 @@
+{
+  "timestamp": "2026-08-11T12:43:47.215Z",
+  "auditSummary": [
+    {
+      "category": "dairy",
+      "keyword": "milk",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "cream",
+      "classification": "CONTEXTUAL (Needs word boundary / negative exclusion rule)"
+    },
+    {
+      "category": "dairy",
+      "keyword": "butter",
+      "classification": "CONTEXTUAL (Needs word boundary / negative exclusion rule)"
+    },
+    {
+      "category": "dairy",
+      "keyword": "cheese",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "whey",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "casein",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "caseinate",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "lactose",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "lactalbumin",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "lactoglobulin",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "ghee",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "paneer",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "curd",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "yogurt",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "yoghurt",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "milk solids",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "milk powder",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "skimmed milk",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "dairy",
+      "keyword": "condensed milk",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "egg",
+      "keyword": "egg",
+      "classification": "CONTEXTUAL (Needs word boundary / negative exclusion rule)"
+    },
+    {
+      "category": "egg",
+      "keyword": "eggs",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "egg",
+      "keyword": "egg yolk",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "egg",
+      "keyword": "egg white",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "egg",
+      "keyword": "albumen",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "egg",
+      "keyword": "ovomucin",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "wheat",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "wheat flour",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "whole wheat",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "refined flour",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "maida",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "gluten",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "semolina",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "durum",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "spelt",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "wheat",
+      "keyword": "triticale",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "soy",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "soya",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "soybean",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "soy lecithin",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "soya lecithin",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "tofu",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "tempeh",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "edamame",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "soy",
+      "keyword": "miso",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "peanut",
+      "keyword": "peanut",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "peanut",
+      "keyword": "peanuts",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "peanut",
+      "keyword": "groundnut",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "peanut",
+      "keyword": "groundnuts",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "peanut",
+      "keyword": "arachis oil",
+      "classification": "POSSIBLE (Specific form / regulation dependent)"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "almond",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "cashew",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "walnut",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "pistachio",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "hazelnut",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "macadamia",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "pecan",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "brazil nut",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "pine nut",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "tree nuts",
+      "keyword": "coconut",
+      "classification": "POSSIBLE (Specific form / regulation dependent)"
+    },
+    {
+      "category": "fish",
+      "keyword": "fish",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "salmon",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "tuna",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "cod",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "haddock",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "sardine",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "anchovy",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "anchovies",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "fish sauce",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "fish",
+      "keyword": "fish oil",
+      "classification": "POSSIBLE (Specific form / regulation dependent)"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "shrimp",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "prawn",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "crab",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "lobster",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "oyster",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "clam",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "scallop",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "mussel",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "shellfish",
+      "keyword": "shellfish",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sesame",
+      "keyword": "sesame",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sesame",
+      "keyword": "sesame oil",
+      "classification": "POSSIBLE (Specific form / regulation dependent)"
+    },
+    {
+      "category": "sesame",
+      "keyword": "tahini",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sesame",
+      "keyword": "til",
+      "classification": "CONTEXTUAL (Needs word boundary / negative exclusion rule)"
+    },
+    {
+      "category": "sesame",
+      "keyword": "gingelly",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "mustard",
+      "keyword": "mustard",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "mustard",
+      "keyword": "mustard oil",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "mustard",
+      "keyword": "mustard seeds",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "sulphite",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "sulfite",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "sulphur dioxide",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "sulfur dioxide",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "e220",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "e221",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "e222",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "e223",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "sulphites",
+      "keyword": "e224",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "celery",
+      "keyword": "celery",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "celery",
+      "keyword": "celeriac",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "lupin",
+      "keyword": "lupin",
+      "classification": "CONFIRMED"
+    },
+    {
+      "category": "lupin",
+      "keyword": "lupine",
+      "classification": "CONFIRMED"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ let serverProcess = null;
 
 async function startServer() {
   return new Promise((resolve) => {
-    serverProcess = spawn('node', ['server/index.js'], {
+    serverProcess = spawn('node', ['backend/server/index.cjs'], {
       cwd: path.join(__dirname),
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false

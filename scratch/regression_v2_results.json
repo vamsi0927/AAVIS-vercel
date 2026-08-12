@@ -1,0 +1,419 @@
+{
+  "timestamp": "2026-08-12T05:07:42.457Z",
+  "results": [
+    {
+      "id": "L01",
+      "name": "Spicy Instant Noodles",
+      "pass": true,
+      "latency": 16437,
+      "score": 29,
+      "allergens": [
+        "wheat"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 1,
+        "extraction_ms": 8686,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 6,
+        "score_ms": 0,
+        "explanation_ms": 7614,
+        "total_ms": 16308,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L02",
+      "name": "Diet Cola",
+      "pass": true,
+      "latency": 17306,
+      "score": 71,
+      "allergens": [],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 9458,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 10,
+        "score_ms": 0,
+        "explanation_ms": 7816,
+        "total_ms": 17286,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L03",
+      "name": "Granola Bar",
+      "pass": true,
+      "latency": 17114,
+      "score": 65,
+      "allergens": [
+        "soy",
+        "tree nuts",
+        "almonds"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 2,
+        "extraction_ms": 7615,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 9472,
+        "total_ms": 17091,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L04",
+      "name": "Cheese Nacho Crisps",
+      "pass": true,
+      "latency": 15013,
+      "score": 49,
+      "allergens": [
+        "dairy",
+        "milk"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 1,
+        "extraction_ms": 7593,
+        "jsonParse_ms": 0,
+        "validation_ms": 1,
+        "allergen_ms": 5,
+        "score_ms": 0,
+        "explanation_ms": 7349,
+        "total_ms": 14950,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L05",
+      "name": "Strawberry Greek Yogurt",
+      "pass": true,
+      "latency": 12820,
+      "score": 70,
+      "allergens": [
+        "dairy",
+        "milk"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 6841,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 5969,
+        "total_ms": 12811,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L06",
+      "name": "Salted Potato Crisps",
+      "pass": true,
+      "latency": 13270,
+      "score": 83,
+      "allergens": [],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 6826,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 6435,
+        "total_ms": 13262,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L07",
+      "name": "Milk Chocolate Bar",
+      "pass": true,
+      "latency": 11392,
+      "score": 24,
+      "allergens": [
+        "dairy",
+        "soy",
+        "milk"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 1,
+        "extraction_ms": 7681,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 3699,
+        "total_ms": 11383,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L08",
+      "name": "Butter Cookies",
+      "pass": true,
+      "latency": 14055,
+      "score": 42,
+      "allergens": [
+        "dairy",
+        "egg",
+        "wheat",
+        "butter",
+        "eggs"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 1,
+        "extraction_ms": 7342,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 6701,
+        "total_ms": 14045,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L09",
+      "name": "Instant Tomato Soup",
+      "pass": true,
+      "latency": 15133,
+      "score": 59,
+      "allergens": [],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 8945,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 0,
+        "score_ms": 0,
+        "explanation_ms": 6174,
+        "total_ms": 15120,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L10",
+      "name": "Whey Protein Isolate",
+      "pass": true,
+      "latency": 13065,
+      "score": 79,
+      "allergens": [
+        "dairy",
+        "milk"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 1,
+        "extraction_ms": 6286,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 6768,
+        "total_ms": 13056,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L11",
+      "name": "Orange Juice",
+      "pass": true,
+      "latency": 11109,
+      "score": 76,
+      "allergens": [],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 6194,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 0,
+        "score_ms": 0,
+        "explanation_ms": 4909,
+        "total_ms": 11103,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L12",
+      "name": "Peanut Butter",
+      "pass": true,
+      "latency": 31042,
+      "score": 69,
+      "allergens": [
+        "peanut",
+        "peanuts"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 21558,
+        "jsonParse_ms": 0,
+        "validation_ms": 1,
+        "allergen_ms": 0,
+        "score_ms": 0,
+        "explanation_ms": 9477,
+        "total_ms": 31036,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L13",
+      "name": "3-in-1 Coffee",
+      "pass": true,
+      "latency": 12946,
+      "score": 64,
+      "allergens": [
+        "dairy",
+        "sodium caseinate"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 1,
+        "extraction_ms": 6031,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 0,
+        "score_ms": 0,
+        "explanation_ms": 6906,
+        "total_ms": 12939,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L14",
+      "name": "Whole Wheat Bread",
+      "pass": true,
+      "latency": 13082,
+      "score": 66,
+      "allergens": [
+        "wheat",
+        "soy",
+        "gluten"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 8185,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 4888,
+        "total_ms": 13074,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    },
+    {
+      "id": "L15",
+      "name": "Mayonnaise",
+      "pass": true,
+      "latency": 11526,
+      "score": 77,
+      "allergens": [
+        "egg",
+        "soy",
+        "eggs"
+      ],
+      "contractValid": true,
+      "scoreValid": true,
+      "ingrsPresent": true,
+      "allergensValid": true,
+      "hallucinated": false,
+      "timings": {
+        "normalize_ms": 0,
+        "extraction_ms": 5957,
+        "jsonParse_ms": 0,
+        "validation_ms": 0,
+        "allergen_ms": 1,
+        "score_ms": 0,
+        "explanation_ms": 5562,
+        "total_ms": 11520,
+        "model": "llama3.2:1b",
+        "explainFailed": false
+      }
+    }
+  ]
+}

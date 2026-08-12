@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "aavis-mobile",
+    "slug": "aavis-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aavis.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "AAVIS needs your camera to scan food labels and barcodes."
+      }
+    },
+    "android": {
+      "package": "com.aavis.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "AAVIS needs your camera to scan food labels and barcodes."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "aavis-mobile-project-id"
+      }
+    }
+  }
+}

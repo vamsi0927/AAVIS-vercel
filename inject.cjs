@@ -15,7 +15,7 @@ const walkSync = (dir, filelist = []) => {
   return filelist;
 };
 
-const files = walkSync(path.join(process.cwd(), 'src/pages'));
+const files = walkSync(path.join(process.cwd(), 'frontend/src/pages'));
 const modifiedFiles = [];
 const inventory = [];
 

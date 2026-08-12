@@ -1,0 +1,149 @@
+{
+  "timestamp": "2026-08-12T04:09:02.451Z",
+  "results": [
+    {
+      "model": "llama3.2:1b",
+      "labelId": "Label1_Standard",
+      "labelName": "Spicy Instant Noodles",
+      "status": "OK",
+      "latency": 31164,
+      "jsonValid": true,
+      "hallucinatedCount": 0,
+      "ingCount": 6,
+      "parsed": {
+        "productName": null,
+        "brand": null,
+        "productType": "General Food",
+        "servingSize": null,
+        "nutritionUnit": null,
+        "ingredients": [
+          "Wheat Flour",
+          "Palm Oil",
+          "Salt",
+          "Monosodium Glutamate (INS 621)",
+          "Sugar",
+          "Tartrazine (INS 102)"
+        ],
+        "nutrients": {
+          "calories": null,
+          "sugar": null,
+          "addedSugar": null,
+          "sodium": null,
+          "fat": null,
+          "satFat": null,
+          "protein": null,
+          "fiber": null,
+          "carbs": null
+        },
+        "additives": [
+          "INS 621",
+          "INS 102"
+        ],
+        "additiveDetails": {},
+        "ingredientDetails": {},
+        "allergens": []
+      }
+    },
+    {
+      "model": "llama3.2:1b",
+      "labelId": "Label2_NoNutrition",
+      "labelName": "Butter Cookies (No Nutrients)",
+      "status": "OK",
+      "latency": 19149,
+      "jsonValid": true,
+      "hallucinatedCount": 0,
+      "ingCount": 5,
+      "parsed": {
+        "productName": null,
+        "brand": null,
+        "productType": "General Food",
+        "servingSize": null,
+        "nutritionUnit": null,
+        "ingredients": [
+          "Wheat Flour",
+          "Butter (Milk)",
+          "Sugar",
+          "Eggs",
+          "Salt"
+        ],
+        "nutrients": {
+          "calories": null,
+          "sugar": null,
+          "addedSugar": null,
+          "sodium": null,
+          "fat": null,
+          "satFat": null,
+          "protein": null,
+          "fiber": null,
+          "carbs": null
+        },
+        "additives": [
+          "INS 503"
+        ],
+        "additiveDetails": {},
+        "ingredientDetails": {},
+        "allergens": []
+      }
+    },
+    {
+      "model": "llama3.2:1b",
+      "labelId": "Label3_ComplexSubIng",
+      "labelName": "Cheese Nacho Crisps",
+      "status": "OK",
+      "latency": 23333,
+      "jsonValid": true,
+      "hallucinatedCount": 0,
+      "ingCount": 3,
+      "parsed": {
+        "productName": null,
+        "brand": null,
+        "productType": "General Food",
+        "servingSize": null,
+        "nutritionUnit": null,
+        "ingredients": [
+          "Corn",
+          "Vegetable Oil (Palm Oil, Sunflower Oil)",
+          "Cheese Powder (Milk Solids, Salt)"
+        ],
+        "nutrients": {
+          "calories": null,
+          "sugar": null,
+          "addedSugar": null,
+          "sodium": null,
+          "fat": null,
+          "satFat": null,
+          "protein": null,
+          "fiber": null,
+          "carbs": null
+        },
+        "additives": [
+          "INS 621"
+        ],
+        "additiveDetails": {},
+        "ingredientDetails": {},
+        "allergens": []
+      }
+    },
+    {
+      "model": "llama3.1:latest",
+      "labelId": "Label1_Standard",
+      "status": "TIMEOUT (>75s)",
+      "latency": 83187,
+      "error": "This operation was aborted"
+    },
+    {
+      "model": "llama3.1:latest",
+      "labelId": "Label2_NoNutrition",
+      "status": "TIMEOUT (>75s)",
+      "latency": 81665,
+      "error": "This operation was aborted"
+    },
+    {
+      "model": "llama3.1:latest",
+      "labelId": "Label3_ComplexSubIng",
+      "status": "TIMEOUT (>75s)",
+      "latency": 75835,
+      "error": "This operation was aborted"
+    }
+  ]
+}

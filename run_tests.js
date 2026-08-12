@@ -2,12 +2,6 @@
 process.env.SUPABASE_URL = 'https://mock.supabase.co';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock_key';
 
-import analyzeHandler from './api/analyze.js';
-import chatHandler from './api/chat.js';
-import registerHandler from './api/auth/register.js';
-import forgotPasswordHandler from './api/auth/forgot-password.js';
-import resetPasswordHandler from './api/auth/reset-password.js';
-
 // Simple mock for Express req/res
 function createMockRes() {
   const res = {
@@ -26,6 +20,12 @@ function createMockRes() {
 }
 
 async function runTests() {
+  const analyzeHandler = (await import('./backend/api/analyze.js')).default;
+  const chatHandler = (await import('./backend/api/chat.js')).default;
+  const sendOtpHandler = (await import('./backend/api/auth/send-otp.js')).default;
+  const forgotPasswordHandler = (await import('./backend/api/auth/forgot-password.js')).default;
+  const resetPasswordHandler = (await import('./backend/api/auth/reset-password.js')).default;
+
   const results = [];
 
   const addResult = (testName, expected, actual, pass) => {
@@ -66,11 +66,11 @@ async function runTests() {
   await chatHandler(req, res);
   addResult('chat.js history > 20', 400, res.statusCode, res.statusCode === 400);
 
-  // register.js fields > 255
+  // send-otp.js fields > 255
   req = { method: 'POST', body: { email: 'a'.repeat(256), password: 'pass', name: 'user' }, headers: {} };
   res = createMockRes();
-  await registerHandler(req, res);
-  addResult('register.js email > 255 chars', 400, res.statusCode, res.statusCode === 400);
+  await sendOtpHandler(req, res);
+  addResult('send-otp.js email > 255 chars', 400, res.statusCode, res.statusCode === 400);
 
   // forgot-password.js email > 255
   req = { method: 'POST', body: { email: 'a'.repeat(256) }, headers: {} };

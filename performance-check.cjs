@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 console.log('🚀 Starting AAVIS Advanced Load & API Performance Suite...');
-const serverProcess = require('child_process').spawn('node', ['server/index.js'], {
+const serverProcess = require('child_process').spawn('node', ['backend/server/index.cjs'], {
   stdio: 'inherit',
   detached: true
 });
