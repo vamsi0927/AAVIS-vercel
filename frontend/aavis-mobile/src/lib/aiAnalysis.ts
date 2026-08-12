@@ -130,14 +130,19 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
     const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) authHeaders['Authorization'] = `Bearer ${token}`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout limit
+
     let response: any = await fetch(getApiUrl(endpoint), {
       method: 'POST',
       headers: authHeaders,
       body: JSON.stringify(body),
+      signal: controller.signal
     }).catch(err => {
-      console.warn('[Mobile AI] Primary fetch failed:', err);
+      console.warn('[Mobile AI] Primary fetch failed or timed out:', err);
       return null;
     });
+    clearTimeout(timeoutId);
 
     if (response && response.ok) {
       const data = await response.json();

@@ -305,7 +305,7 @@ export default function ScanScreen({ navigation }: any) {
     }
   };
 
-  const runAnalysisBackend = async (promptText: string, defaultName: string) => {
+  const runAnalysisBackend = async (promptText: string, defaultName: string, ingText: string, nutText: string | null) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -313,24 +313,29 @@ export default function ScanScreen({ navigation }: any) {
       let analysisJson: any = null;
 
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout limit
+
         const analysisRes = await fetch(getApiUrl('/api/analyze'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ text: promptText })
+          body: JSON.stringify({ text: promptText }),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         if (analysisRes.ok) {
           analysisJson = await analysisRes.json();
         }
       } catch (err) {
-        console.log('[ScanScreen] Backend fetch failed, falling back to local analysis engine');
+        console.log('[ScanScreen] Backend fetch failed or timed out, falling back to local analysis engine');
       }
 
       if (!analysisJson) {
-        const aiResult = await analyzeMultiStepScan(ingredientsText || promptText, nutritionText, profile);
+        const aiResult = await analyzeMultiStepScan(ingText || promptText, nutText, profile);
         analysisJson = {
           productName: aiResult.product.name,
           brand: aiResult.product.brand,
@@ -460,7 +465,7 @@ export default function ScanScreen({ navigation }: any) {
       clearInterval(progressInterval);
       setOcrPercent(95);
       
-      await runAnalysisBackend(combinedText, 'Scanned Product');
+      await runAnalysisBackend(combinedText, 'Scanned Product', ingText, nutText);
     } catch (e: any) {
       clearInterval(progressInterval);
       setLoading(false);
