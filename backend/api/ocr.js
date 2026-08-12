@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       const model = 'gemini-3.1-flash-lite';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-      let prompt: string;
+      let prompt;
       if (mode === 'nutrition') {
         prompt = `You are a precise nutrition label reader with expert vision. Your task is to read EVERY piece of text from this nutrition facts panel.
 
