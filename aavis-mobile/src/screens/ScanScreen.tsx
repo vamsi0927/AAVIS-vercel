@@ -79,6 +79,7 @@ export default function ScanScreen({ navigation }: any) {
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
   const cameraRef = useRef<any>(null);
+  const capturedLabelUri = useRef<string | null>(null); // Stores the ingredient label photo URI for saving
 
   // Scan line animation
   const scanLineAnim = useRef(new Animated.Value(0)).current;
@@ -102,6 +103,7 @@ export default function ScanScreen({ navigation }: any) {
       setIngredientsText(null);
       setNutritionText(null);
       setLoading(false);
+      capturedLabelUri.current = null;
     });
     return unsubscribe;
   }, [navigation]);
@@ -194,6 +196,10 @@ export default function ScanScreen({ navigation }: any) {
       });
       if (photo && photo.uri) {
         const mode = scanStep === 'nutrition_scan' ? 'nutrition' : 'ingredients';
+        // Save the ingredients label URI for display in History
+        if (mode === 'ingredients' && !capturedLabelUri.current) {
+          capturedLabelUri.current = photo.uri;
+        }
         setPreviewImageDetails(photo.uri, photo.width, photo.height, mode);
       }
     } catch (e: any) {
@@ -344,6 +350,34 @@ export default function ScanScreen({ navigation }: any) {
           if (!error && savedRow) {
             finalScanId = savedRow.id;
             created_at = savedRow.created_at;
+
+            // Upload label photo to Supabase Storage
+            if (capturedLabelUri.current) {
+              try {
+                const localUri = capturedLabelUri.current;
+                const fileName = `${user.id}/${finalScanId}.jpg`;
+                const response = await fetch(localUri);
+                const blob = await response.blob();
+                const arrayBuffer = await new Response(blob).arrayBuffer();
+                const uint8 = new Uint8Array(arrayBuffer);
+
+                const { error: uploadError } = await supabase.storage
+                  .from('scan-images')
+                  .upload(fileName, uint8, { contentType: 'image/jpeg', upsert: true });
+
+                if (!uploadError) {
+                  const { data: publicData } = supabase.storage
+                    .from('scan-images')
+                    .getPublicUrl(fileName);
+                  if (publicData?.publicUrl) {
+                    await supabase.from('scans').update({ image_url: publicData.publicUrl }).eq('id', finalScanId);
+                    analysisJson._imageUrl = publicData.publicUrl;
+                  }
+                }
+              } catch (imgErr) {
+                console.log('Label image upload error:', imgErr);
+              }
+            }
           }
         } catch (err) {
           console.log('Supabase scan insert error:', err);
@@ -362,6 +396,7 @@ export default function ScanScreen({ navigation }: any) {
           name: analysisJson.productName || defaultName,
           brand: analysisJson.brand || '',
           imageEmoji: '🤖',
+          imageUrl: analysisJson._imageUrl || undefined,
           ingredients: analysisJson.ingredients || [],
           productType: analysisJson.productType,
           servingSize: analysisJson.servingSize,
