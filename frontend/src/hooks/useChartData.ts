@@ -156,8 +156,8 @@ export function useChartData(
     const lowest = scores.length > 0 ? Math.min(...scores) : 0;
     const median = calculateMedian(scores);
 
-    const activePeriods = chartData.filter(d => !d.isEmpty && !d.isGhost).length;
-    const totalPeriods = chartData.filter(d => !d.isGhost).length;
+    const activePeriods = chartData.filter(d => !d.isEmpty && !d.isGhost && !d.isFuture).length;
+    const totalPeriods = chartData.filter(d => !d.isGhost && !d.isFuture).length;
     const consistency =
       totalPeriods > 0
         ? Math.round((activePeriods / totalPeriods) * 100)

@@ -521,7 +521,7 @@ export function Scan() {
                 <p className="text-sm text-content-secondary max-w-sm">
                   {scanStep === 'processing' 
                     ? 'Our AI is parsing ingredients, detecting additives, and computing custom scores...' 
-                    : 'Running optical character recognition to extract details...'}
+                    : (scanStep === 'ingredients' ? 'Extracting ingredient information...' : 'Extracting nutrition label information...')}
                 </p>
                 <div className="w-64 h-1.5 bg-navy-700 rounded-full mt-8 overflow-hidden mx-auto">
                   <div 
@@ -593,7 +593,7 @@ export function Scan() {
                       {reviewingText.type === 'ingredients' ? '📋 Review Extracted Ingredients' : '📊 Review Extracted Nutrition'}
                     </h4>
                     <p className="text-xs text-content-secondary mt-1">
-                      Check for spelling or digit recognition errors and edit text directly.
+                      Check for spelling or digit extraction errors and edit text directly.
                     </p>
                   </div>
                   <div className="glass-card rounded-2xl p-4 border border-white/5 bg-navy-900/60 shadow-inner flex flex-col h-[30vh]">

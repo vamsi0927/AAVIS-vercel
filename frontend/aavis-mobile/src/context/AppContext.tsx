@@ -432,6 +432,9 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
 
           const seen = new Set();
           const deduped = cloudConverted.filter(scan => {
+            const isBookmarked = cloudBookmarkedIds.includes(scan.id);
+            if (isBookmarked) return true;
+
             const timeKey = scan.date.substring(0, 13);
             const key = `${scan.product?.name}-${timeKey}`;
             if (seen.has(key)) return false;

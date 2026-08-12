@@ -66,6 +66,16 @@ export default function HealthScreen({ navigation }: any) {
 
   const today = useMemo(() => new Date(), []);
 
+  const signupDate = useMemo(() => {
+    if (scans.length === 0) return new Date();
+    const valid = scans.filter(s => s.date && !isNaN(new Date(s.date).getTime()));
+    if (valid.length === 0) return new Date();
+    const minMs = Math.min(...valid.map(s => new Date(s.date).getTime()));
+    const d = new Date(minMs);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [scans]);
+
   // ─── Stats Calculations (matches original useChartData) ──────────────────────
   const periodDays = timeRange === 'Week' ? 7 : 30;
 
@@ -101,8 +111,13 @@ export default function HealthScreen({ navigation }: any) {
     const median = calculateMedian(scores);
 
     // active days vs total days
-    const activeDays = periodKeys.filter(k => scansByDate[k]?.length > 0).length;
-    const consistency = Math.round((activeDays / periodDays) * 100);
+    const eligibleKeys = periodKeys.filter(k => {
+      const d = new Date(k);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime() >= signupDate.getTime();
+    });
+    const activeDays = eligibleKeys.filter(k => scansByDate[k]?.length > 0).length;
+    const consistency = eligibleKeys.length > 0 ? Math.round((activeDays / eligibleKeys.length) * 100) : 0;
 
     const safeCount = scans.filter(s => s.verdict === 'safe').length;
     const cautionCount = scans.filter(s => s.verdict === 'caution').length;
