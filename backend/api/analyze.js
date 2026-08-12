@@ -17,9 +17,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'No text provided for analysis' });
   }
 
-  // 1. Payload limits
-  if (text.length > 5000) {
-    return res.status(400).json({ error: 'Payload too large. Maximum 5000 characters allowed.' });
+  // 1. Payload limits (Upgraded to 15000 for large vision OCR outputs)
+  if (text.length > 15000) {
+    return res.status(400).json({ error: 'Payload too large. Maximum 15000 characters allowed.' });
   }
 
   // 2. Optional Authentication Verification (allows guest scans as well)
