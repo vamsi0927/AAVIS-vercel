@@ -162,25 +162,7 @@ export default function ScanScreen({ navigation }: any) {
     );
   }
 
-  const handleBarcodeScanned = async ({ type, data }: { type: string, data: string }) => {
-    if (scanned || loading || previewImageUrl || reviewingText) return;
-    setScanned(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    
-    setLoading(true);
-    setOcrPercent(25);
-    setOcrProgress(`Found product code: ${data}`);
 
-    // Open Food Facts API is removed per requirements. Prompt manual label scanning.
-    setTimeout(() => {
-      setLoading(false);
-      setScanned(false);
-      Alert.alert(
-        'Barcode Scanner Disabled',
-        'Barcode database lookup is disabled. Please scan the ingredients and nutrition labels directly for a full AI analysis.'
-      );
-    }, 800);
-  };
 
   const pickImage = async () => {
     try {
@@ -852,10 +834,6 @@ export default function ScanScreen({ navigation }: any) {
               facing="back"
               ref={cameraRef}
               onCameraReady={() => setCameraReady(true)}
-              barcodeScannerSettings={{
-                barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e", "qr"],
-              }}
-              onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
             />
           </View>
           
