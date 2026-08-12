@@ -125,26 +125,19 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
       options: { temperature: isChat ? 0.7 : 0.1, num_ctx: 8192 }
     });
 
-    let response: any = null;
-    try {
-      response = await fetch('http://localhost:11434/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: ollamaBody,
-      })
-      .catch(() => fetch('http://10.0.2.2:11434/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: ollamaBody,
-      }))
-      .catch(() => fetch(getApiUrl('/api/analyze'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      }));
-    } catch (e) {
-      console.warn('[Ollama Mobile] Fetch network error:', e);
-    }
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) authHeaders['Authorization'] = `Bearer ${token}`;
+
+    let response: any = await fetch(getApiUrl(endpoint), {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(body),
+    }).catch(err => {
+      console.warn('[Mobile AI] Primary fetch failed:', err);
+      return null;
+    });
 
     if (response && response.ok) {
       const data = await response.json();

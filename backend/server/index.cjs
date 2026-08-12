@@ -716,7 +716,7 @@ app.post('/api/ocr', async (req, res) => {
   if (apiKey) {
     try {
       console.log(`[Server] Processing OCR request via Gemini API, mode: ${mode}`);
-      const model = 'gemini-1.5-flash';
+      const model = 'gemini-3.1-flash-lite';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
       let prompt = "Read this nutrition label carefully. Extract BOTH the nutrient names on the left and their corresponding numeric values on the right. Format each line as 'Nutrient Name: Value'. Do not skip the nutrient names. Preserve all text exactly.";
@@ -979,7 +979,7 @@ app.post('/api/chat', async (req, res) => {
         }
       };
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),

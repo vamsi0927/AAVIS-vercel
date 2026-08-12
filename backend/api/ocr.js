@@ -15,24 +15,24 @@ export default async function handler(req, res) {
   const { image, mode = 'ingredients' } = req.body;
   if (!image) return res.status(400).json({ error: 'No image provided' });
 
-  // Authentication Verification
+  // Optional Authentication Verification
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
-  }
-  
-  const token = authHeader.split(' ')[1];
-  const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-  
-  if (authError || !user) {
-    return res.status(401).json({ error: 'Unauthorized: Invalid session' });
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    if (token && token !== 'undefined' && token !== 'null') {
+      try {
+        await supabaseAdmin.auth.getUser(token);
+      } catch (err) {
+        console.warn('[Vercel API] Token validation warning:', err.message);
+      }
+    }
   }
 
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (apiKey) {
     try {
       console.log(`[Vercel API] Processing OCR request via Gemini API, mode: ${mode}`);
-      const model = 'gemini-1.5-flash';
+      const model = 'gemini-3.1-flash-lite';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
       let prompt = "Read this nutrition label carefully. Extract BOTH the nutrient names on the left and their corresponding numeric values on the right. Format each line as 'Nutrient Name: Value'. Do not skip the nutrient names. Preserve all text exactly.";
