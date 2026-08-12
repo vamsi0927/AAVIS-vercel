@@ -406,7 +406,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     setState((prev) => {
       const updatedScans = prev.scans.map(scan => {
         if (!scan.product) return scan;
-        const newScore = computeHealthScore(scan.product, profile);
+        const newScore = computeHealthScore(scan.product, profile, scan.score);
         return {
           ...scan,
           score: newScore.score,

@@ -134,6 +134,71 @@ export default function ProfileScreen() {
   const activeAllergens: string[] = profile?.allergens || [];
   const activeConditions: string[] = profile?.conditions || [];
 
+  const getPersonalizedInsights = () => {
+    const insights = [];
+    const activeConditionsList = editData.conditions || profile?.conditions || [];
+    const activeAllergensList = editData.allergens || profile?.allergens || [];
+    const diet = editData.diet || profile?.diet || 'None';
+
+    if (activeConditionsList.some((c: string) => c.toLowerCase() === 'diabetes' || c.toLowerCase() === 'diabetic')) {
+      insights.push({
+        id: 'diabetes',
+        icon: '⚠️',
+        title: 'Diabetic Precaution',
+        desc: 'Keep an eye on "hidden sugars" like Maltodextrin and High Fructose Corn Syrup in packaged snacks.',
+        color: colors.brandHazardous,
+      });
+    }
+
+    if (activeAllergensList.length > 0) {
+      insights.push({
+        id: 'allergens',
+        icon: '🛡️',
+        title: 'Active Allergen Filters',
+        desc: `We are scanning all ingredients for ${activeAllergensList.join(', ')}.`,
+        color: colors.brandPrimary,
+      });
+    }
+
+    if (diet === 'Vegan') {
+      insights.push({
+        id: 'vegan',
+        icon: '💡',
+        title: 'Vegan Tip',
+        desc: 'Watch out for E120 (Carmine), which is derived from insects and is not vegan.',
+        color: colors.brandSafe,
+      });
+    } else if (diet === 'Vegetarian') {
+      insights.push({
+        id: 'veg',
+        icon: 'ℹ️',
+        title: 'Vegetarian Check',
+        desc: 'We automatically flag hidden animal-derived additives like gelatin or certain emulsifiers.',
+        color: '#60a5fa',
+      });
+    } else if (diet === 'Non-Vegetarian') {
+      insights.push({
+        id: 'nonveg',
+        icon: 'ℹ️',
+        title: 'Non-Vegetarian Profile',
+        desc: 'We will focus on flagging harmful additives, artificial colors, and your specific allergens.',
+        color: '#f87171',
+      });
+    }
+
+    if (insights.length === 0) {
+      insights.push({
+        id: 'general',
+        icon: '💡',
+        title: 'Smart Scanning',
+        desc: 'Update your health conditions or allergies in settings to get personalized warnings and tips.',
+        color: colors.brandPrimary,
+      });
+    }
+
+    return insights;
+  };
+
   const totalScans = scans.length;
   const avgScore = totalScans > 0
     ? Math.round(scans.reduce((a, s) => a + s.score, 0) / totalScans)
@@ -479,6 +544,37 @@ export default function ProfileScreen() {
             </View>
           )}
         </GlassCard>
+
+        {/* ── Personalized Insights ────────────────────────────────────── */}
+        {!isEditing && (
+          <View style={{ marginTop: 16 }}>
+            <Text style={[styles.cardTitle, { marginLeft: 4, marginBottom: 12 }]}>PERSONALIZED INSIGHTS</Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 12, paddingHorizontal: 4 }}
+            >
+              {getPersonalizedInsights().map((insight) => (
+                <View 
+                  key={insight.id} 
+                  style={[
+                    styles.insightCard, 
+                    { 
+                      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+                      borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                    }
+                  ]}
+                >
+                  <View style={styles.insightHeader}>
+                    <Text style={styles.insightIcon}>{insight.icon}</Text>
+                    <Text style={styles.insightTitle}>{insight.title}</Text>
+                  </View>
+                  <Text style={styles.insightDesc}>{insight.desc}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         {/* Spacer for floating button */}
         <View style={{ height: 100 }} />
@@ -828,6 +924,31 @@ const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontWeight: '500',
     color: colors.textSecondary,
     paddingVertical: 8,
+  },
+  insightCard: {
+    width: 265,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  insightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  insightIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  insightTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  insightDesc: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    lineHeight: 18,
   },
   chipInactive: {
     backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',

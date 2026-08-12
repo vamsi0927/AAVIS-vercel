@@ -81,13 +81,29 @@ CRITICAL INSTRUCTIONS:
 11. RETURN ONLY VALID JSON. No markdown, no backticks, no explanation.`;
 
 
-// Helper to call Ollama directly with fallback
+// ─── Client-side OCR Normalization (mirrors server-side) ──────────
+// Applied before submission so the backend receives cleaner text.
+function normalizeOcrText(rawText: string): string {
+  if (!rawText) return rawText;
+  let t = rawText;
+  t = t.replace(/(\d)O(\d)/g, '$10$2');
+  t = t.replace(/(\d)O(g|ml|mg|kcal|kJ)/gi, '$10$2');
+  t = t.replace(/\bl(\d)/g, '1$1');
+  t = t.replace(/\bl\.(\d)/g, '1.$1');
+  t = t.replace(/\bS(\d)(g|ml|mg|kcal|kJ)\b/gi, '5$1$2');
+  t = t.replace(/(\d)I(\d)/g, '$11$2');
+  t = t.replace(/(\d)A(\d)/g, '$14$2');
+  t = t.replace(/\bINS\s*-?\s*(\d{3,4}[a-zA-Z]?)\b/gi, 'E$1');
+  return t;
+}
+
+// Helper to route to the Aavis Express server (which handles Ollama internally)
 async function callBackend(endpoint: string, body: object): Promise<any> {
   const text = (body as any).text || (body as any).message;
   const isChat = endpoint === '/api/chat';
   const history = (body as any).history || [];
 
-  console.log('[Ollama Mobile] Routing request to local Ollama server...');
+  console.log('[Aavis Mobile] Routing request to Express server...');
   try {
     const messages: { role: string; content: string }[] = [];
 
@@ -102,33 +118,26 @@ async function callBackend(endpoint: string, body: object): Promise<any> {
     }
 
     const ollamaBody = JSON.stringify({
-      model: 'llama3.2',
+      model: 'llama3.2:1b',
       messages,
       stream: false,
       format: isChat ? undefined : 'json',
       options: { temperature: isChat ? 0.7 : 0.1, num_ctx: 8192 }
     });
 
-    let response: any = null;
-    try {
-      response = await fetch('http://localhost:11434/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: ollamaBody,
-      })
-      .catch(() => fetch('http://10.0.2.2:11434/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: ollamaBody,
-      }))
-      .catch(() => fetch(getApiUrl('/api/analyze'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      }));
-    } catch (e) {
-      console.warn('[Ollama Mobile] Fetch network error:', e);
-    }
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) authHeaders['Authorization'] = `Bearer ${token}`;
+
+    let response: any = await fetch(getApiUrl(endpoint), {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(body),
+    }).catch(err => {
+      console.warn('[Mobile AI] Primary fetch failed:', err);
+      return null;
+    });
 
     if (response && response.ok) {
       const data = await response.json();
@@ -165,16 +174,20 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     return null;
   };
 
+  const nutritionSkipped = rawText ? (rawText.includes('Nutrition scan was skipped') || rawText.includes('Nutrition scan not performed') || rawText.includes('(Nutrition scan not performed)')) : false;
+
   const rawNutrients = {
     unit: parsed.nutritionUnit || null,
     calories: getNutrient('calories'),
     sugar: getNutrient('sugar'),
+    addedSugar: typeof parsed.nutrients?.addedSugar === 'number' ? parsed.nutrients.addedSugar : null,
     sodium: getNutrient('sodium'),
     fat: getNutrient('fat'),
     satFat: getNutrient('satFat'),
     protein: getNutrient('protein'),
     fiber: getNutrient('fiber'),
     carbs: getNutrient('carbs'),
+    _skipped: nutritionSkipped || undefined
   };
 
   const normalizeECode = (str: any) => {
@@ -231,13 +244,17 @@ export async function analyzeMultiStepScan(
   
   const profileContext = `Age: ${profile.age}, Diet: ${profile.diet}, Allergies: ${profile.allergens.join(', ')}, Conditions: ${profile.conditions.join(', ')}`;
   
-  let combinedText = `INGREDIENTS SCAN TEXT:\n${ingredientsText}\n\n`;
-  if (nutritionText) {
-    combinedText += `NUTRITION FACTS SCAN TEXT:\n${nutritionText}\n\n`;
+  // Apply client-side OCR normalization before sending to backend
+  const normalizedIngredients = normalizeOcrText(ingredientsText);
+  const normalizedNutrition = nutritionText ? normalizeOcrText(nutritionText) : null;
+
+  let combinedText = `INGREDIENTS SCAN TEXT:\n${normalizedIngredients}\n\n`;
+  if (normalizedNutrition) {
+    combinedText += `NUTRITION FACTS SCAN TEXT:\n${normalizedNutrition}\n\n`;
   }
 
-  const prompt = `${TEXT_ANALYSIS_PROMPT.replace('{PROFILE_CONTEXT}', profileContext)}\n\n${combinedText}`;
-  const parsed = await callBackend('/api/analyze', { text: prompt });
+  // Send to Express backend (which runs the full hybrid pipeline)
+  const parsed = await callBackend('/api/analyze', { text: combinedText });
 
   onProgress?.('Generating Health Insights...', 95);
   const getArray = (val: any) => Array.isArray(val) ? val : (typeof val === 'string' ? [val] : []);
@@ -264,7 +281,9 @@ export async function analyzeTextWithAi(
   onProgress?.('Analyzing with Aavis AI...', 25);
 
   const profileContext = `Age: ${profile.age}, Diet: ${profile.diet}, Allergies: ${profile.allergens.join(', ')}, Conditions: ${profile.conditions.join(', ')}`;
-  const text = `Product Name: ${productName}\nIngredients/Details: ${ingredientsText}\n\n${TEXT_ANALYSIS_PROMPT.replace('{PROFILE_CONTEXT}', profileContext)}`;
+  // Normalize OCR text before sending
+  const normalizedText = normalizeOcrText(ingredientsText);
+  const text = `Product Name: ${productName}\nIngredients/Details: ${normalizedText}\nUser Profile: ${profileContext}`;
   
   const parsed = await callBackend('/api/analyze', { text });
   onProgress?.('Finalizing results...', 95);

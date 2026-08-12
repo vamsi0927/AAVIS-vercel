@@ -31,7 +31,7 @@ import { supabase } from '../lib/supabase';
 import { getThemeColors } from '../lib/theme';
 import { useAppContext } from '../context/AppContext';
 import { getApiUrl } from '../lib/apiConfig';
-import { analyzeMultiStepScan } from '../lib/aiAnalysis';
+import { analyzeMultiStepScan, isValidFoodLabelText } from '../lib/aiAnalysis';
 
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -41,79 +41,9 @@ import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const VIEWFINDER_SIZE = 280;
 
-const TEXT_ANALYSIS_PROMPT = `Analyze this food label text as a professional nutrition expert.
-Return a concise JSON object with the following structure:
-{
-  "productName": "string - common name (Look for largest/topmost text. If unknown, infer e.g. 'Instant Noodles', 'Processed Snack')",
-  "brand": "string - brand name (Look for brand logo text)",
-  "productType": "Whole Food | Beverage | Snack | Dairy | Bakery | Breakfast Food | Protein Supplement | Confectionery | Sauce & Condiment | Cooking Oil & Fat | Ready Meal | Plant-Based Alternative | General Food",
-  "servingSize": "string - e.g. '28g', '1 scoop (30g)', '200ml' (Extract any serving size, portion size, or reference amount. Null if missing.)",
-  "nutritionUnit": "string - e.g. 'per 100g', 'per serving', 'per 20g' (Exactly as written above the nutrition column)",
-  "ingredients": ["array of ingredients - PRIORITIZE risky/processed items first in the list"],
-  "nutrients": {
-    "calories": number or null,
-    "sugar": number or null,
-    "sodium": number or null,
-    "fat": number or null,
-    "satFat": number or null,
-    "protein": number or null,
-    "fiber": number or null,
-    "carbs": number or null
-  },
-  "additives": ["array of E-codes found"],
-  "additiveDetails": {
-    "E_CODE": {
-      "name": "Common Name",
-      "function": "Purpose (e.g., Emulsifier)",
-      "healthExplanation": "Consumer-friendly health impact (MUST explain every single additive found)",
-      "hazard": "safe | caution | hazardous"
-    }
-  },
-  "ingredientDetails": {
-    "INGREDIENT_NAME": {
-      "hazard": "safe | mild | caution | harmful | hazardous",
-      "explanation": "short human-readable explanation (MUST explain every single ingredient found in the list)"
-    }
-  },
-  "dimensions": {
-    "ingredientSafety": { "score": 0, "justification": "string" },
-    "nutritionalQuality": { "score": 0, "justification": "string" },
-    "processingLevel": { "score": 0, "justification": "string" },
-    "nutrientDensity": { "score": 0, "justification": "string" },
-    "energyDensity": { "score": 0, "justification": "string" },
-    "wholeFoodContent": { "score": 0, "justification": "string" },
-    "functionalHealthImpact": { "score": 0, "justification": "string" }
-  },
-  "finalScore": 0,
-  "overallAssessment": "string",
-  "allergens": ["array of detected allergens"],
-  "mainConcerns": ["array of 2-3 short human-readable health risks"],
-  "majorBenefits": ["array of 2-3 short human-readable health benefits"],
-  "dietAdvice": "A strict, brutally honest, conversational 2-line verdict acting as a human nutrition expert explaining exactly why it is safe or hazardous",
-  "aiSummary": "short funny AI roast line (Indian context)"
-}
+// Note: All AI prompting is handled server-side in the hybrid pipeline.
+// ScanScreen sends only raw OCR label text to /api/analyze.
 
-CRITICAL INSTRUCTIONS:
-1. Product Detection: Carefully identify the product name and brand. If OCR is messy, use context to infer a reasonable product type rather than 'Unknown'.
-2. Ingredient Prioritization: List harmful additives, refined oils, and processed sugars AT THE BEGINNING of the 'ingredients' array.
-3. NEVER skip difficult or long ingredient names.
-4. Normalize INS: Convert any "INS XXX" codes found on the label directly into European "E XXX" codes (e.g. INS 471 -> E471) in both the ingredients list and additives list to maintain global consistency.
-5. Identify hidden names for sugar (maltodextrin, dextrose, syrups) and flag them as "caution" or "harmful".
-6. E-codes or INS codes must be parsed accurately into additiveDetails (EVERY additive must have details).
-7. Treat "Vegetable Oil (Edible Vegetable Oil, Palm Oil, Palmolein)" as "harmful" due to saturated fats and processing.
-8. Identify UPF (Ultra Processed Food) markers.
-9. Match against profile: {PROFILE_CONTEXT}. Warn strongly if allergens or conditions are triggered!
-   IMPORTANT MAPPING: Do not just check the condition name; MAP conditions to specific ingredients! For example:
-   - Diabetes -> Check for added sugar, total sugar, glycemic impact, refined carbs.
-   - Hypertension -> Check for sodium, sodium-based additives.
-   - High Cholesterol -> Check for saturated fat, trans fat.
-   - Kidney Disease (CKD) -> Check for sodium, potassium, phosphorus.
-   - Celiac Disease -> Check for gluten-containing ingredients.
-   - Gout -> Check for high-purine ingredients and sugary beverages.
-   - Lactose Intolerance -> Check for milk, whey, casein, lactose.
-   - Sesame Allergy -> Check for sesame, sesame oil, tahini.
-   Apply this level of deep ingredient mapping to ALL conditions and allergens the user has!
-`;
 
 export default function ScanScreen({ navigation }: any) {
   const { theme, profile, addScan } = useAppContext();
@@ -349,6 +279,14 @@ export default function ScanScreen({ navigation }: any) {
 
       const extractedText = await runOCR(cropResult.base64, previewMode);
       
+      const validation = isValidFoodLabelText(
+        extractedText, 
+        previewMode === 'general' ? 'general' : (previewMode === 'nutrition' ? 'nutrition' : 'ingredients')
+      );
+      if (!validation.valid) {
+        throw new Error(validation.reason);
+      }
+      
       setOcrPercent(100);
       setTimeout(() => {
         setLoading(false);
@@ -415,6 +353,15 @@ export default function ScanScreen({ navigation }: any) {
           score: aiResult.finalScore,
           verdict: aiResult.finalScore !== undefined ? (aiResult.finalScore < 40 ? 'hazardous' : aiResult.finalScore < 70 ? 'caution' : 'safe') : 'caution',
         };
+      }
+
+      const skippedNutrition = promptText.includes('Nutrition scan not performed') || promptText.includes('Nutrition scan was skipped') || promptText.includes('(Nutrition scan not performed)');
+      if (skippedNutrition) {
+        if (!analysisJson.nutrients) analysisJson.nutrients = {};
+        analysisJson.nutrients._skipped = true;
+        if (analysisJson.product?.nutrients) {
+          analysisJson.product.nutrients._skipped = true;
+        }
       }
 
       let finalScanId = `scan_${Date.now()}`;
@@ -505,21 +452,15 @@ export default function ScanScreen({ navigation }: any) {
     }, 400);
 
     try {
-      const profileContext = `Age: ${profile?.age || '--'}, Diet: ${profile?.diet || 'None'}, Allergies: ${(profile?.allergens || []).join(', ')}, Conditions: ${(profile?.conditions || []).join(', ')}`;
-      
-      let combinedText = `INGREDIENTS SCAN TEXT:\n${ingText}\n\n`;
-      if (nutText) {
-        combinedText += `NUTRITION FACTS SCAN TEXT:\n${nutText}\n\n`;
-      } else {
-        combinedText += `(Note: Nutrition scan was skipped. Use ingredients for analysis.)\n\n`;
-      }
-
-      const prompt = `${TEXT_ANALYSIS_PROMPT.replace('{PROFILE_CONTEXT}', profileContext)}\n\n${combinedText}`;
+      // Send raw OCR text to the new hybrid server pipeline.
+      // The server handles all prompting, extraction, validation, and scoring.
+      const profileCtx = `User Profile: Age: ${profile?.age || '--'}, Diet: ${profile?.diet || 'None'}, Allergies: ${(profile?.allergens || []).join(', ')}, Conditions: ${(profile?.conditions || []).join(', ')}`;
+      const combinedText = `${profileCtx}\n\nINGREDIENTS SCAN TEXT:\n${ingText}\n\n` + (nutText ? `NUTRITION FACTS SCAN TEXT:\n${nutText}\n\n` : '(Nutrition scan not performed)\n');
       
       clearInterval(progressInterval);
       setOcrPercent(95);
       
-      await runAnalysisBackend(prompt, 'Scanned Product');
+      await runAnalysisBackend(combinedText, 'Scanned Product');
     } catch (e: any) {
       clearInterval(progressInterval);
       setLoading(false);

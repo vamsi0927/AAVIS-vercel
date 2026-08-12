@@ -26,7 +26,8 @@ export function ScanManual() {
       const aiResult = await analyzeTextWithAi(productName, ingredients, profile);
       
       // Score it based on user's health profile
-      const scoredResult = computeHealthScore(aiResult.product, profile);
+      const finalScore = aiResult.finalScore !== undefined ? aiResult.finalScore : undefined;
+      const scoredResult = computeHealthScore(aiResult.product, profile, finalScore);
       
       const scan: any = {
         id: `scan_${Date.now()}`,

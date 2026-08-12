@@ -133,7 +133,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.skipBtn} onPress={handleSkipPermissions}>
-              <Text style={styles.skipBtnText}>Not Now</Text>
+              <Text style={styles.skipBtnText}>Deny</Text>
             </TouchableOpacity>
           </View>
         </View>

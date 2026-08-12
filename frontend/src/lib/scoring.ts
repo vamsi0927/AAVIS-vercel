@@ -129,7 +129,8 @@ function detectKeywords(ingredients: string[], keywords: string[]): boolean {
 
 export function computeHealthScore(
   rawProduct: Product,
-  profile: UserProfile
+  profile: UserProfile,
+  overrideScore?: number
 ): Omit<ScanResult, 'id' | 'date'> {
   const warnings: string[] = [];
   const scoreReasons: string[] = [];
@@ -390,6 +391,9 @@ export function computeHealthScore(
 
   // ── FINAL CAP ─────────────────────────────────────────────────────────────
   score = Math.max(0, Math.min(100, Math.round(score)));
+  if (overrideScore !== undefined) {
+    score = overrideScore;
+  }
 
   // ── STEP 16: FINAL VERDICT ────────────────────────────────────────────────
   let verdict: HazardLevel = 'safe';

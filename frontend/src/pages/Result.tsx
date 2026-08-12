@@ -141,7 +141,8 @@ export function Result() {
       });
       
       // Still run local scoring for personalized warnings/structural checks
-      const updatedScoreData = computeHealthScore(aiResult.product, profile);
+      const aiScore = aiResult.finalScore !== undefined ? aiResult.finalScore : undefined;
+      const updatedScoreData = computeHealthScore(aiResult.product, profile, aiScore);
       
       setReanalyzeStatus('[REANALYZE] Updating Database...');
       

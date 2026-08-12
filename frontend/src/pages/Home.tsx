@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   Heart,
   AlertTriangle,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Camera
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
@@ -27,6 +28,35 @@ import logoImg from '../assets/logo.png';
 export function Home() {
   const navigate = useNavigate();
   const { profile, scans } = useAppContext();
+  const [showPermModal, setShowPermModal] = useState(false);
+
+  useEffect(() => {
+    const checkWebPermissions = () => {
+      try {
+        const seen = localStorage.getItem('aavis_perms_requested');
+        if (!seen) {
+          setTimeout(() => setShowPermModal(true), 800);
+        }
+      } catch (_) {}
+    };
+    checkWebPermissions();
+  }, []);
+
+  const handleAllowWebPermissions = async () => {
+    localStorage.setItem('aavis_perms_requested', '1');
+    setShowPermModal(false);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach(track => track.stop());
+    } catch (err) {
+      console.warn('Camera access request denied or failed:', err);
+    }
+  };
+
+  const handleDenyWebPermissions = () => {
+    localStorage.setItem('aavis_perms_requested', '1');
+    setShowPermModal(false);
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const recentScans = scans.slice(0, 2);
@@ -94,13 +124,6 @@ export function Home() {
             </div>
             
             <div className="flex items-center gap-2">
-              <button data-testid='btn-home-1'
-                onClick={() => navigate('/search')}
-                aria-label="Search"
-                className="p-2.5 text-content-secondary hover:text-white rounded-xl bg-white/5 border border-white/5 transition-colors">
-                <SearchIcon className="w-4 h-4" />
-              </button>
-
               <button data-testid='btn-home-2'
                 onClick={() => navigate('/settings')}
                 aria-label="Settings"
@@ -312,10 +335,75 @@ export function Home() {
 
           </div>
 
-        </div>
       </div>
 
+      <AnimatePresence>
+        {showPermModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] bg-navy-950/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-navy-900 border border-white/10 rounded-3xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-full blur-2xl -mr-8 -mt-8" />
+              
+              <div className="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center mb-5 mx-auto border border-brand-primary/20">
+                <span className="text-3xl">📸</span>
+              </div>
 
+              <h3 className="text-xl font-display font-black text-white text-center mb-2">
+                Allow Access
+              </h3>
+              <p className="text-content-secondary text-sm text-center mb-6 leading-relaxed">
+                AAVIS needs access to your camera and file library to scan food ingredients and nutrition labels.
+              </p>
+
+              <div className="space-y-4 mb-6">
+                <div className="flex gap-4 items-start p-3 bg-white/5 rounded-2xl border border-white/5">
+                  <div className="p-2 bg-brand-safe/10 rounded-xl text-brand-safe shrink-0 border border-brand-safe/20">
+                    <Camera className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white leading-tight">Camera</h4>
+                    <p className="text-[11px] text-content-secondary mt-0.5">Scan food labels in real time using your camera.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 items-start p-3 bg-white/5 rounded-2xl border border-white/5">
+                  <div className="p-2 bg-brand-primary/10 rounded-xl text-brand-primary shrink-0 border border-brand-primary/20">
+                    <ImageIcon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white leading-tight">Gallery / Files</h4>
+                    <p className="text-[11px] text-content-secondary mt-0.5">Upload existing screenshots or photos of food labels.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleAllowWebPermissions}
+                  className="w-full bg-brand-primary hover:bg-brand-primary-hover text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg transition-colors text-sm"
+                >
+                  Allow Access
+                </button>
+                <button
+                  onClick={handleDenyWebPermissions}
+                  className="w-full bg-transparent hover:bg-white/5 text-content-secondary hover:text-white font-bold py-3.5 px-4 rounded-2xl transition-colors text-sm"
+                >
+                  Deny
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

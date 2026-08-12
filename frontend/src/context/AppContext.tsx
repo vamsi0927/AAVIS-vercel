@@ -401,7 +401,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       // Recalculate historical scans based on the new profile
       const updatedScans = prev.scans.map(scan => {
         if (!scan.product) return scan;
-        const newScore = computeHealthScore(scan.product, profile);
+        const newScore = computeHealthScore(scan.product, profile, scan.score);
         return {
           ...scan,
           score: newScore.score,

@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, Alert, Switch } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { Moon, Camera, Trash2, Shield, FileText, UserX, HelpCircle, Mail, Info, LogOut, ChevronRight } from 'lucide-react-native';
+import { Moon, Trash2, Shield, FileText, UserX, HelpCircle, Mail, Info, LogOut, ChevronRight } from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
 import { getThemeColors } from '../lib/theme';
-import FloatingAIBubble from '../components/FloatingAIBubble';
+import { supabase } from '../lib/supabase';
+import { getApiUrl } from '../lib/apiConfig';
 
 export function SettingsScreen({ navigation }: any) {
   const { theme, setTheme, clearHistory, logout } = useAppContext();
@@ -36,10 +37,38 @@ export function SettingsScreen({ navigation }: any) {
   const handleDeleteAccount = () => {
     Alert.alert(
       "Delete Account?",
-      "Are you absolutely sure you want to delete your account? This action is permanent and will delete all your data.",
+      "This will permanently delete your account and all your data. This cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => handleNotImplemented('Delete Account') }
+        {
+          text: "Delete Forever",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const { data: { session } } = await supabase.auth.getSession();
+              if (!session?.access_token) {
+                Alert.alert('Error', 'You must be logged in to delete your account.');
+                return;
+              }
+
+              const res = await fetch(getApiUrl('/api/auth/delete-account'), {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session.access_token}`,
+                },
+              });
+
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Failed to delete account');
+
+              await supabase.auth.signOut();
+              navigation.replace('Login');
+            } catch (err: any) {
+              Alert.alert('Error', err.message || 'Failed to delete account. Please try again.');
+            }
+          }
+        }
       ]
     );
   };
@@ -90,17 +119,6 @@ export function SettingsScreen({ navigation }: any) {
               trackColor={{ false: '#3f3f46', true: '#14b8a6' }} 
             />
           </View>
-
-          <TouchableOpacity 
-            style={styles.rowItem} 
-            onPress={() => handleNotImplemented('Camera Permissions')}
-          >
-            <View style={styles.rowLeft}>
-              <Camera size={20} color="#34d399" />
-              <Text style={styles.rowText}>Camera Permissions</Text>
-            </View>
-            <ChevronRight size={16} color={colors.textSecondary} />
-          </TouchableOpacity>
 
           <TouchableOpacity 
             style={[styles.rowItem, styles.lastRow]} 
@@ -194,7 +212,6 @@ export function SettingsScreen({ navigation }: any) {
         <Text style={styles.versionText}>Aavis Mobile 1.0.0</Text>
       </View>
     </ScrollView>
-    <FloatingAIBubble />
   </View>
   );
 }

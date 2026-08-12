@@ -262,7 +262,8 @@ export function Scan() {
         setOcrPercent(p);
       });
 
-      const scoreResult = computeHealthScore(result.product, profile);
+      const finalScore = result.finalScore !== undefined ? result.finalScore : undefined;
+      const scoreResult = computeHealthScore(result.product, profile, finalScore);
       
       // Add imageUrl to product if we have an ingredientsImage
       if (ingredientsImage) {
