@@ -287,59 +287,28 @@ export default function ScanScreen({ navigation }: any) {
     }
   };
 
-  const runAnalysisBackend = async (promptText: string, defaultName: string, ingText: string, nutText: string | null) => {
+  const runAnalysisBackend = async (promptText: string, defaultName: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      let analysisJson: any = null;
+      const response = await fetch(getApiUrl('/api/analyze'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ text: promptText }),
+      });
 
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout limit
-
-        const analysisRes = await fetch(getApiUrl('/api/analyze'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ text: promptText }),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-
-        if (analysisRes.ok) {
-          analysisJson = await analysisRes.json();
-        }
-      } catch (err) {
-        console.log('[ScanScreen] Backend fetch failed or timed out, falling back to local analysis engine');
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => '');
+        throw new Error(`Server Error (${response.status}): ${errorText || 'Failed to generate health report.'}`);
       }
 
-      if (!analysisJson) {
-        const aiResult = await analyzeMultiStepScan(ingText || promptText, nutText, profile);
-        analysisJson = {
-          productName: aiResult.product.name,
-          brand: aiResult.product.brand,
-          productType: aiResult.product.productType,
-          servingSize: aiResult.product.servingSize,
-          ingredients: aiResult.product.ingredients,
-          nutrients: aiResult.product.nutrients,
-          additives: aiResult.product.additives,
-          additiveDetails: aiResult.product.dynamicAdditives,
-          ingredientDetails: aiResult.product.dynamicIngredients,
-          dimensions: aiResult.aiDimensions,
-          finalScore: aiResult.finalScore,
-          overallAssessment: aiResult.overallAssessment,
-          allergens: aiResult.product.allergens,
-          mainConcerns: aiResult.mainConcerns,
-          majorBenefits: aiResult.majorBenefits,
-          dietAdvice: aiResult.dietAdvice,
-          aiSummary: aiResult.aiSummary,
-          product: aiResult.product,
-          score: aiResult.finalScore,
-          verdict: aiResult.finalScore !== undefined ? (aiResult.finalScore < 40 ? 'hazardous' : aiResult.finalScore < 70 ? 'caution' : 'safe') : 'caution',
-        };
+      const analysisJson = await response.json();
+      if (!analysisJson || typeof analysisJson !== 'object') {
+        throw new Error('Server returned invalid data format.');
       }
 
       const skippedNutrition = promptText.includes('Nutrition scan not performed') || promptText.includes('Nutrition scan was skipped') || promptText.includes('(Nutrition scan not performed)');
@@ -447,7 +416,7 @@ export default function ScanScreen({ navigation }: any) {
       clearInterval(progressInterval);
       setOcrPercent(95);
       
-      await runAnalysisBackend(combinedText, 'Scanned Product', ingText, nutText);
+      await runAnalysisBackend(combinedText, 'Scanned Product');
     } catch (e: any) {
       clearInterval(progressInterval);
       setLoading(false);

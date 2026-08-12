@@ -22,18 +22,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Payload too large. Maximum 15000 characters allowed.' });
   }
 
-  // 2. Optional Authentication Verification (allows guest scans as well)
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1];
-    if (token && token !== 'undefined' && token !== 'null') {
-      try {
-        await supabaseAdmin.auth.getUser(token);
-      } catch (err) {
-        console.warn('[Vercel API] Token validation warning:', err.message);
-      }
-    }
-  }
+
 
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
