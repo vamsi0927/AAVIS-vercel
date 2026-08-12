@@ -28,6 +28,6 @@ export function isAavisAIConfigured(): boolean {
 export const isGeminiConfigured = isAavisAIConfigured;
 
 export function getApiUrl(path: string): string {
-  return `https://aavis-backend.onrender.com${path}`;
+  return `https://aavis.vercel.app${path}`;
 }
 
