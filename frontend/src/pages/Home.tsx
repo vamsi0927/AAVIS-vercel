@@ -27,7 +27,7 @@ import logoImg from '../assets/logo.png';
 
 export function Home() {
   const navigate = useNavigate();
-  const { profile, scans } = useAppContext();
+  const { profile, scans, setCameraPermission } = useAppContext();
   const [showPermModal, setShowPermModal] = useState(false);
 
   useEffect(() => {
@@ -48,13 +48,16 @@ export function Home() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       stream.getTracks().forEach(track => track.stop());
+      setCameraPermission('granted');
     } catch (err) {
       console.warn('Camera access request denied or failed:', err);
+      setCameraPermission('denied');
     }
   };
 
   const handleDenyWebPermissions = () => {
     localStorage.setItem('aavis_perms_requested', '1');
+    setCameraPermission('denied');
     setShowPermModal(false);
   };
   const containerRef = useRef<HTMLDivElement>(null);

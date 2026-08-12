@@ -22,7 +22,8 @@ export default function HomeScreen() {
   useEffect(() => {
     const checkPermissions = async () => {
       try {
-        const seen = await AsyncStorage.getItem('aavis_perms_requested');
+        const key = profile?.email ? `aavis_perms_requested_${profile.email}` : 'aavis_perms_requested';
+        const seen = await AsyncStorage.getItem(key);
         if (!seen) {
           // Small delay so the home screen fully renders first
           setTimeout(() => setShowPermModal(true), 800);
@@ -30,11 +31,12 @@ export default function HomeScreen() {
       } catch (_) {}
     };
     checkPermissions();
-  }, []);
+  }, [profile?.email]);
 
   const handleGrantPermissions = async () => {
     setShowPermModal(false);
-    await AsyncStorage.setItem('aavis_perms_requested', '1');
+    const key = profile?.email ? `aavis_perms_requested_${profile.email}` : 'aavis_perms_requested';
+    await AsyncStorage.setItem(key, '1');
     // Ask camera permission
     await ExpoCamera.requestCameraPermissionsAsync();
     // Ask media library / gallery permission
@@ -43,7 +45,8 @@ export default function HomeScreen() {
 
   const handleSkipPermissions = async () => {
     setShowPermModal(false);
-    await AsyncStorage.setItem('aavis_perms_requested', '1');
+    const key = profile?.email ? `aavis_perms_requested_${profile.email}` : 'aavis_perms_requested';
+    await AsyncStorage.setItem(key, '1');
   };
 
   const recentScans = scans.slice(0, 2);

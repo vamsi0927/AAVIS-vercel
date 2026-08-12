@@ -219,6 +219,32 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     }
   };
 
+  // ── Supabase Realtime Listener for Scans ──
+  useEffect(() => {
+    if (!supabaseUserId || !isSupabaseConfigured()) return;
+
+    const channel = supabase
+      .channel(`realtime-scans-${supabaseUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'scans',
+          filter: `user_id=eq.${supabaseUserId}`,
+        },
+        async (payload) => {
+          console.log('Realtime change detected in scans table:', payload);
+          await loadCloudScans();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabaseUserId]);
+
   // ── Load scans from cloud ──
   const loadCloudScans = async (signal?: AbortSignal) => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -233,7 +259,15 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           const currentProfile = prev.profile;
           
           const cloudConverted: ScanResult[] = cloudScans.map(cs => {
-            const ar = cs.analysis_results || cs.gemini_analysis || {};
+            const rawNutrientsVal = cs.nutrients || {};
+            const ar = cs.analysis_results || cs.gemini_analysis || {
+              dimensions: rawNutrientsVal._aiDimensions,
+              overallAssessment: rawNutrientsVal._overallAssessment,
+              majorBenefits: rawNutrientsVal._majorBenefits,
+              scoreBreakdown: rawNutrientsVal._scoreBreakdown,
+              mainConcerns: rawNutrientsVal._mainConcerns || [],
+              ...rawNutrientsVal
+            };
             
             const product = {
               id: cs.id,

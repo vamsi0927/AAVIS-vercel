@@ -37,16 +37,16 @@ export default function ResultScreen({ route, navigation }: any) {
       name: data.product_name ?? 'Scanned Product',
       brand: data.brand ?? 'Unknown Brand',
       imageEmoji: '🤖',
-      ingredients: data.ingredients_text ? data.ingredients_text.split(',').map((i: string) => i.trim()) : [],
+      ingredients: Array.isArray(data.ingredients) ? data.ingredients : (data.ingredients_text ? data.ingredients_text.split(',').map((i: string) => i.trim()) : (typeof data.ingredients === 'string' ? data.ingredients.split(',').map((i: string) => i.trim()) : [])),
       nutrients: data.nutrients ?? {},
-      additives: data.additives ?? [],
-      allergens: data.allergens_detected ?? [],
+      additives: Array.isArray(data.additives) ? data.additives : (data.additives_text ? data.additives_text.split(',').map((i: string) => i.trim()) : []),
+      allergens: Array.isArray(data.allergens_detected) ? data.allergens_detected : (Array.isArray(data.allergens) ? data.allergens : []),
     },
     aiSummary: data.ai_summary ?? '',
     dietAdvice: data.diet_advice ?? '',
     mainConcerns: data.main_concerns ?? [],
     majorBenefits: data.major_benefits ?? [],
-    aiDimensions: data.nutrients?._aiDimensions ?? {},
+    aiDimensions: data.aiDimensions ?? data.product?.nutrients?._aiDimensions ?? data.nutrients?._aiDimensions ?? {},
   };
 
   const product = scan.product;
@@ -198,7 +198,7 @@ export default function ResultScreen({ route, navigation }: any) {
         ) : null}
 
         {/* AI Dimensions Breakdown */}
-        {scan.aiDimensions ? (
+        {scan.aiDimensions && Object.keys(scan.aiDimensions).length > 0 ? (
           <View style={styles.dimensionsContainer}>
             <Text style={styles.dimensionsHeader}>HEALTH DIMENSIONS BREAKDOWN</Text>
             {Object.entries(scan.aiDimensions).map(([dim, val]: [string, any], idx) => {

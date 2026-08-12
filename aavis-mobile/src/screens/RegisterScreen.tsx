@@ -426,6 +426,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 12,
+    width: '100%',
   },
   buttonDisabled: {
     opacity: 0.5,

@@ -33,6 +33,11 @@ export function Scan() {
   const [ocrPercent, setOcrPercent] = useState(0);
   const [scanError, setScanError] = useState<string | null>(null);
   
+  const handleCameraError = useCallback((err: string | DOMException) => {
+    console.warn("Webcam error:", err);
+    setScanError("Camera access is blocked or not available. Please verify browser camera permissions in your address bar.");
+  }, []);
+
   const barcodeInputRef = useRef<HTMLInputElement>(null);
 
   const handleBarcodeUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -749,6 +754,7 @@ export function Scan() {
                 screenshotFormat="image/jpeg"
                 videoConstraints={{ facingMode: { ideal: 'environment' } }}
                 onUserMedia={() => setCameraReady(true)}
+                onUserMediaError={handleCameraError}
                 className="absolute inset-0 w-full h-full object-cover"
               />
               {!cameraReady && (
