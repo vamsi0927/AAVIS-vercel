@@ -27,8 +27,13 @@ import logoImg from '../assets/logo.png';
 
 export function Home() {
   const navigate = useNavigate();
-  const { profile, scans, setCameraPermission } = useAppContext();
+  const { profile, scans, setCameraPermission, loadCloudScans, syncProfileFromCloud } = useAppContext();
   const [showPermModal, setShowPermModal] = useState(false);
+
+  useEffect(() => {
+    loadCloudScans().catch(() => {});
+    syncProfileFromCloud().catch(() => {});
+  }, [loadCloudScans, syncProfileFromCloud]);
 
   useEffect(() => {
     const checkWebPermissions = () => {

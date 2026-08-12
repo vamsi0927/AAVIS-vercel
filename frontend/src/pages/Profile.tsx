@@ -19,7 +19,11 @@ const getConditionOptions = (gender: string) => {
 
 export function Profile() {
   const navigate = useNavigate();
-  const { profile, updateProfile, logout, bookmarkedProductIds = [], scans = [], toggleBookmark } = useAppContext();
+  const { profile, updateProfile, logout, bookmarkedProductIds = [], scans = [], toggleBookmark, syncProfileFromCloud } = useAppContext();
+  
+  React.useEffect(() => {
+    syncProfileFromCloud().catch(() => {});
+  }, [syncProfileFromCloud]);
   
   const [isEditing, setIsEditing] = useState(() => {
     const ts = sessionStorage.getItem('profile_draftTimestamp');

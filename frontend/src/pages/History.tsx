@@ -22,6 +22,10 @@ export function History() {
   const [selectedImageScan, setSelectedImageScan] = useState<ScanResult | null>(null);
   const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
 
+  useEffect(() => {
+    loadCloudScans().catch(() => {});
+  }, [loadCloudScans]);
+
   // Keyboard shortcut for ESC to close modals
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

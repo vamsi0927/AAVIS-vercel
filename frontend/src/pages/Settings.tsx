@@ -24,7 +24,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export function Settings() {
   const navigate = useNavigate();
-  const { profile, updateProfile, logout, clearHistory, scans, theme, setTheme, cameraPermission, setCameraPermission, supabaseUserId } = useAppContext();
+  const { profile, updateProfile, logout, clearHistory, scans, theme, setTheme, cameraPermission, setCameraPermission, supabaseUserId, syncProfileFromCloud } = useAppContext();
+  
+  React.useEffect(() => {
+    syncProfileFromCloud().catch(() => {});
+  }, [syncProfileFromCloud]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
 

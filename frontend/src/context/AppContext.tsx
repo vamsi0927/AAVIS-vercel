@@ -31,6 +31,7 @@ interface AppContextType extends AppState {
   supabaseUserId: string | null;
   loadCloudScans: () => Promise<void>;
   loadSavedMythsContext: () => Promise<void>;
+  syncProfileFromCloud: () => Promise<void>;
   saveMyth: (mythData: Omit<SavedMyth, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<SavedMyth | null>;
   removeSavedMyth: (mythId: string) => Promise<boolean>;
 }
@@ -687,6 +688,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         supabaseUserId,
         loadCloudScans,
         loadSavedMythsContext,
+        syncProfileFromCloud,
         saveMyth,
         removeSavedMyth
       }}>

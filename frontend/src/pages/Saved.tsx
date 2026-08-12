@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Search, Bookmark, SlidersHorizontal, Image as ImageIcon, X, Trash2, ExternalLink } from 'lucide-react';
 import { SAMPLE_PRODUCTS } from '../data/sampleProducts';
@@ -6,7 +6,11 @@ import { useAppContext } from '../context/AppContext';
 
 export function Saved() {
   const navigate = useNavigate();
-  const { bookmarkedProductIds, scans, toggleBookmark } = useAppContext();
+  const { bookmarkedProductIds, scans, toggleBookmark, loadCloudScans } = useAppContext();
+
+  useEffect(() => {
+    loadCloudScans().catch(() => {});
+  }, [loadCloudScans]);
   
   const [searchQuery, setSearchQuery] = useState('');
   
