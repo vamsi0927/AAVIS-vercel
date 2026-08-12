@@ -101,63 +101,31 @@ export interface AiAnalysisResult {
   rawResponse: any;
 }
 
-// ─── Helper: call Ollama directly with fallback ─────────────────
+// ─── Helper: call backend API ─────────────────────────────────────
 async function callBackend(endpoint: string, body: object): Promise<any> {
-  const text = (body as any).text || (body as any).message;
-  const isChat = endpoint === '/api/chat';
-  const history = (body as any).history || [];
-
-  console.log('[Ollama Web] Routing request to local Ollama server...');
-  try {
-    const messages: { role: string; content: string }[] = [];
-
-    if (isChat) {
-      messages.push({ role: 'system', content: 'You are Aavis, a helpful and slightly humorous AI nutrition assistant for an Indian health app.' });
-      for (const msg of history) {
-        messages.push({ role: msg.role === 'assistant' ? 'assistant' : 'user', content: msg.content });
-      }
-      messages.push({ role: 'user', content: text });
-    } else {
-      messages.push({ role: 'user', content: text });
-    }
-
-    let response: any = null;
-    try {
-      response = await fetch('http://localhost:11434/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'llama3.2',
-          messages,
-          stream: false,
-          format: isChat ? undefined : 'json',
-          options: { temperature: isChat ? 0.7 : 0.1, num_ctx: 8192 }
-        }),
-      });
-    } catch (e) {
-      console.warn('[Ollama Web] Direct fetch error:', e);
-    }
-
-    if (response && response.ok) {
-      const data = await response.json();
-      const textResponse = data.message?.content || '';
-
-      if (isChat) return { reply: textResponse };
-
-      let cleaned = textResponse.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
-      try {
-        return JSON.parse(cleaned);
-      } catch (e) {
-        const match = cleaned.match(/\{[\s\S]*\}/);
-        if (match) return JSON.parse(match[0]);
-      }
-    }
-  } catch (e: any) {
-    console.warn('[Ollama Web Error]:', e);
-    throw new Error(e.message || 'Connection Error: Failed to reach the Aavis AI Analysis Server.');
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+  
+  if (token) {
+    authHeaders['Authorization'] = `Bearer ${token}`;
   }
 
-  throw new Error('Aavis AI Server did not return a valid response. Please check your connection.');
+  const url = getApiUrl(endpoint);
+  console.log(`[AI Analysis Web] Routing request to: ${url}`);
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: authHeaders,
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData?.error || response.statusText);
+  }
+
+  return response.json();
 }
 
 // ─── Helper: build Product from parsed JSON ───────────────────────

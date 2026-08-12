@@ -6,7 +6,7 @@
   "homepage": "https://vamsi0927.github.io/AAVIS-vercel",
   "scripts": {
     "dev": "npm run dev --prefix frontend",
-    "build": "npm run build --prefix frontend && node -e \"const fs = require('fs'); if(fs.existsSync('dist')){fs.rmSync('dist', {recursive:true,force:true});} fs.renameSync('frontend/dist', 'dist');\"",
+    "build": "npm run build --prefix frontend",
     "lint": "npm run lint --prefix frontend",
     "preview": "npm run preview --prefix frontend",
     "server": "node backend/server/index.cjs",

@@ -2,8 +2,44 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
+
+// ─── SUPABASE ADMIN CLIENT ─────────────────────────────────────────
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+let supabaseAdmin = null;
+function getSupabaseAdmin() {
+  if (!supabaseAdmin) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error('Missing Supabase env vars');
+    supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+  }
+  return supabaseAdmin;
+}
+
+// ─── NODEMAILER (GMAIL) ────────────────────────────────────────────
+const GMAIL_USER = process.env.GMAIL_USER || 'aavis.support@gmail.com';
+const GMAIL_PASS = process.env.GMAIL_APP_PASSWORD || '';
+const mailTransport = nodemailer.createTransport({ service: 'gmail', auth: { user: GMAIL_USER, pass: GMAIL_PASS } });
+async function sendEmail({ to, subject, html }) {
+  return mailTransport.sendMail({ from: `AAVIS <${GMAIL_USER}>`, to, subject, html });
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─── IN-MEMORY RATE LIMITER (simple, per IP) ──────────────────────
+const rateLimitMap = new Map();
+function rateLimitCheck(ip, key, max, windowMs) {
+  const now = Date.now();
+  const k = `${ip}:${key}`;
+  const entry = rateLimitMap.get(k) || { count: 0, reset: now + windowMs };
+  if (now > entry.reset) { entry.count = 0; entry.reset = now + windowMs; }
+  entry.count++;
+  rateLimitMap.set(k, entry);
+  return entry.count <= max;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -51,25 +87,221 @@ function writeUsers(users) {
 
 // ─── AUTH ROUTES ──────────────────────────────────────────────────
 
-app.post('/api/signup', async (req, res) => {
-  const { username, password, name } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
-  const users = readUsers();
-  if (users.find((u) => u.username === username)) return res.status(400).json({ error: 'Username already exists' });
-  const hashedPassword = await bcrypt.hash(password, 10);
-  users.push({ username, password: hashedPassword, name });
-  writeUsers(users);
-  res.json({ success: true, message: 'User registered successfully' });
+// POST /api/auth/send-otp  — Register + send email OTP
+app.post('/api/auth/send-otp', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip || '127.0.0.1';
+  if (!rateLimitCheck(ip, 'auth', 5, 60000)) return res.status(429).json({ error: 'Too many requests. Please try again.' });
+
+  const { email, password, name } = req.body;
+  if (!email || !password || !name) return res.status(400).json({ error: 'Missing required fields' });
+
+  try {
+    const db = getSupabaseAdmin();
+    const cleanEmail = email.trim();
+    let userId, isNewUser = true;
+
+    const { data: userData, error: createError } = await db.auth.admin.createUser({
+      email: cleanEmail, password, email_confirm: false,
+      user_metadata: { name, signupSource: 'app' }
+    });
+
+    if (createError) {
+      if (!createError.message.toLowerCase().includes('already')) {
+        return res.status(400).json({ error: createError.message });
+      }
+      isNewUser = false;
+      const { data: { users } } = await db.auth.admin.listUsers();
+      const existing = users.find(u => u.email === cleanEmail);
+      if (!existing) return res.status(500).json({ error: 'Failed to locate account' });
+      userId = existing.id;
+      if (existing.email_confirmed_at) {
+        await sendEmail({ to: cleanEmail, subject: 'AAVIS Registration Attempt', html: '<p>You already have an AAVIS account. Please log in.</p>' }).catch(() => {});
+        return res.status(200).json({ message: 'Registration processed. Check your email.' });
+      }
+    } else {
+      userId = userData.user.id;
+    }
+
+    const rawOtp = crypto.randomInt(100000, 1000000).toString();
+    const hashedOtp = crypto.createHash('sha256').update(rawOtp).digest('hex');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+    await db.from('verification_tokens').delete().eq('user_id', userId);
+    const { error: dbError } = await db.from('verification_tokens').insert({ user_id: userId, hashed_token: hashedOtp, expires_at: expiresAt });
+    if (dbError) {
+      if (isNewUser && userId) await db.auth.admin.deleteUser(userId).catch(() => {});
+      return res.status(500).json({ error: 'Failed to generate verification code' });
+    }
+
+    await sendEmail({
+      to: cleanEmail,
+      subject: 'Verify your AAVIS Account',
+      html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2>Welcome to AAVIS, ${escapeHtml(name)}!</h2><p>Your verification code:</p><div style="background:#f3f4f6;padding:16px;font-size:32px;font-weight:bold;letter-spacing:6px;text-align:center;border-radius:8px;margin:20px 0">${rawOtp}</div><p style="color:#dc2626;font-weight:bold">Expires in 10 minutes.</p></div>`
+    });
+
+    return res.status(200).json({ message: 'Verification code sent.' });
+  } catch (err) {
+    console.error('[Auth] send-otp error:', err.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
-  const users = readUsers();
-  const user = users.find((u) => u.username === username);
-  if (!user) return res.status(400).json({ error: 'Invalid username or password' });
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ error: 'Invalid username or password' });
-  res.json({ success: true, user: { username: user.username, name: user.name } });
+// POST /api/auth/verify-otp  — Verify email OTP
+app.post('/api/auth/verify-otp', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip || '127.0.0.1';
+  if (!rateLimitCheck(ip, 'verify', 10, 60000)) return res.status(429).json({ error: 'Too many attempts. Please try again.' });
+
+  const { email, otp } = req.body;
+  if (!email || !otp) return res.status(400).json({ error: 'Missing email or OTP' });
+
+  try {
+    const db = getSupabaseAdmin();
+    const { data: { users } } = await db.auth.admin.listUsers();
+    const user = users.find(u => u.email === email.trim());
+    if (!user) return res.status(400).json({ error: 'Invalid verification attempt' });
+
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+    const { data: deleted, error: deleteError } = await db.from('verification_tokens')
+      .delete().eq('user_id', user.id).eq('hashed_token', hashedOtp)
+      .gte('expires_at', new Date().toISOString()).select();
+
+    if (deleteError || !deleted || deleted.length === 0)
+      return res.status(400).json({ error: 'Invalid or expired verification code' });
+
+    await db.auth.admin.updateUserById(user.id, { email_confirm: true });
+    return res.status(200).json({ message: 'Email verified successfully.' });
+  } catch (err) {
+    console.error('[Auth] verify-otp error:', err.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/auth/forgot-password  — Send password reset OTP
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip || '127.0.0.1';
+  if (!rateLimitCheck(ip, 'auth', 5, 60000)) return res.status(429).json({ error: 'Too many requests. Please try again.' });
+
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Missing email' });
+
+  try {
+    const db = getSupabaseAdmin();
+    const { data: { users } } = await db.auth.admin.listUsers();
+    const user = users.find(u => u.email === email.trim());
+    if (!user) return res.status(200).json({ message: 'If an account exists, a reset link has been sent.' });
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedToken = crypto.createHash('sha256').update(otpCode).digest('hex');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+    await db.from('password_reset_tokens').delete().eq('user_id', user.id);
+    const { error: dbError } = await db.from('password_reset_tokens').insert({ user_id: user.id, hashed_token: hashedToken, expires_at: expiresAt });
+    if (dbError) return res.status(500).json({ error: 'Failed to generate reset token' });
+
+    await sendEmail({
+      to: email,
+      subject: 'Your AAVIS Password Reset Code',
+      html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2>Password Reset</h2><p>Your reset code:</p><div style="background:#f3f4f6;padding:16px;font-size:32px;font-weight:bold;letter-spacing:6px;text-align:center;border-radius:8px;margin:20px 0">${otpCode}</div><p style="color:#dc2626;font-weight:bold">Expires in 10 minutes.</p></div>`
+    });
+
+    return res.status(200).json({ message: 'If an account exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error('[Auth] forgot-password error:', err.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/auth/verify-reset-otp  — Verify reset OTP and issue secure token
+app.post('/api/auth/verify-reset-otp', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip || '127.0.0.1';
+  if (!rateLimitCheck(ip, 'verify', 10, 60000)) return res.status(429).json({ error: 'Too many attempts. Please try again.' });
+
+  const { email, otp } = req.body;
+  if (!email || !otp) return res.status(400).json({ error: 'Missing email or OTP code' });
+
+  try {
+    const db = getSupabaseAdmin();
+    const { data: { users } } = await db.auth.admin.listUsers();
+    const user = users.find(u => u.email === email.trim());
+    if (!user) return res.status(400).json({ error: 'Invalid or expired OTP.' });
+
+    const hashedOtp = crypto.createHash('sha256').update(otp.trim()).digest('hex');
+    const { data: tokens, error: fetchError } = await db.from('password_reset_tokens')
+      .select('*').eq('user_id', user.id).eq('hashed_token', hashedOtp).single();
+
+    if (fetchError || !tokens) return res.status(400).json({ error: 'Invalid or expired OTP code.' });
+    if (new Date(tokens.expires_at) < new Date()) {
+      await db.from('password_reset_tokens').delete().eq('id', tokens.id);
+      return res.status(400).json({ error: 'This OTP has expired. Please request a new one.' });
+    }
+
+    await db.from('password_reset_tokens').delete().eq('id', tokens.id);
+
+    const secureToken = crypto.randomBytes(32).toString('hex');
+    const hashedSecureToken = crypto.createHash('sha256').update(secureToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+    await db.from('password_reset_tokens').insert({ user_id: user.id, hashed_token: hashedSecureToken, expires_at: expiresAt });
+
+    return res.status(200).json({ success: true, token: secureToken, uid: user.id });
+  } catch (err) {
+    console.error('[Auth] verify-reset-otp error:', err.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/auth/reset-password  — Set new password using secure token
+app.post('/api/auth/reset-password', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip || '127.0.0.1';
+  if (!rateLimitCheck(ip, 'auth', 5, 60000)) return res.status(429).json({ error: 'Too many requests. Please try again.' });
+
+  const { token, uid, newPassword } = req.body;
+  if (!token || !uid || !newPassword) return res.status(400).json({ error: 'Missing required fields' });
+
+  try {
+    const db = getSupabaseAdmin();
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const { data: tokenRow, error: fetchError } = await db.from('password_reset_tokens')
+      .select('*').eq('user_id', uid).eq('hashed_token', hashedToken).single();
+
+    if (fetchError || !tokenRow) return res.status(400).json({ error: 'Invalid or expired reset link.' });
+    if (new Date(tokenRow.expires_at) < new Date()) {
+      await db.from('password_reset_tokens').delete().eq('id', tokenRow.id);
+      return res.status(400).json({ error: 'This reset link has expired.' });
+    }
+
+    const { error: updateError } = await db.auth.admin.updateUserById(uid, { password: newPassword });
+    if (updateError) return res.status(500).json({ error: 'Failed to reset password.' });
+
+    await db.from('password_reset_tokens').delete().eq('id', tokenRow.id);
+    return res.status(200).json({ message: 'Password has been successfully reset.' });
+  } catch (err) {
+    console.error('[Auth] reset-password error:', err.message);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// DELETE /api/auth/delete-account  — Delete user account
+app.delete('/api/auth/delete-account', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip || '127.0.0.1';
+  if (!rateLimitCheck(ip, 'auth', 5, 60000)) return res.status(429).json({ error: 'Too many requests. Please try again.' });
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'Missing or invalid authorization header' });
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const db = getSupabaseAdmin();
+    const { data: { user }, error: userError } = await db.auth.getUser(token);
+    if (userError || !user) return res.status(401).json({ error: 'Invalid or expired session' });
+
+    const { error: deleteError } = await db.auth.admin.deleteUser(user.id);
+    if (deleteError) return res.status(500).json({ error: 'Failed to delete account.' });
+
+    return res.status(200).json({ success: true, message: 'Account successfully deleted.' });
+  } catch (err) {
+    console.error('[Auth] delete-account error:', err.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════

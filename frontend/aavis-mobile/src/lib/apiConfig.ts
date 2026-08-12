@@ -28,9 +28,9 @@ export function isAavisAIConfigured(): boolean {
 export const isGeminiConfigured = isAavisAIConfigured;
 
 export function getApiUrl(path: string): string {
-  // In production builds, use the live Vercel backend URL
+  // In production builds, use the live Render backend URL
   if (process.env.NODE_ENV === 'production') {
-    return `https://aavis.vercel.app${path}`;
+    return `https://aavis-backend.onrender.com${path}`;
   }
 
   // In development, try to connect to the developer's local machine running npm run server
