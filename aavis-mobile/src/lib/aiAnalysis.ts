@@ -174,6 +174,8 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     return null;
   };
 
+  const nutritionSkipped = rawText ? (rawText.includes('Nutrition scan was skipped') || rawText.includes('Nutrition scan not performed') || rawText.includes('(Nutrition scan not performed)')) : false;
+
   const rawNutrients = {
     unit: parsed.nutritionUnit || null,
     calories: getNutrient('calories'),
@@ -185,6 +187,7 @@ function buildProduct(parsed: any, fallbackName: string, emoji: string, rawText?
     protein: getNutrient('protein'),
     fiber: getNutrient('fiber'),
     carbs: getNutrient('carbs'),
+    _skipped: nutritionSkipped || undefined
   };
 
   const normalizeECode = (str: any) => {

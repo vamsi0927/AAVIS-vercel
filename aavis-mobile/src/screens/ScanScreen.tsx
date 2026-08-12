@@ -355,6 +355,15 @@ export default function ScanScreen({ navigation }: any) {
         };
       }
 
+      const skippedNutrition = promptText.includes('Nutrition scan not performed') || promptText.includes('Nutrition scan was skipped') || promptText.includes('(Nutrition scan not performed)');
+      if (skippedNutrition) {
+        if (!analysisJson.nutrients) analysisJson.nutrients = {};
+        analysisJson.nutrients._skipped = true;
+        if (analysisJson.product?.nutrients) {
+          analysisJson.product.nutrients._skipped = true;
+        }
+      }
+
       let finalScanId = `scan_${Date.now()}`;
       let created_at = new Date().toISOString();
 
