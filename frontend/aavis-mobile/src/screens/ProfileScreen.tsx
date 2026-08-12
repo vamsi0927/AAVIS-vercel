@@ -21,7 +21,7 @@ import {
 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useAppContext } from '../context/AppContext';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { getThemeColors } from '../lib/theme';
 import FloatingAIBubble from '../components/FloatingAIBubble';
@@ -44,7 +44,13 @@ const getDietEmoji = (diet?: string) => {
 
 export default function ProfileScreen() {
   const navigation = useNavigation<any>();
-  const { theme, profile, updateProfile, scans } = useAppContext();
+  const { theme, profile, updateProfile, scans, syncProfileFromCloud } = useAppContext();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      syncProfileFromCloud().catch(() => {});
+    }, [syncProfileFromCloud])
+  );
   const colors = getThemeColors(theme);
   const isDark = theme === 'dark';
   

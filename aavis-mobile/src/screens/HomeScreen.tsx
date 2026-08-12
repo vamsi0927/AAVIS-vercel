@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image,
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Search, Settings, ChevronRight, Clock, Image as ImageIcon, MessageSquare, Droplet, Camera, Image as GalleryIcon } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getThemeColors } from '../lib/theme';
 import FloatingAIBubble from '../components/FloatingAIBubble';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,7 +11,14 @@ import { Camera as ExpoCamera } from 'expo-camera';
 
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
-  const { profile, scans, theme } = useAppContext();
+  const { profile, scans, theme, loadCloudScans, syncProfileFromCloud } = useAppContext();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCloudScans().catch(() => {});
+      syncProfileFromCloud().catch(() => {});
+    }, [loadCloudScans, syncProfileFromCloud])
+  );
 
   const colors = getThemeColors(theme);
   const styles = getStyles(colors);

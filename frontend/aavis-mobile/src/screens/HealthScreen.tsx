@@ -26,6 +26,7 @@ import {
   Sparkles,
 } from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
+import { useFocusEffect } from '@react-navigation/native';
 import { getThemeColors } from '../lib/theme';
 import FloatingAIBubble from '../components/FloatingAIBubble';
 import { ScanResult } from '../lib/types';
@@ -57,7 +58,15 @@ function calcGrade(avg: number, total: number): string {
 }
 
 export default function HealthScreen({ navigation }: any) {
-  const { theme, scans } = useAppContext();
+  const { theme, scans, loadCloudScans, syncProfileFromCloud } = useAppContext();
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCloudScans().catch(() => {});
+      syncProfileFromCloud().catch(() => {});
+    }, [loadCloudScans, syncProfileFromCloud])
+  );
+
   const colors = getThemeColors(theme);
   const isDark = theme === 'dark';
 

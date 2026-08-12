@@ -675,6 +675,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
         supabaseUserId,
         loadCloudScans,
         loadSavedMythsContext,
+        syncProfileFromCloud,
         saveMyth,
         removeSavedMyth
       }}>

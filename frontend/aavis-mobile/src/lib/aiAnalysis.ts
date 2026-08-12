@@ -253,8 +253,10 @@ export async function analyzeMultiStepScan(
     combinedText += `NUTRITION FACTS SCAN TEXT:\n${normalizedNutrition}\n\n`;
   }
 
+  const prompt = `${TEXT_ANALYSIS_PROMPT.replace('{PROFILE_CONTEXT}', profileContext)}\n\n${combinedText}`;
+
   // Send to Express backend (which runs the full hybrid pipeline)
-  const parsed = await callBackend('/api/analyze', { text: combinedText });
+  const parsed = await callBackend('/api/analyze', { text: prompt });
 
   onProgress?.('Generating Health Insights...', 95);
   const getArray = (val: any) => Array.isArray(val) ? val : (typeof val === 'string' ? [val] : []);
@@ -281,11 +283,10 @@ export async function analyzeTextWithAi(
   onProgress?.('Analyzing with Aavis AI...', 25);
 
   const profileContext = `Age: ${profile.age}, Diet: ${profile.diet}, Allergies: ${profile.allergens.join(', ')}, Conditions: ${profile.conditions.join(', ')}`;
-  // Normalize OCR text before sending
-  const normalizedText = normalizeOcrText(ingredientsText);
-  const text = `Product Name: ${productName}\nIngredients/Details: ${normalizedText}\nUser Profile: ${profileContext}`;
+  const rawText = `Product Name: ${productName}\nIngredients/Details: ${normalizedText}`;
+  const prompt = `${TEXT_ANALYSIS_PROMPT.replace('{PROFILE_CONTEXT}', profileContext)}\n\n${rawText}`;
   
-  const parsed = await callBackend('/api/analyze', { text });
+  const parsed = await callBackend('/api/analyze', { text: prompt });
   onProgress?.('Finalizing results...', 95);
 
   const product = buildProduct(parsed, productName || 'Scanned Product', '📝', ingredientsText);

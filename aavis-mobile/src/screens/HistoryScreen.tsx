@@ -5,9 +5,16 @@ import { FileText, Calendar, ChevronRight, Search, Trash2 } from 'lucide-react-n
 import { getThemeColors } from '../lib/theme';
 import { deleteUserScan, deleteAllUserScans } from '../lib/supabaseService';
 import FloatingAIBubble from '../components/FloatingAIBubble';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function HistoryScreen({ navigation }: any) {
-  const { scans, bookmarkedProductIds, clearHistory, removeScan, restoreScans, supabaseUserId, theme } = useAppContext();
+  const { scans, bookmarkedProductIds, clearHistory, removeScan, restoreScans, supabaseUserId, theme, loadCloudScans } = useAppContext();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCloudScans().catch(() => {});
+    }, [loadCloudScans])
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'saved'>('all');
 
