@@ -405,5 +405,6 @@ export function Home() {
         )}
       </AnimatePresence>
     </div>
+  </div>
   );
 }
