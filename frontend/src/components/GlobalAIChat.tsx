@@ -28,7 +28,7 @@ export function GlobalAIChat() {
   // unless we're explicitly hiding it based on route
   const location = useLocation();
   const hideFabPaths = ['/login', '/register', '/forgot-password', '/setup-profile', '/verify-otp', '/reset-password'];
-  const shouldHide = hideFabPaths.includes(location.pathname);
+  const shouldHide = hideFabPaths.includes(location.pathname) || location.pathname.startsWith('/result');
 
   useEffect(() => {
     if (isOpen) {
