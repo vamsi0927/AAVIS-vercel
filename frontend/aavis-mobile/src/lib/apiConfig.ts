@@ -28,7 +28,7 @@ export function isAavisAIConfigured(): boolean {
 export const isGeminiConfigured = isAavisAIConfigured;
 
 export function getApiUrl(path: string): string {
-  let host = 'localhost';
+  let host = '172.23.30.184';
 
   // 1. Try to extract IP/domain from React Native's bundler scriptURL
   const scriptURL = NativeModules.SourceCode?.scriptURL || '';
