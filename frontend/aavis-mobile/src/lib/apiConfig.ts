@@ -28,26 +28,6 @@ export function isAavisAIConfigured(): boolean {
 export const isGeminiConfigured = isAavisAIConfigured;
 
 export function getApiUrl(path: string): string {
-  let host = '172.23.30.184';
-
-  // 1. Try to extract IP/domain from React Native's bundler scriptURL
-  const scriptURL = NativeModules.SourceCode?.scriptURL || '';
-  const match = scriptURL.match(/^https?:\/\/([^:\/\s]+)/);
-  if (match && match[1]) {
-    const parsedHost = match[1];
-    // Use it only if it is a local IP or localhost
-    if (parsedHost.match(/^\d+\.\d+\.\d+\.\d+$/) || parsedHost === 'localhost') {
-      host = parsedHost;
-    }
-  }
-
-  // 2. Emulator loopback fallbacks if resolved to localhost
-  if (host === 'localhost') {
-    if (Platform.OS === 'android') {
-      host = '10.0.2.2'; // Loopback to host machine
-    }
-  }
-
-  return `http://${host}:3002${path}`;
+  return `https://aavis.vercel.app${path}`;
 }
 
