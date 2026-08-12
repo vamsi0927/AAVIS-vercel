@@ -338,7 +338,6 @@ export default function ScanScreen({ navigation }: any) {
             verdict: analysisJson.verdict || 'caution',
             diet_advice: analysisJson.dietAdvice || '',
             ai_summary: analysisJson.aiSummary || '',
-            analysis_results: analysisJson,
             gemini_analysis: analysisJson
           }).select().single();
 
