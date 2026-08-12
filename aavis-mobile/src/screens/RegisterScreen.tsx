@@ -124,28 +124,30 @@ export default function RegisterScreen({ navigation }: any) {
 
     setIsLoading(true);
     try {
+      // Step 1: Verify the OTP code via our backend
       const res = await fetch(getApiUrl('/api/auth/verify-otp'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), token: code, type: 'signup' })
+        body: JSON.stringify({ email: email.trim(), otp: code })
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed');
 
-      const { session, error: authError } = await supabase.auth.setSession({
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
+      // Step 2: Now sign in with Supabase directly to get a real session
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
       });
 
-      if (authError || !session) {
+      if (authError || !authData.session) {
         throw new Error(authError?.message || 'Failed to authenticate after verification.');
       }
 
-      Alert.alert('Success', 'Account created successfully!');
+      Alert.alert('Welcome to AAVIS! 🎉', 'Your account has been created successfully!');
       navigation.replace('Onboarding');
     } catch (err: any) {
-      Alert.alert('Error', 'Verification failed. Please try again.');
+      Alert.alert('Verification Failed', err.message || 'Please try again.');
     } finally {
       setIsLoading(false);
     }

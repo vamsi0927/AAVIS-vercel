@@ -1,10 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Search, Settings, ChevronRight, Clock, Image as ImageIcon, MessageSquare, Droplet } from 'lucide-react-native';
+import { Search, Settings, ChevronRight, Clock, Image as ImageIcon, MessageSquare, Droplet, Camera, Image as GalleryIcon } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getThemeColors } from '../lib/theme';
 import FloatingAIBubble from '../components/FloatingAIBubble';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
+import { Camera as ExpoCamera } from 'expo-camera';
 
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
@@ -12,6 +15,36 @@ export default function HomeScreen() {
 
   const colors = getThemeColors(theme);
   const styles = getStyles(colors);
+  const isDark = theme === 'dark';
+
+  const [showPermModal, setShowPermModal] = useState(false);
+
+  useEffect(() => {
+    const checkPermissions = async () => {
+      try {
+        const seen = await AsyncStorage.getItem('aavis_perms_requested');
+        if (!seen) {
+          // Small delay so the home screen fully renders first
+          setTimeout(() => setShowPermModal(true), 800);
+        }
+      } catch (_) {}
+    };
+    checkPermissions();
+  }, []);
+
+  const handleGrantPermissions = async () => {
+    setShowPermModal(false);
+    await AsyncStorage.setItem('aavis_perms_requested', '1');
+    // Ask camera permission
+    await ExpoCamera.requestCameraPermissionsAsync();
+    // Ask media library / gallery permission
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
+  };
+
+  const handleSkipPermissions = async () => {
+    setShowPermModal(false);
+    await AsyncStorage.setItem('aavis_perms_requested', '1');
+  };
 
   const recentScans = scans.slice(0, 2);
   const totalScans = scans.length;
@@ -61,6 +94,51 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      {/* ── First-time Permissions Modal ── */}
+      <Modal visible={showPermModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: isDark ? '#0f1023' : '#fff' }]}>
+            {/* Gradient header bar */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalEmoji}>📸</Text>
+            </View>
+
+            <Text style={styles.modalTitle}>Allow Access</Text>
+            <Text style={styles.modalSubtitle}>
+              AAVIS needs access to your camera and photo library to scan food labels.
+            </Text>
+
+            <View style={styles.permRow}>
+              <View style={styles.permIcon}>
+                <Camera size={24} color="#14b8a6" />
+              </View>
+              <View style={styles.permText}>
+                <Text style={[styles.permTitle, { color: isDark ? '#fff' : '#111' }]}>Camera</Text>
+                <Text style={styles.permDesc}>Scan food labels in real time</Text>
+              </View>
+            </View>
+
+            <View style={[styles.permRow, { marginBottom: 28 }]}>
+              <View style={styles.permIcon}>
+                <GalleryIcon size={24} color="#818cf8" />
+              </View>
+              <View style={styles.permText}>
+                <Text style={[styles.permTitle, { color: isDark ? '#fff' : '#111' }]}>Photo Library</Text>
+                <Text style={styles.permDesc}>Upload existing label photos</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity style={styles.allowBtn} onPress={handleGrantPermissions}>
+              <Text style={styles.allowBtnText}>Allow Access</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.skipBtn} onPress={handleSkipPermissions}>
+              <Text style={styles.skipBtnText}>Not Now</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       {/* Background glow effect */}
       {theme === 'dark' && <View style={styles.glowTop} />}
@@ -566,5 +644,101 @@ const getStyles = (colors: any) => StyleSheet.create({
   },
   badgeTextHazardous: {
     color: '#ef4444',
+  },
+  // ── Permissions Modal ──
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 32,
+  },
+  modalCard: {
+    width: '92%',
+    borderRadius: 28,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  modalHeader: {
+    backgroundColor: '#14b8a6',
+    paddingVertical: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalEmoji: {
+    fontSize: 44,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: colors.textPrimary,
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 8,
+    paddingHorizontal: 24,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    paddingHorizontal: 24,
+    marginBottom: 24,
+  },
+  permRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 16,
+  },
+  permIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: colors.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  permText: {
+    flex: 1,
+  },
+  permTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  permDesc: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  allowBtn: {
+    marginHorizontal: 24,
+    marginBottom: 12,
+    backgroundColor: '#14b8a6',
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  allowBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+  skipBtn: {
+    marginHorizontal: 24,
+    marginBottom: 24,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  skipBtnText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
