@@ -219,122 +219,78 @@ export async function preprocessImageTwoPasses(
  * nutrition tables. Falls back to PSM 11 (sparse text) only when PSM 6
  * yields fewer than 30 characters.
  */
+/**
+ * Sends the image to the Gemini Vision backend for extraction.
+ * Falls back to Tesseract only if the backend call fails.
+ */
 export async function optimizedOCR(
   file: File,
   mode: 'ingredients' | 'nutrition' | 'general' = 'general',
   onProgress?: (percent: number) => void
 ): Promise<string> {
+  onProgress?.(10);
+
+  // ── Step 1: Try Gemini Vision via backend /api/ocr ──────────────
   try {
-    const base64Image = await new Promise<string>((resolve, reject) => {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          const base64 = reader.result.split(',')[1];
-          resolve(base64);
-        } else {
-          reject(new Error('Failed to convert image to base64'));
-        }
-      };
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
 
-    onProgress?.(60);
+    onProgress?.(30);
 
-    let prompt = "Read this nutrition label carefully. Extract BOTH the nutrient names on the left and their corresponding numeric values on the right. Format each line as 'Nutrient Name: Value'. Do not skip the nutrient names. Preserve all text exactly.";
-    if (mode === 'ingredients') {
-      prompt = "You are an expert OCR engine specializing in food packaging ingredient lists. Scan this image of the ingredients list and extract the raw ingredients text. Extract the complete list of ingredients, including brackets, percentages (e.g. 4.3%), and additive codes/names. DO NOT summarize, format as lists, or drop any text. Extract every single word in the ingredients section exactly as printed on the label. Preserve the natural layout of the text.";
-    } else if (mode === 'general') {
-      prompt = "You are a high-fidelity OCR engine. Read all text from this food packaging label, including ingredient lists, nutrition facts, brand names, product names, and other details. Extract all visible text exactly as printed. Do not skip any sections. Preserve the natural layout of the text.";
-    }
+    const apiUrl = typeof window !== 'undefined' && window.location.hostname === 'aavis.vercel.app'
+      ? '/api/ocr'
+      : 'https://aavis.vercel.app/api/ocr';
 
-    const ollamaBody = JSON.stringify({
-      model: 'llama3.2',
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-          images: [base64Image]
-        }
-      ],
-      stream: false,
-      options: {
-        temperature: 0.1
-      }
-    });
-
-    const response = await fetch('http://localhost:11434/api/chat', {
+    const res = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: ollamaBody,
+      body: JSON.stringify({ image: dataUrl, mode }),
     });
 
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Ollama Vision HTTP Error');
-    }
+    onProgress?.(80);
 
-    const text = data.message?.content;
-    if (!text) {
-      throw new Error('Empty response from Ollama');
+    if (res.ok) {
+      const data = await res.json();
+      const text = data.text?.trim() || '';
+      if (text.length > 10) {
+        console.log(`[OCR] Gemini Vision → ${text.length} chars`);
+        onProgress?.(100);
+        return text;
+      }
+    } else {
+      const err = await res.json().catch(() => ({}));
+      console.warn('[OCR] Gemini Vision backend error:', err.error || res.statusText);
     }
-
-    console.log(`[OCR] Ollama Vision → ${text.length} chars`);
-    onProgress?.(100);
-    return text.trim();
   } catch (e) {
-    console.warn('[OCR] Ollama Vision failed, falling back to Tesseract...', e);
+    console.warn('[OCR] Gemini Vision call failed, falling back to Tesseract...', e);
   }
 
-  // FALLBACK TO TESSERACT IF OLLAMA IS NOT AVAILABLE
-  console.log('[OCR] Lightly enhancing image...');
+  // ── Step 2: Tesseract Fallback ────────────────────────────────────
+  console.log('[OCR] Falling back to Tesseract...');
   let enhanced: File;
   try {
     enhanced = await preprocessImageForOCR(file);
-  } catch (err) {
-    console.warn('[OCR] Preprocessing failed, using original image', err);
+  } catch {
     enhanced = file;
   }
 
-  console.log('[OCR] Running Tesseract PSM SINGLE_BLOCK (6) for uniform text reading...');
-  const worker3 = await Tesseract.createWorker('eng', undefined, {
+  const worker = await Tesseract.createWorker('eng', undefined, {
     logger: (m: Tesseract.LoggerMessage) => {
       if (m.status === 'recognizing text') {
         onProgress?.(Math.round(m.progress * 100));
       }
     },
   });
+  await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK });
+  const result = await worker.recognize(enhanced);
+  await worker.terminate();
 
-  await worker3.setParameters({
-    tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-  });
-
-  const result3 = await worker3.recognize(enhanced);
-  await worker3.terminate();
-
-  const text3 = result3.data.text.trim();
-  console.log(`[OCR] PSM SINGLE_BLOCK → ${text3.length} chars`);
-
-  if (text3.length >= 30) return text3;
-
-  console.log('[OCR] Short result — retrying with PSM SPARSE_TEXT (11)...');
-  const worker4 = await Tesseract.createWorker('eng', undefined, {
-    logger: (m: Tesseract.LoggerMessage) => {
-      if (m.status === 'recognizing text') {
-        onProgress?.(Math.round(m.progress * 100));
-      }
-    },
-  });
-
-  await worker4.setParameters({
-    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
-  });
-
-  const result4 = await worker4.recognize(enhanced);
-  await worker4.terminate();
-
-  const text4 = result4.data.text.trim();
-  console.log(`[OCR] PSM SINGLE_COLUMN → ${text4.length} chars`);
-
-  return text4.length > text3.length ? text4 : text3;
+  const text = result.data.text.trim();
+  console.log(`[OCR] Tesseract → ${text.length} chars`);
+  return text;
 }
+
