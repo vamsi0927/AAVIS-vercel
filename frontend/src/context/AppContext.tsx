@@ -348,8 +348,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     try {
       const cloudScans = await getUserScans(userId, 100);
       if (signal?.aborted) return;
-      if (cloudScans.length > 0) {
-        setState(prev => {
+      setState(prev => {
           const currentProfile = prev.profile;
           
           const cloudConverted: ScanResult[] = cloudScans.map(cs => {
@@ -418,23 +417,12 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
           const cloudIds = new Set(cloudConverted.map(c => c.id));
           const cloudBookmarkedIds = cloudScans.filter(cs => (cs as any).is_bookmarked).map(cs => cs.id);
 
-          const seen = new Set();
-          const deduped = cloudConverted.filter(scan => {
-            const isBookmarked = cloudBookmarkedIds.includes(scan.id);
-            if (isBookmarked) return true;
-
-            const timeKey = scan.date.substring(0, 13);
-            const key = `${scan.product?.name}-${timeKey}`;
-            if (seen.has(key)) return false;
-            seen.add(key);
-            return true;
-          }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          const deduped = cloudConverted.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
           const allBookmarks = cloudBookmarkedIds;
 
           return { ...prev, scans: deduped, scanCount: deduped.length, bookmarkedProductIds: allBookmarks };
         });
-      }
     } catch (e) {
       console.error('Error fetching cloud scans:', e);
     }
