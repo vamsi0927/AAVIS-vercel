@@ -95,6 +95,13 @@ export function History() {
     setScanToDelete(null);
     setIsDeleting(true);
 
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idToDelete);
+    if (!isUuid) {
+      setIsDeleting(false);
+      toast.success("Scan deleted successfully.");
+      return;
+    }
+
     try {
       const success = await deleteUserScan(idToDelete, supabaseUserId);
       if (success) {

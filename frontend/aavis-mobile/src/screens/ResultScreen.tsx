@@ -12,6 +12,7 @@ export default function ResultScreen({ route, navigation }: any) {
   const { data } = route.params || {};
   const { bookmarkedProductIds, toggleBookmark, theme } = useAppContext();
   const [expandedIngredient, setExpandedIngredient] = useState<string | null>(null);
+  const [showAllIngredients, setShowAllIngredients] = useState(false);
 
   const colors = getThemeColors(theme);
   const styles = getStyles(colors);
@@ -303,6 +304,95 @@ export default function ResultScreen({ route, navigation }: any) {
         </View>
       ) : null}
 
+      {/* Ingredients List */}
+      <View style={styles.cardSection}>
+        <Text style={styles.cardHeader}>Ingredients Breakdown</Text>
+        {product.ingredients.length === 0 ? (
+          <Text style={styles.emptyText}>No ingredients detected.</Text>
+        ) : (
+          <View style={styles.ingredientsGrid}>
+            {(() => {
+              const displayed = showAllIngredients 
+                ? product.ingredients 
+                : product.ingredients.slice(0, 6);
+              const hasMore = product.ingredients.length > 6 && !showAllIngredients;
+
+              return (
+                <>
+                  {displayed.map((ingr: string, idx: number) => {
+                    const level = getIngredientLevel(ingr);
+                    const explanation = getIngredientExplanation(ingr);
+                    const isExpanded = expandedIngredient === ingr;
+                    const levelColor = getVerdictChipColor(level);
+
+                    return (
+                      <View 
+                        key={idx} 
+                        style={isExpanded ? { width: '100%', marginBottom: 4 } : { marginRight: 8, marginBottom: 4 }}
+                      >
+                        <TouchableOpacity 
+                          style={[styles.ingredientChip, { borderColor: `${levelColor}40`, backgroundColor: `${levelColor}10` }]}
+                          onPress={() => explanation && setExpandedIngredient(isExpanded ? null : ingr)}
+                        >
+                          <View style={[styles.dot, { backgroundColor: levelColor }]} />
+                          <Text style={[styles.ingredientChipText, { color: levelColor }]}>{ingr}</Text>
+                          {explanation ? (
+                            isExpanded ? <ChevronUp color={colors.textSecondary} size={12} /> : <ChevronDown color={colors.textSecondary} size={12} />
+                          ) : null}
+                        </TouchableOpacity>
+                        {isExpanded && explanation ? (
+                          <View style={[styles.ingredientExplanation, { borderLeftColor: levelColor, backgroundColor: colors.isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.02)' }]}>
+                            <Text style={styles.explanationText}>{explanation}</Text>
+                          </View>
+                        ) : null}
+                      </View>
+                    );
+                  })}
+                  
+                  {hasMore && (
+                    <TouchableOpacity 
+                      style={[styles.ingredientChip, { borderColor: colors.border, backgroundColor: colors.isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)', marginBottom: 4 }]}
+                      onPress={() => setShowAllIngredients(true)}
+                    >
+                      <Text style={[styles.ingredientChipText, { color: colors.textSecondary }]}>..</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              );
+            })()}
+          </View>
+        )}
+      </View>
+
+      {/* Additives Section */}
+      {(product.additives && product.additives.length > 0) ? (
+        <View style={styles.cardSection}>
+          <Text style={styles.cardHeader}>Additives & E-Codes</Text>
+          {product.additives.map((code: string, idx: number) => {
+            const localDbAdditive = ADDITIVES_DB[code];
+            const name = localDbAdditive?.name || code;
+            const hazard = localDbAdditive?.hazard || 'caution';
+            const healthExplanation = localDbAdditive?.healthExplanation || 'Industrial food additive.';
+            const functionName = localDbAdditive?.function || 'Food Additive';
+            const hazardColor = getVerdictChipColor(hazard);
+
+            return (
+              <View key={idx} style={[styles.additiveCard, { borderLeftColor: hazardColor }]}>
+                <View style={styles.additiveHeader}>
+                  <Text style={styles.additiveCode}>{code}</Text>
+                  <View style={[styles.hazardBadge, { backgroundColor: `${hazardColor}1F` }]}>
+                    <Text style={[styles.hazardBadgeText, { color: hazardColor }]}>{hazard}</Text>
+                  </View>
+                </View>
+                <Text style={styles.additiveName}>{name}</Text>
+                <Text style={styles.additiveFunction}>{functionName}</Text>
+                <Text style={styles.additiveExplanation}>{healthExplanation}</Text>
+              </View>
+            );
+          })}
+        </View>
+      ) : null}
+
       {/* ── Nutritional Facts or Key Health Concerns (if skipped) ── */}
       {showNutritionTable ? (
         (() => {
@@ -467,72 +557,6 @@ export default function ResultScreen({ route, navigation }: any) {
           </View>
         ) : null
       )}
-
-      {/* Ingredients List */}
-      <View style={styles.cardSection}>
-        <Text style={styles.cardHeader}>Ingredients Breakdown</Text>
-        {product.ingredients.length === 0 ? (
-          <Text style={styles.emptyText}>No ingredients detected.</Text>
-        ) : (
-          <View style={styles.ingredientsGrid}>
-            {product.ingredients.map((ingr: string, idx: number) => {
-              const level = getIngredientLevel(ingr);
-              const explanation = getIngredientExplanation(ingr);
-              const isExpanded = expandedIngredient === ingr;
-              const levelColor = getVerdictChipColor(level);
-
-              return (
-                <View key={idx} style={styles.ingredientWrapper}>
-                  <TouchableOpacity 
-                    style={[styles.ingredientChip, { borderColor: `${levelColor}40`, backgroundColor: `${levelColor}10` }]}
-                    onPress={() => explanation && setExpandedIngredient(isExpanded ? null : ingr)}
-                  >
-                    <View style={[styles.dot, { backgroundColor: levelColor }]} />
-                    <Text style={[styles.ingredientChipText, { color: levelColor }]}>{ingr}</Text>
-                    {explanation ? (
-                      isExpanded ? <ChevronUp color={colors.textSecondary} size={12} /> : <ChevronDown color={colors.textSecondary} size={12} />
-                    ) : null}
-                  </TouchableOpacity>
-                  {isExpanded && explanation ? (
-                    <View style={[styles.ingredientExplanation, { borderLeftColor: levelColor, backgroundColor: colors.isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.02)' }]}>
-                      <Text style={styles.explanationText}>{explanation}</Text>
-                    </View>
-                  ) : null}
-                </View>
-              );
-            })}
-          </View>
-        )}
-      </View>
-
-      {/* Additives Section */}
-      {(product.additives && product.additives.length > 0) ? (
-        <View style={styles.cardSection}>
-          <Text style={styles.cardHeader}>Additives & E-Codes</Text>
-          {product.additives.map((code: string, idx: number) => {
-            const localDbAdditive = ADDITIVES_DB[code];
-            const name = localDbAdditive?.name || code;
-            const hazard = localDbAdditive?.hazard || 'caution';
-            const healthExplanation = localDbAdditive?.healthExplanation || 'Industrial food additive.';
-            const functionName = localDbAdditive?.function || 'Food Additive';
-            const hazardColor = getVerdictChipColor(hazard);
-
-            return (
-              <View key={idx} style={[styles.additiveCard, { borderLeftColor: hazardColor }]}>
-                <View style={styles.additiveHeader}>
-                  <Text style={styles.additiveCode}>{code}</Text>
-                  <View style={[styles.hazardBadge, { backgroundColor: `${hazardColor}1F` }]}>
-                    <Text style={[styles.hazardBadgeText, { color: hazardColor }]}>{hazard}</Text>
-                  </View>
-                </View>
-                <Text style={styles.additiveName}>{name}</Text>
-                <Text style={styles.additiveFunction}>{functionName}</Text>
-                <Text style={styles.additiveExplanation}>{healthExplanation}</Text>
-              </View>
-            );
-          })}
-        </View>
-      ) : null}
 
       <TouchableOpacity style={styles.dashboardButton} onPress={() => navigation.navigate('Home')}>
         <Text style={styles.dashboardButtonText}>Back to Dashboard</Text>

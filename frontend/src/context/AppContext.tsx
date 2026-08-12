@@ -219,7 +219,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
     }
   };
 
-  // ── Supabase Realtime Listener for Scans ──
+  // ── Supabase Realtime Listener for Scans, Profiles & Myths ──
   useEffect(() => {
     if (!supabaseUserId || !isSupabaseConfigured()) return;
 
@@ -240,10 +240,103 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
       )
       .subscribe();
 
+    const profileChannel = supabase
+      .channel(`realtime-profile-${supabaseUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${supabaseUserId}`,
+        },
+        async (payload) => {
+          console.log('Realtime change detected in profiles table:', payload);
+          await syncProfileFromCloud();
+        }
+      )
+      .subscribe();
+
+    const mythsChannel = supabase
+      .channel(`realtime-myths-${supabaseUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'saved_myths',
+          filter: `user_id=eq.${supabaseUserId}`,
+        },
+        async (payload) => {
+          console.log('Realtime change detected in saved_myths table:', payload);
+          await loadSavedMythsContext();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(profileChannel);
+      supabase.removeChannel(mythsChannel);
     };
   }, [supabaseUserId]);
+
+  const syncProfileFromCloud = async () => {
+    if (!supabaseUserId || !isSupabaseConfigured()) return;
+    try {
+      const { data: dbUser, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', supabaseUserId)
+        .single();
+      
+      if (dbUser && !error) {
+        const cloudProfile = {
+          name: dbUser.name || '',
+          email: dbUser.email || '',
+          avatarUrl: dbUser.avatar_url || undefined,
+          age: dbUser.age || '',
+          gender: dbUser.gender || 'Prefer not to say',
+          height: dbUser.height || '',
+          weight: dbUser.weight || '',
+          activityLevel: dbUser.activity_level || 'Moderately Active',
+          diet: dbUser.diet_type || 'None',
+          allergens: dbUser.allergens || [],
+          conditions: dbUser.health_conditions || [],
+          fitnessGoals: dbUser.fitness_goals || [],
+        };
+        
+        setState(prev => {
+          if (JSON.stringify(prev.profile) === JSON.stringify(cloudProfile)) {
+            return prev;
+          }
+          
+          const updatedScans = prev.scans.map(scan => {
+            if (!scan.product) return scan;
+            const newScore = computeHealthScore(scan.product, cloudProfile, scan.score);
+            return {
+              ...scan,
+              score: newScore.score,
+              verdict: newScore.verdict,
+              warnings: newScore.warnings,
+              scoreReasons: newScore.scoreReasons,
+              mainConcerns: newScore.mainConcerns,
+              personalizedWarnings: newScore.personalizedWarnings,
+              dietAdvice: newScore.dietAdvice || scan.dietAdvice
+            };
+          });
+          
+          return {
+            ...prev,
+            profile: cloudProfile,
+            scans: updatedScans
+          };
+        });
+      }
+    } catch (err) {
+      console.error('Error syncing profile from cloud:', err);
+    }
+  };
 
   // ── Load scans from cloud ──
   const loadCloudScans = async (signal?: AbortSignal) => {
@@ -333,7 +426,7 @@ export function AppProvider({ children }: {children: React.ReactNode;}) {
             return true;
           }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-          const allBookmarks = Array.from(new Set([...prev.bookmarkedProductIds, ...cloudBookmarkedIds]));
+          const allBookmarks = cloudBookmarkedIds;
 
           return { ...prev, scans: deduped, scanCount: deduped.length, bookmarkedProductIds: allBookmarks };
         });

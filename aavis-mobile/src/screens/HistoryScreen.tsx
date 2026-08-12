@@ -59,7 +59,8 @@ export default function HistoryScreen({ navigation }: any) {
           onPress: async () => {
             const previousScans = [...scans];
             removeScan(scanId);
-            if (supabaseUserId) {
+            const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(scanId);
+            if (supabaseUserId && isUuid) {
               try {
                 const success = await deleteUserScan(scanId, supabaseUserId);
                 if (!success) {
